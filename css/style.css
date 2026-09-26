@@ -10,8 +10,6 @@
   --font: 'Noto Sans Thai', system-ui, sans-serif;
   --hand: 'Mali', 'Noto Sans Thai', sans-serif; /* ลายมือบนกระดาน (ชั่วคราว) */
   --gutter: clamp(16px, 3vw, 48px);
-  --tl-right: clamp(14px, 3.5vw, 60px);
-  --tl-w: clamp(14px, 1.6vw, 26px);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -101,18 +99,59 @@ body.touch #play-btn { display: block; }
 body.playing #play-btn { background: var(--purple-2); color: var(--white); border-color: var(--purple-2); }
 body.playing .stage { touch-action: none; }
 
-#timeline {
-  position: fixed; z-index: 40;
-  right: var(--tl-right); top: calc(var(--gutter) + 66px);
-  width: var(--tl-w); height: calc(100vh - var(--gutter) - 66px - 6vh);
-  opacity: 0; visibility: hidden; pointer-events: none;
+/* ---------- NAV BAR ด้านบน (เส้นทาง) ---------- */
+#topnav {
+  position: fixed; z-index: 60;
+  top: var(--gutter);
+  left: calc(var(--gutter) + clamp(44px, 5vw, 64px) + 14px);
+  right: calc(var(--gutter) + 46px * 2 + 10px + 14px);
+  height: 46px; max-width: 880px; margin-inline: auto;
+  display: grid; align-items: center;
+  padding: 0 14px;
+  background: var(--white); color: var(--ink);
+  border: 2.5px solid var(--ink); border-radius: 999px;
+  box-shadow: 4px 4px 0 rgba(0,0,0,.12);
 }
-#timeline svg { width: 100%; height: 100%; overflow: visible; }
-#tl-outline { fill: none; stroke: var(--ink); stroke-width: 2.5px; stroke-linejoin: round; }
-#tl-fill { fill: var(--purple-2); }
-#tl-marks i {
-  position: absolute; left: 50%; width: 12px; height: 12px; margin: -6px 0 0 -6px;
-  background: var(--white); border: 2.5px solid var(--ink); border-radius: 50%;
+#nav-items { list-style: none; display: flex; justify-content: space-between; gap: 4px; position: relative; z-index: 1; }
+#nav-items li { flex: 1 1 0; min-width: 0; display: flex; justify-content: center; }
+#nav-items button {
+  display: flex; align-items: center; gap: 7px; max-width: 100%;
+  padding: 5px 10px; border-radius: 999px;
+  font-weight: 800; font-size: clamp(11px, 1vw, 14px); color: #777;
+  transition: color .2s ease, background .2s ease;
+}
+#nav-items button span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#nav-items button i { /* จุดบนเส้นทาง */
+  flex: none; width: 10px; height: 10px; border-radius: 50%;
+  background: var(--white); border: 2.5px solid #999; transition: background .2s ease, border-color .2s ease;
+}
+#nav-items button:hover { color: var(--ink); }
+#nav-items button:focus-visible { outline: 2.5px solid var(--purple-2); outline-offset: 2px; }
+#nav-items li.passed button { color: var(--ink); }
+#nav-items li.passed button i { background: var(--purple-2); border-color: var(--purple-2); }
+#nav-items li.active button { background: var(--ink); color: var(--white); }
+#nav-items li.active button i { background: var(--purple-2); border-color: var(--white); }
+#nav-track { /* เส้นความคืบหน้าด้านล่างของ Nav */
+  position: absolute; left: 14px; right: 14px; bottom: 5px; height: 3px;
+  border-radius: 3px; background: #e6e6e6; pointer-events: none;
+}
+#nav-fill {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: 3px;
+  background: linear-gradient(90deg, var(--purple) 0%, var(--purple-2) 80%, #c28be0 100%);
+}
+#nav-dot { /* Tracing Beam: หัวแสง */
+  position: absolute; left: -5px; top: -3.5px; width: 10px; height: 10px; border-radius: 50%;
+  background: var(--white); border: 2px solid var(--purple-2);
+  box-shadow: 0 0 10px 4px rgba(123,31,162,.5);
+  animation: beam-pulse 1.6s ease-in-out infinite;
+}
+@keyframes beam-pulse { 50% { box-shadow: 0 0 16px 7px rgba(123,31,162,.3); } }
+/* จอกว้าง: Nav Bar ทำหน้าที่แทนเมนู → ซ่อนปุ่ม ☰ */
+@media (min-width: 861px) { #top-right #menu-btn { display: none; } #topnav { right: calc(var(--gutter) + 46px + 14px); } }
+/* จอแคบ: แสดงเฉพาะช่วงปัจจุบัน (รายการเต็มอยู่ในเมนู ☰) */
+@media (max-width: 860px) {
+  #nav-items li:not(.active) { display: none; }
+  #nav-items button { color: var(--ink); }
 }
 
 /* ============================================================
@@ -145,7 +184,7 @@ body.playing .stage { touch-action: none; }
 /* ฉาก 3 */
 .s3-text {
   position: absolute; z-index: 3;
-  right: calc(var(--tl-right) + var(--tl-w) + 2vw);
+  right: calc(var(--gutter) + 2vw);
   top: 46%; transform: translateY(-50%);
   opacity: 0; visibility: hidden; pointer-events: none;
 }
@@ -168,7 +207,7 @@ body.playing .stage { touch-action: none; }
 }
 #board {
   position: relative;
-  width: min(calc(100vw - 2 * (var(--tl-right) + var(--tl-w)) - 5vw), 150vh);
+  width: min(calc(100vw - 2 * var(--gutter) - 4vw), 150vh);
   height: min(calc(100vh - 2 * var(--gutter) - 140px), 50vw);
   margin-top: 30px;
 }
@@ -354,7 +393,7 @@ body.playing .stage { touch-action: none; }
    RESPONSIVE — จอแนวตั้ง / มือถือ
    ============================================================ */
 @media (max-aspect-ratio: 1/1) {
-  .s3-text { top: auto; bottom: calc(var(--gutter) + 130px); transform: none; right: calc(var(--tl-right) + 30px); left: var(--gutter); }
+  .s3-text { top: auto; bottom: calc(var(--gutter) + 130px); transform: none; right: var(--gutter); left: var(--gutter); }
   .s3-text p {
     font-size: clamp(22px, 6.4vw, 40px); text-align: left; display: inline-block; padding: 10px 16px;
     background: var(--white); border: 2.5px solid var(--ink); border-radius: 4px;
@@ -387,8 +426,23 @@ body.playing .stage { touch-action: none; }
   #mascot { height: 30vh; }
 }
 
+/* Text Generate / Flip Words / Sparkles */
+.w { display: inline; }
+.flip { display: inline-block; text-align: center; white-space: nowrap; }
+.flip-word { display: inline-block; }
+.fc { display: inline-block; white-space: pre; }
+.photo.main { transform-style: preserve-3d; }
+.sparkles { position: absolute; inset: 0; pointer-events: none; }
+.sparkles i {
+  position: absolute; width: 12px; height: 12px; margin: -6px 0 0 -6px; transform: scale(0);
+  background: var(--purple-2);
+  clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
+}
+.sparkles i.ink { background: var(--ink); width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; }
+
 @media (prefers-reduced-motion: reduce) {
   .scroll-hint i { animation: none; }
+  #nav-dot { animation: none; }
 }
 
 /* กระดานเตี้ยมาก (จอโน้ตบุ๊กเล็ก/แนวนอนเตี้ย): ซ่อนประโยครอง ไม่ให้ล้นกระดาน */

@@ -27,17 +27,15 @@
     d.className = 'line';
     d.innerHTML = `<p class="in">${html}</p>`;
     linesWrap.appendChild(d);
+    Effects.splitWords(d.querySelector('.in')); // Text Generate: ค่อยๆ ชัดทีละคำ
   });
-  $('#path-line').innerHTML = C.pathLine;
+  Effects.flipWords($('#path-line'), C.pathLine);
   $('#scroll-hint-text').textContent = C.scrollHint;
   if (isTouch) $('#play-hint').textContent = 'กด ✏️ โหมดเล่น แล้วลองปาปากกา · เขียนหนังสือ · ดึงหัว';
 
   /* ---------- วาดฉาก ---------- */
   const svg = $('#scene');
   const S = window.buildScene(svg, C);
-  $('#tl-shape-clip').setAttribute('d', window.TIMELINE_SHAPE);
-  $('#tl-outline').setAttribute('d', window.TIMELINE_SHAPE);
-  gsap.set('#tl-fill', { scaleY: 0, transformOrigin: '50% 0%' });
 
   /* ---------- ตัวชี้ (เมาส์/นิ้ว) ---------- */
   const pointer = { x: window.innerWidth * 0.5, y: window.innerHeight * 0.3 };
@@ -78,6 +76,8 @@
 
   window.initCharacter(S, api);
   const Board = window.initBoard(C, api);
+  Effects.tiltCards(document.getElementById('slides'));   // 3D Card
+  Effects.sparkles(document.getElementById('slides'));    // Sparkles
   const Mascot = window.initMascot(api);
 
   /* ============================================================
@@ -133,7 +133,12 @@
   tl.addLabel('start', 0);
   tl.to('.scroll-hint', { autoAlpha: 0, duration: 0.3 }, 0);
   lines.forEach((line, i) => {
-    if (i > 0) tl.fromTo(line, { autoAlpha: 0, y: 60, filter: 'blur(10px)' }, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.6 });
+    if (i > 0) {
+      // Text Generate: คำค่อยๆ ปรากฏจากเบลอ ทีละคำตามการเลื่อน
+      const ws = line.querySelectorAll('.w');
+      tl.set(line, { autoAlpha: 1, y: 0, filter: 'blur(0px)' });
+      tl.fromTo(ws, { opacity: 0, filter: 'blur(10px)' }, { opacity: 1, filter: 'blur(0px)', duration: 0.35, stagger: 0.9 / ws.length, ease: 'none', immediateRender: i > 0 });
+    }
     tl.to(line, { autoAlpha: 0, y: -60, filter: 'blur(10px)', duration: 0.6, ease: 'power2.in' }, '+=0.7');
   });
   tl.to('#opening', { autoAlpha: 0, duration: 1, ease: 'none' });
@@ -150,7 +155,6 @@
   tl.to(cam, { k: 2, duration: 2, ease: 'power2.inOut', onUpdate: applyCam }, 'name');
   tl.to(S.qWrap, { autoAlpha: 0, scale: 1.5, duration: 0.6, ease: 'power2.in' }, 'name');
   tl.fromTo('.s3-text', { autoAlpha: 0, x: 40 }, { autoAlpha: 1, x: 0, duration: 0.8 }, 'name+=1.5');
-  tl.fromTo('#timeline', { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.8 }, 'name+=1.5');
   tl.fromTo('#play-hint', { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: 0.6 }, 'name+=1.9');
   tl.to({}, { duration: 3 }); // ค้างไว้ให้เล่นกิมมิก
 
@@ -220,16 +224,68 @@
       const inR = t >= r.a && t <= r.b;
       if (inR !== r.in) { r.in = inR; inR ? r.on() : r.off(); }
     });
-    gsap.set('#tl-fill', { scaleY: tl.progress() });
+    updateNav(t);
   });
 
-  /* ---------- จุดบนไทม์ไลน์ (ช่วงชีวิต/ผลงาน) ---------- */
-  const marks = $('#tl-marks');
-  ['question', ...targets.map((t) => t.label)].forEach((l) => {
-    const d = document.createElement('i');
-    d.style.top = (tl.labels[l] / tl.duration()) * 100 + '%';
-    marks.appendChild(d);
+  /* ============================================================
+     NAV BAR ด้านบน = เส้นทาง (แทนไทม์ไลน์แนวตั้งเดิม)
+     ห้องเรียน → คำถาม → ผลงานแต่ละชิ้น → ติดต่อ · กดเพื่อกระโดดไปได้
+     เส้นม่วง + หัวแสง (Tracing Beam) วิ่งตามการเลื่อน ถึงจุดไหน = อยู่ช่วงนั้น
+     ============================================================ */
+  const NAV = [
+    { label: C.nav.start, target: 'start' },
+    { label: C.nav.question, target: 'question' },
+    ...C.projects.map((p, i) => ({ label: p.short || p.title, target: 'project-' + i })),
+    { label: C.nav.contact, target: 'contact' }
+  ].filter((n) => n.target === 'start' || tl.labels[n.target] !== undefined)
+   .map((n) => ({ ...n, time: n.target === 'start' ? 0 : tl.labels[n.target] }));
+
+  const navList = $('#nav-items'), navTrack = $('#nav-track'), navFill = $('#nav-fill'), navDot = $('#nav-dot');
+  NAV.forEach((n, i) => {
+    const li = document.createElement('li');
+    li.innerHTML = `<button data-target="${n.target}"><i></i><span>${n.label}</span></button>`;
+    navList.appendChild(li);
+    n.el = li;
   });
+  let navX = [], navW = 1, activeNav = -1;
+  function measureNav() {
+    const tr = navTrack.getBoundingClientRect();
+    navW = tr.width || 1;
+    navX = NAV.map((n) => {
+      const r = n.el.querySelector('i').getBoundingClientRect();
+      return r.width ? r.left + r.width / 2 - tr.left : null;
+    });
+  }
+  function updateNav(t) {
+    const dur = tl.duration();
+    let k = 0;
+    while (k < NAV.length - 1 && t >= NAV[k + 1].time) k++;
+    let x;
+    if (navX.some((v) => v === null)) {
+      x = (t / dur) * navW; // จอแคบ: แสดงแค่ช่วงปัจจุบัน → ใช้สัดส่วนรวม
+    } else if (k < NAV.length - 1) {
+      const f = (t - NAV[k].time) / (NAV[k + 1].time - NAV[k].time);
+      x = navX[k] + (navX[k + 1] - navX[k]) * f;
+    } else {
+      x = navX[k] + (navW - navX[k]) * ((t - NAV[k].time) / Math.max(0.001, dur - NAV[k].time));
+    }
+    navFill.style.width = Math.max(0, x) + 'px';
+    navDot.style.transform = `translateX(${x}px)`;
+    if (k !== activeNav) {
+      activeNav = k;
+      NAV.forEach((n, i) => {
+        n.el.classList.toggle('active', i === k);
+        n.el.classList.toggle('passed', i < k);
+      });
+    }
+  }
+  navList.addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-target]');
+    if (b) { Sound.play('click'); scrollToLabel(b.dataset.target); }
+  });
+  window.addEventListener('resize', measureNav);
+  document.fonts.ready.then(measureNav);
+  measureNav();
 
   /* ---------- ? ลอย + เงาขยับ ---------- */
   if (!reduceMotion) {
@@ -250,8 +306,7 @@
   $('#logo-btn').addEventListener('click', () => scrollToLabel('start', 2.2));
 
   const menu = $('#menu'), menuBtn = $('#menu-btn');
-  C.nav.forEach((n) => {
-    if (n.target !== 'start' && tl.labels[n.target] === undefined) return;
+  NAV.forEach((n) => {
     const li = document.createElement('li');
     li.innerHTML = `<button data-target="${n.target}">${n.label}</button>`;
     $('#menu-list').appendChild(li);
@@ -309,7 +364,7 @@
       .to('.loader-pct', { autoAlpha: 0, duration: 0.3 }, '<')
       .to('#loader', { autoAlpha: 0, duration: 0.5 })
       .add(() => { document.body.classList.remove('is-loading'); lenis.start(); })
-      .from(lines[0].querySelector('.in'), { y: 40, autoAlpha: 0, filter: 'blur(10px)', duration: 0.9, ease: 'power3.out' }, '-=0.2')
+      .from(lines[0].querySelectorAll('.w'), { opacity: 0, filter: 'blur(10px)', duration: 0.6, stagger: 0.12, ease: 'power2.out' }, '-=0.2')
       .from('.scroll-hint', { autoAlpha: 0, duration: 0.6 }, '-=0.3')
       .to('.ui', { autoAlpha: 1, duration: 0.6 }, '<');
   }

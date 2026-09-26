@@ -13,7 +13,12 @@ window.CONTENT = {
   ],
 
   name: 'นายฐนน เพ็ญวิเชียร',
-  pathLine: 'และนี่คือ<em>เส้นทาง</em>ของผม',
+  // ฉาก 3: คำตรงกลางสลับไปมา (Flip Words) — ⚠️ คำชั่วคราว แก้/เพิ่มได้
+  pathLine: {
+    before: 'และนี่คือ',
+    words: ['เส้นทาง', 'ความฝัน', 'เรื่องราว'],
+    after: 'ของผม'
+  },
   scrollHint: 'เลื่อนลง',
 
   // กระดาน: คำถาม
@@ -28,6 +33,7 @@ window.CONTENT = {
     {
       id: 'tookajok',
       title: 'Too Ka Jok (ห้ามพวน)',
+      short: 'Too Ka Jok',          // ชื่อสั้นบน Nav Bar
       date: '6–13 ส.ค. 2569',
       duration: '1 สัปดาห์',
       about: 'เกม<em>จำลองอาชีพคนเช็ดกระจกตึกสูง</em>',
@@ -50,6 +56,7 @@ window.CONTENT = {
     {
       id: '404reborn',
       title: '404 : REBORN',
+      short: '404 : REBORN',
       date: '4 ก.ย. 2569',
       duration: '4 ชั่วโมง 30 นาที',
       award: 'WINNER • Mini Game Jam 2026 KMITL',
@@ -92,11 +99,6 @@ window.CONTENT = {
     sub: 'ขอบคุณที่เดินทางมาด้วยกันจนถึงตรงนี้'
   },
 
-  // เมนูทางลัด
-  nav: [
-    { label: 'ห้องเรียน', target: 'start' },
-    { label: 'คำถาม', target: 'question' },
-    { label: 'ผลงาน', target: 'project-0' },
-    { label: 'ติดต่อ', target: 'contact' }
-  ]
+  // ชื่อช่วงบน Nav Bar ด้านบน (ผลงานใช้ช่อง short ของแต่ละเกม)
+  nav: { start: 'ห้องเรียน', question: 'คำถาม', contact: 'ติดต่อ' }
 };
