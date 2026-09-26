@@ -32,8 +32,9 @@
       const avail = h - top - 24, standRatio = .16;
       const endW = mobile ? w - margin * 2 : Math.min(w * .74, (avail / (1 + standRatio)) * 1.72);
       const endH = mobile ? avail / (1 + standRatio) : endW / 1.72;
-      const startW = mobile ? w * .6 : w * .44;
-      const a = { x: mobile ? w * .2 : w * .42, y: mobile ? h * .2 : h * .18, w: startW, h: startW / 1.72 };
+      const startW = mobile ? w * .56 : w * .34;
+      // มุมกว้าง: จออยู่ด้านขวาและเล็กพอให้เห็นหลังมาสคอต โต๊ะ ขาโต๊ะ และ CPU ฝั่งซ้าย
+      const a = { x: mobile ? w * .31 : w * .54, y: mobile ? h * .19 : h * .13, w: startW, h: startW / 1.72 };
       const b = { x: (w - endW) / 2, y: top + (avail - endH * (1 + standRatio)) / 2, w: endW, h: endH };
       const p = camera.p;
       [['x', 'left'], ['y', 'top'], ['w', 'width'], ['h', 'height']].forEach(([k, prop]) => { shell.style[prop] = (a[k] + (b[k] - a[k]) * p) + 'px'; });
@@ -322,36 +323,71 @@
       gsap.timeline().fromTo(toast, { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: .25 }).to(toast, { autoAlpha: 0, duration: .3, delay: 1.6 });
     });
 
-    /* ---------- เอกสารบนโต๊ะ: กดให้หล่นลงพื้น กดกองเพื่อเก็บกลับ ---------- */
+    /* ---------- เอกสารบนโต๊ะ: หยิบแผ่นบนสุดมาปา หรือดึงฐานให้กองล้ม ---------- */
     const paperWrap = document.getElementById('work-papers');
-    const paperPile = document.getElementById('paper-pile');
     const papers = [...paperWrap.querySelectorAll('.work-paper')];
     let dropped = 0;
-    function dropPaper(paper) {
-      if (paper.classList.contains('dropped')) return;
+    const floorPose = (paper, slot, velocity = { x: 0, y: 0 }) => {
       const r = paper.getBoundingClientRect(), sr = stage.getBoundingClientRect();
+      const columns = [0.12, 0.19, 0.27, 0.34, 0.16, 0.3, 0.23, 0.38, 0.1];
+      const currentX = Number(gsap.getProperty(paper, 'x')) || 0;
+      const currentY = Number(gsap.getProperty(paper, 'y')) || 0;
+      return {
+        x: currentX + sr.left + sr.width * columns[slot % columns.length] - r.left + gsap.utils.clamp(-80, 80, velocity.x * .12),
+        y: currentY + sr.bottom - Math.max(r.height, 62) - 24 - (slot % 3) * 5 - r.top + gsap.utils.clamp(-30, 24, velocity.y * .08),
+        rotation: [-19, 8, -5, 16, -12, 4, 21, -8, 12][slot % 9]
+      };
+    };
+    function dropPaper(paper, velocity = { x: 0, y: 0 }, delay = 0) {
+      if (paper.classList.contains('dropped')) return;
       const slot = dropped++;
+      const pose = floorPose(paper, slot, velocity);
       paper.classList.add('dropped');
-      Sound.play('paper', .3);
+      paper.classList.remove('dragging');
       gsap.to(paper, {
-        x: sr.left + sr.width * (.16 + slot * .035) - r.left,
-        y: sr.bottom - Math.max(r.height, 70) - 38 - r.top + slot * 2,
-        rotation: -14 + slot * 12,
-        duration: reduce ? .01 : .72,
-        ease: 'bounce.out',
-        onComplete: () => paperPile.classList.add('has-paper')
+        ...pose, delay, duration: reduce ? .01 : .62, ease: 'power2.inOut'
       });
     }
-    papers.forEach((paper) => paper.addEventListener('click', () => dropPaper(paper)));
-    paperPile.addEventListener('click', () => {
-      dropped = 0;
+    function toppleStack() {
+      const standing = papers.filter((paper) => !paper.classList.contains('dropped'));
+      if (!standing.length) return;
       Sound.play('paper', .25);
-      papers.forEach((paper, i) => gsap.to(paper, {
-        x: 0, y: 0, rotation: [-8, 3, 9][i], duration: reduce ? .01 : .55,
-        delay: reduce ? 0 : i * .07, ease: 'back.out(1.7)',
-        onComplete: () => paper.classList.remove('dropped')
-      }));
-      paperPile.classList.remove('has-paper');
+      standing.forEach((paper, i) => dropPaper(paper, { x: (i - 4) * 70, y: 100 }, reduce ? 0 : i * .045));
+    }
+    const topStandingPaper = () => papers.filter((paper) => !paper.classList.contains('dropped')).at(-1);
+    papers.forEach((paper) => {
+      let drag = null;
+      paper.addEventListener('pointerdown', (e) => {
+        if (paper.classList.contains('dropped')) return;
+        if (Number(paper.dataset.depth) <= 2) {
+          toppleStack();
+          e.preventDefault();
+          return;
+        }
+        if (paper !== topStandingPaper()) return;
+        drag = { px: e.clientX, py: e.clientY, t: performance.now(), vx: 0, vy: 0 };
+        paper.classList.add('dragging');
+        gsap.killTweensOf(paper);
+        try { paper.setPointerCapture(e.pointerId); } catch (_) {}
+        e.preventDefault();
+      });
+      paper.addEventListener('pointermove', (e) => {
+        if (!drag) return;
+        const now = performance.now(), dt = Math.max(16, now - drag.t);
+        drag.vx = (e.clientX - drag.px) / dt * 1000;
+        drag.vy = (e.clientY - drag.py) / dt * 1000;
+        gsap.set(paper, { x: `+=${e.clientX - drag.px}`, y: `+=${e.clientY - drag.py}`, rotation: gsap.utils.clamp(-18, 18, drag.vx * .018) });
+        drag.px = e.clientX; drag.py = e.clientY; drag.t = now;
+      });
+      const release = () => {
+        if (!drag) return;
+        const velocity = { x: drag.vx, y: drag.vy };
+        drag = null;
+        Sound.play('paper', .3);
+        dropPaper(paper, velocity);
+      };
+      paper.addEventListener('pointerup', release);
+      paper.addEventListener('pointercancel', release);
     });
 
     /* ---------- ปุ่มคอม: คนดูกดปิด แล้วมาสคอตเอื้อมไปเปิดกลับ ---------- */

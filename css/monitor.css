@@ -4,26 +4,33 @@
    → จอคอมเล็กหรือใหญ่ ข้อความก็พอดีจอ ไม่ล้นกรอบ
    ============================================================ */
 
-/* ---------- ห้องทำงาน: คอมอยู่ตรงหน้า เห็นข้ามไหล่ ---------- */
-#work-desk { left: 26%; right: 4%; bottom: 25%; height: 9%; }
-#work-chair { left: 37%; width: 31%; height: 72%; bottom: 2%; perspective: 1100px; }
+/* ---------- ห้องทำงาน: กล้องอยู่ด้านหลัง เห็นโต๊ะ ขาโต๊ะ และ CPU ---------- */
+#work-desk { left: 14%; right: 7%; bottom: 27%; height: 7%; }
+#work-chair { left: 33%; width: 29%; height: 68%; bottom: 1%; perspective: 1100px; }
 .work-pose { backface-visibility: hidden; transform-origin: 50% 60%; }
 .room-caption { left: 4%; max-width: 30%; }
+#work-cpu { position: absolute; z-index: 2; left: 18%; bottom: 3%; width: 10%; height: 27%; border: 5px solid #111; border-radius: 5px; background: #202024; box-shadow: inset 0 0 0 5px #38383d, 7px 8px 0 #0002; }
+#work-cpu::before { content: 'NOK'; position: absolute; left: 13%; top: 8%; color: #aaa; font: 900 clamp(9px,1vw,15px)/1 sans-serif; letter-spacing: .14em; }
+#work-cpu i { position: absolute; left: 13%; right: 13%; top: 22%; height: 34%; border: 2px solid #555; background: repeating-linear-gradient(0deg,#161619 0 4px,#2d2d32 4px 6px); }
+#work-cpu b { position: absolute; right: 13%; bottom: 13%; width: 14%; aspect-ratio: 1; border-radius: 50%; background: #b776d6; box-shadow: 0 0 10px #7b1fa2; }
+#work-cpu span { position: absolute; left: 13%; right: 36%; bottom: 15%; height: 3px; background: #555; }
 
-/* ---------- เอกสารบนโต๊ะ: กดทีละแผ่นให้ตกลงไปกองที่พื้น ---------- */
-#work-papers { position: absolute; z-index: 6; left: 31%; bottom: 35%; width: 15%; height: 12%; pointer-events: none; }
-.work-paper { position: absolute; width: 68%; aspect-ratio: 1.42; padding: 14% 11%; border: 2px solid #111; background: #fff; box-shadow: 3px 4px 0 #0002; pointer-events: auto; cursor: grab; transform-origin: 50% 90%; }
+/* ---------- กองงาน: ดึงแผ่นบนไปปา หรือดึงฐานให้ทั้งกองล้ม ---------- */
+#work-papers { position: absolute; z-index: 6; left: 21%; bottom: 34%; width: 13%; height: 25%; pointer-events: none; }
+.work-paper { position: absolute; left: 6%; bottom: calc(var(--depth) * 7%); z-index: calc(10 + var(--depth)); width: 88%; aspect-ratio: 1.42; padding: 14% 11%; border: 2px solid #111; background: #fff; box-shadow: 2px 3px 0 #bbb; pointer-events: auto; cursor: grab; transform: translateX(var(--x)) rotate(var(--r)); transform-origin: 50% 90%; touch-action: none; }
+.work-paper[data-depth="0"] { --depth: 0; --x:-10%; --r:-2deg; }
+.work-paper[data-depth="0"]::after { content: 'ดึงฐาน'; position: absolute; left: -31%; bottom: 8%; width: 34%; padding: 5% 2%; border: 2px solid #111; border-right: 0; background: #fff; color: #6a1b9a; font: 900 clamp(7px,.7vw,11px)/1 sans-serif; letter-spacing: .03em; }
+.work-paper[data-depth="1"] { --depth: 1; --x:1%; --r:1deg; }
+.work-paper[data-depth="2"] { --depth: 2; --x:4%; --r:-1deg; }
+.work-paper[data-depth="3"] { --depth: 3; --x:-2%; --r:2deg; }
+.work-paper[data-depth="4"] { --depth: 4; --x:3%; --r:-2deg; }
+.work-paper[data-depth="5"] { --depth: 5; --x:-3%; --r:.5deg; }
+.work-paper[data-depth="6"] { --depth: 6; --x:2%; --r:2deg; }
+.work-paper[data-depth="7"] { --depth: 7; --x:-1%; --r:-1deg; }
+.work-paper[data-depth="8"] { --depth: 8; --x:2%; --r:1deg; }
 .work-paper span { display: block; height: 2px; margin: 8% 0; background: #777; }
-.work-paper.p1 { left: 2%; top: 22%; transform: rotate(-8deg); }
-.work-paper.p2 { left: 18%; top: 10%; transform: rotate(3deg); }
-.work-paper.p3 { left: 32%; top: 0; transform: rotate(9deg); }
-.work-paper.dropped { cursor: default; pointer-events: none; }
-#paper-pile { position: absolute; z-index: 6; left: 13%; bottom: 2%; width: 22%; height: 9%; border: 0; background: transparent; cursor: pointer; opacity: 0; pointer-events: none; }
-#paper-pile::before,#paper-pile::after { content: ''; position: absolute; left: 5%; right: 5%; height: 28%; bottom: 2%; border: 2px solid #111; background: #fff; transform: rotate(-3deg); }
-#paper-pile::after { transform: translate(5px,-5px) rotate(4deg); }
-#paper-pile span { position: absolute; z-index: 2; left: 50%; bottom: 100%; translate: -50% 0; width: max-content; padding: .25em .55em; border-radius: 99px; background: #111; color: #fff; font: 800 10px 'Noto Sans Thai',sans-serif; opacity: 0; transition: opacity .2s; }
-#paper-pile:hover span,#paper-pile:focus-visible span { opacity: 1; }
-#paper-pile.has-paper { opacity: 1; pointer-events: auto; }
+.work-paper.dropped { cursor: default; pointer-events: none; box-shadow: 3px 4px 0 #0002; }
+.work-paper.dragging { cursor: grabbing; z-index: 50; box-shadow: 8px 12px 0 #0003; }
 
 /* ---------- ปุ่มเปิด/ปิดคอม + ท่าเอื้อมมือของมาสคอต ---------- */
 #monitor-power { position: absolute; z-index: 8; right: 2.2%; bottom: 1.1%; width: 17px; height: 17px; padding: 0; border: 1px solid #777; border-radius: 50%; background: #222; cursor: pointer; }
@@ -31,7 +38,7 @@
 #monitor-screen::after { content: ''; position: absolute; z-index: 30; inset: 0; background: #050506; opacity: 0; pointer-events: none; transition: opacity .28s ease; }
 #workspace-layer.computer-off #monitor-screen::after { opacity: 1; }
 #workspace-layer.computer-off #monitor-power i { background: #333; box-shadow: none; }
-#work-chair.power-reaching .work-turned { animation: reach-power .72s ease-in-out 2 alternate; transform-origin: 78% 66%; }
+#work-chair.power-reaching .work-pose { animation: reach-power .72s ease-in-out 2 alternate; transform-origin: 78% 66%; }
 @keyframes reach-power { to { transform: translate(10%,4%) rotate(5deg) scale(.98); } }
 
 /* ---------- จอก่อนซูม: หน้าจอกำลังทำเกม ---------- */
@@ -92,9 +99,9 @@
 
 @media (max-aspect-ratio: 1/1) {
   #work-chair { left: 20%; width: 60%; height: 55%; bottom: 3%; }
-  #work-desk { left: 6%; right: -6%; bottom: 50%; height: 6%; }
-  #work-papers { left: 10%; bottom: 58%; width: 30%; }
-  #paper-pile { left: 5%; width: 38%; }
+  #work-desk { left: 3%; right: -7%; bottom: 48%; height: 6%; }
+  #work-cpu { left: 8%; bottom: 12%; width: 19%; height: 25%; border-width: 3px; }
+  #work-papers { left: 8%; bottom: 55%; width: 24%; height: 18%; }
   .project-panel { grid-template-columns: minmax(0, 1fr); grid-template-rows: 36% minmax(0, 1fr); gap: 3cqh; }
   .project-gallery { width: 78%; height: 88%; margin: auto; }
   .project-copy h2 { font-size: clamp(16px, 6.4cqw, 28px); }
@@ -111,7 +118,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .idle-code b, .idle-game i, .idle-caret::after { animation: none; }
-  #work-chair.power-reaching .work-turned { animation: none; }
+  #work-chair.power-reaching .work-pose { animation: none; }
 }
 /* เทปแปะการ์ดในจอ: ย่อตามขนาดการ์ด ไม่ให้บังชื่อช่องทาง */
 .monitor-contact .c-card::before { width: 16%; height: 11%; min-height: 6px; top: -6%; right: 7%; }

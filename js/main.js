@@ -228,7 +228,7 @@
   tl.to(Workspace.camera, {p:1,duration:2.2,ease:'power3.inOut',onUpdate:Workspace.renderCamera},'monitor');
   tl.to('#monitor-idle', { autoAlpha: 0, duration: .5 }, 'monitor+=1.0');
   tl.to('#work-chair', {autoAlpha:0,xPercent:-15,duration:.8},'monitor');
-  tl.to(['#work-desk', '.room-tone'], { autoAlpha: 0, duration: .8 }, 'monitor+=.5');
+  tl.to(['#work-desk', '#work-cpu', '#work-papers', '.room-tone'], { autoAlpha: 0, duration: .8 }, 'monitor+=.5');
   tl.to({}, { duration: .5 });
 
   // 9) ในจอ = เบราว์เซอร์ Nokkawow News — กดอ่านข่าวได้อิสระ (ไม่กดก็เลื่อนผ่านได้)
@@ -239,7 +239,7 @@
   // 10) ซูมออกจากจอ → เจอมาสคอตนั่งหน้าคอม ทักทาย + บัตรขูดติดต่อ
   tl.addLabel('zoomout');
   tl.to(Workspace.camera, { p: 0, duration: 1.6, ease: 'power3.inOut', onUpdate: Workspace.renderCamera }, 'zoomout');
-  tl.to(['#work-desk', '.room-tone'], { autoAlpha: 1, duration: .8 }, 'zoomout+=.4');
+  tl.to(['#work-desk', '#work-cpu', '#work-papers', '.room-tone'], { autoAlpha: 1, duration: .8 }, 'zoomout+=.4');
   tl.to('#work-chair', { autoAlpha: 1, xPercent: 0, duration: .8 }, 'zoomout+=.6');
   tl.addLabel('contact');
   tl.fromTo('#fin-bubble', { autoAlpha: 0, scale: .6, y: 20 }, { autoAlpha: 1, scale: 1, y: 0, duration: .5, ease: 'back.out(2)' }, 'contact');
