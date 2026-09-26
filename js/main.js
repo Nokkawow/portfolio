@@ -85,9 +85,9 @@
      กล้องห้องเรียน (viewBox)
      ============================================================ */
   const SHOTS = [
-    { x: 0,   y: 0,   w: 1920, h: 1080, roi: [480, 1360] }, // ภาพ 1: ห้องเรียนมุมกว้าง
-    { x: 560, y: 70,  w: 960,  h: 540,  roi: [700, 1440] }, // ภาพ 2: ซูมเข้าหานักเรียน + ?
-    { x: 600, y: 222, w: 880,  h: 495,  roi: [700, 1140], roiNarrow: [790, 1050] }  // ภาพ 3: หน้า + ป้ายชื่อ + หนังสือ
+    { x: 0,   y: -60, w: 1920, h: 1080, roi: [480, 1360] }, // ภาพ 1: ห้องเรียนมุมกว้าง (y ติดลบ = เว้นที่ให้ Nav)
+    { x: 560, y: 20,  w: 960,  h: 540,  roi: [700, 1440] }, // ภาพ 2: ซูมเข้าหานักเรียน + ?
+    { x: 600, y: 175, w: 880,  h: 495,  roi: [700, 1140], roiNarrow: [790, 1050] }  // ภาพ 3: หน้า + ป้ายชื่อ + หนังสือ
   ];
   let boxes = [];
   function computeBoxes() {
@@ -190,7 +190,8 @@
   tl.addLabel('time');
   tl.set('#time-layer', { autoAlpha: 1 }, 'time');
   Workspace.calendarPages.slice(0, -1).forEach((page, i) => {
-    tl.to(page, { yPercent: 125, rotation: i % 2 ? 14 : -12, autoAlpha: 0, duration: .75, ease: 'power2.in' }, `time+=${i * .62}`);
+    tl.to(page, { yPercent: 125, rotation: i % 2 ? 14 : -12, duration: .75, ease: 'power2.in' }, `time+=${i * .62}`);
+    tl.set(page, { autoAlpha: 0 }, `time+=${i * .62 + .75}`);
   });
   tl.fromTo('.time-copy', { autoAlpha: 0, x: -30 }, { autoAlpha: 1, x: 0, duration: .8 }, 'time+=1.5');
   tl.to({}, { duration: .7 });
@@ -202,13 +203,20 @@
   tl.fromTo('.room-caption', { autoAlpha: 0, y: 25 }, { autoAlpha: 1, y: 0, duration: .9 }, 'workspace+=.35');
   tl.to({}, { duration: 1.2 });
   tl.addLabel('turn');
-  tl.to('.work-back', { autoAlpha: 0, xPercent: -4, duration: reduceMotion ? .1 : .85 }, 'turn');
-  tl.fromTo('.work-turned', {autoAlpha:0,xPercent:6}, {autoAlpha:1,xPercent:0,duration:reduceMotion ? .1 : 1.1,immediateRender:false}, 'turn+=.15');
+  if (reduceMotion) {
+    tl.to('.work-back', { autoAlpha: 0, duration: .1 }, 'turn');
+    tl.fromTo('.work-turned', { autoAlpha: 0 }, { autoAlpha: 1, duration: .1, immediateRender: false }, 'turn');
+  } else {
+    tl.to('.work-back', { rotationY: 88, scale: .96, duration: .55, ease: 'power2.in' }, 'turn');
+    tl.set('.work-back', { autoAlpha: 0 }, 'turn+=.55');
+    tl.fromTo('.work-turned', { autoAlpha: 1, rotationY: -88, scale: .96 }, { rotationY: 0, scale: 1, duration: .65, ease: 'back.out(1.4)', immediateRender: false }, 'turn+=.55');
+  }
   tl.to(['.room-caption', '.turn-hint'], { autoAlpha: 0, duration: .5 }, 'turn+=.7');
   cues.push({ label: 'turn', fwd: () => Sound.play('whoosh', .5), back: () => Sound.play('whoosh', .5) });
   tl.to({}, {duration:1.1});
   tl.addLabel('monitor');
   tl.to(Workspace.camera, {p:1,duration:2.2,ease:'power3.inOut',onUpdate:Workspace.renderCamera},'monitor');
+  tl.to('#monitor-idle', { autoAlpha: 0, duration: .5 }, 'monitor+=1.0');
   tl.to('#work-chair', {autoAlpha:0,xPercent:-15,duration:.8},'monitor');
   tl.to(['#work-desk', '.room-tone'], { autoAlpha: 0, duration: .8 }, 'monitor+=.5');
   tl.to({}, { duration: .5 });
@@ -221,9 +229,15 @@
     // ภาพขึ้นก่อน (ระหว่างหน้าเลื่อนเข้ามา) แล้วตัวอักษรตามมาทีหลัง — ย้อนได้ตามการเลื่อน
     const at = i === 0 ? 'monitor+=1.3' : label + '-=0.9';
     const photos = panel.querySelectorAll('.stack-photo');
-    const copy = panel.querySelectorAll('.project-index, .project-copy > *, .monitor-contact > * , .monitor-thanks > div > *');
+    const copy = panel.querySelectorAll('.project-index, .project-copy > *, .ct-head > *, .monitor-thanks > div > *');
     if (photos.length) tl.fromTo(photos, { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: .6, stagger: .1, ease: 'back.out(1.6)' }, at);
     if (copy.length) tl.fromTo(copy, { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: .5, stagger: .08, ease: 'power2.out' }, photos.length ? label + '+=0.1' : at);
+    const cards = panel.querySelectorAll('.c-card');
+    cards.forEach((c, k) => {
+      const r = parseFloat(c.style.getPropertyValue('--r')) || 0;
+      tl.fromTo(c, { autoAlpha: 0, y: -60, scale: 1.2, rotation: k % 2 ? 20 : -20 },
+        { autoAlpha: 1, y: 0, scale: 1, rotation: r, duration: .5, ease: 'back.out(2)' }, label + '+=' + (0.4 + k * 0.18));
+    });
     tl.to({}, { duration: i < C.projects.length ? 3.2 : 2.5 });
   });
 
@@ -270,6 +284,7 @@
   const NAV = [
     { label: C.nav.start, target: 'start' },
     { label: C.nav.question, target: 'question' },
+    { label: C.nav.workspace, target: 'workspace' },
     ...C.projects.map((p, i) => ({ label: p.short || p.title, target: 'project-' + i })),
     { label: C.nav.contact, target: 'contact' }
   ].filter((n) => n.target === 'start' || tl.labels[n.target] !== undefined)
@@ -373,20 +388,25 @@
      0. LOADING
      ============================================================ */
   function loaded(img) { return new Promise((r) => (img.complete ? r() : (img.onload = img.onerror = r))); }
+  // โหลดภาพหลักๆ ไว้ก่อน % จะได้สะท้อนการโหลดจริง
+  const preload = ['assets/characters/student-front.webp', 'assets/characters/student-back.webp', 'assets/characters/student-turn.webp']
+    .map((src) => { const im = new Image(); im.src = src; return loaded(im); });
   const tasks = [
     document.fonts.ready,
-    loaded($('.loader-logo')),
+    loaded($('.loader-mascot')),
+    ...preload,
     new Promise((r) => (document.readyState === 'complete' ? r() : window.addEventListener('load', r)))
   ];
   let done = 0;
   tasks.forEach((t) => t.then(() => done++));
-  const num = $('#loader-num');
+  const num = $('#loader-num'), fill = $('#loader-fill');
   const t0 = performance.now(), MIN = 1400, st0 = { p: 0 };
   function tick() {
     const target = Math.min(done / tasks.length, (performance.now() - t0) / MIN);
     st0.p += (target - st0.p) * 0.12;
     if (target >= 1 && st0.p > 0.995) st0.p = 1;
     num.textContent = Math.round(st0.p * 100);
+    fill.style.width = st0.p * 100 + '%';
     if (st0.p === 1) { gsap.ticker.remove(tick); finishLoading(); }
   }
   gsap.ticker.add(tick);
@@ -395,8 +415,9 @@
     ScrollTrigger.refresh();
     Board.layout(); Workspace.layout();
     gsap.timeline({ delay: 0.25 })
-      .to('.loader-logo', { scale: 0.85, autoAlpha: 0, duration: 0.5, ease: 'power2.in' })
-      .to('.loader-pct', { autoAlpha: 0, duration: 0.3 }, '<')
+      .to('.loader-mascot', { y: -30, duration: 0.25, ease: 'power2.out' })          // กระโดดดีใจ
+      .to('.loader-scene', { y: 60, scale: 0.8, autoAlpha: 0, duration: 0.45, ease: 'power2.in' })
+      .to(['.loader-pct', '.loader-bar'], { autoAlpha: 0, duration: 0.3 }, '<')
       .to('#loader', { autoAlpha: 0, duration: 0.5 })
       .add(() => { document.body.classList.remove('is-loading'); lenis.start(); })
       .from(lines[0].querySelectorAll('.w'), { opacity: 0, filter: 'blur(10px)', duration: 0.6, stagger: 0.12, ease: 'power2.out' }, '-=0.2')

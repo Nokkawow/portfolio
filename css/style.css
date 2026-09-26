@@ -32,8 +32,24 @@ html.lenis, html.lenis body { height: auto; }
   display: grid; place-content: center; justify-items: center; gap: 20px;
   background: var(--black);
 }
-.loader-logo { width: clamp(110px, 16vw, 180px); }
-.loader-pct { font-weight: 800; font-size: 14px; letter-spacing: .2em; font-variant-numeric: tabular-nums; }
+.loader-scene { position: relative; width: clamp(120px, 15vw, 170px); aspect-ratio: 350 / 700; }
+.loader-mascot { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; transform-origin: 50% 100%; animation: chew 0.9s ease-in-out infinite; }
+.loader-shadow { position: absolute; left: 12%; right: 12%; bottom: -4%; height: 6%; border-radius: 50%; background: rgba(123,31,162,.45); filter: blur(4px); animation: shadow 0.9s ease-in-out infinite; }
+.loader-seeds i { /* เปลือกเมล็ดทานตะวันกระเด็นออกจากปาก */
+  position: absolute; left: 31%; top: 42%; width: 9px; height: 5px; border-radius: 50%;
+  background: #eee; border: 1.5px solid #555; opacity: 0; animation: seed 1.8s ease-out infinite;
+}
+.loader-seeds i:nth-child(2) { animation-delay: .6s; --dx: -70px; }
+.loader-seeds i:nth-child(3) { animation-delay: 1.2s; --dx: -40px; }
+.loader-bar { width: clamp(160px, 22vw, 260px); height: 6px; border-radius: 6px; background: #2a2a2a; overflow: hidden; }
+#loader-fill { display: block; height: 100%; width: 0; border-radius: 6px; background: linear-gradient(90deg, var(--purple), #c28be0); }
+.loader-pct { font-weight: 800; font-size: 14px; letter-spacing: .12em; font-variant-numeric: tabular-nums; color: #ddd; }
+.loader-label b { animation: dot 1.2s infinite; } .loader-label b:nth-child(2) { animation-delay: .2s; } .loader-label b:nth-child(3) { animation-delay: .4s; }
+@keyframes chew { 0%,100% { transform: translateY(0) scale(1,1); } 45% { transform: translateY(-6%) scale(.97,1.03); } 60% { transform: translateY(0) scale(1.04,.96); } }
+@keyframes shadow { 0%,100% { transform: scaleX(1); opacity: 1; } 45% { transform: scaleX(.8); opacity: .6; } }
+@keyframes seed { 0% { opacity: 0; transform: translate(0,0) rotate(0); } 10% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--dx, -55px), 60px) rotate(-260deg); } }
+@keyframes dot { 0%,100% { opacity: .2; } 40% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .loader-mascot, .loader-shadow, .loader-seeds i, .loader-label b { animation: none; } }
 
 /* ============================================================
    UI ติดจอ

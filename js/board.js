@@ -98,7 +98,7 @@
         <h2 class="b-title b-huge write">${C.thanks.title}</h2>
         <p class="b-text write">${C.thanks.sub}</p>
       </div>
-      <img class="t-mascot pop" src="assets/mascot/stand.png" alt="">
+      <img class="t-mascot pop" src="assets/mascot/stand.webp" alt="">
     `);
 
     // คัดลอกอีเมล/เบอร์

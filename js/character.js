@@ -41,6 +41,11 @@
     function setFace(f, holdFor) {
       face = f;
       S.mouth.setAttribute('d', MOUTH[f]);
+      if (S.mouthPatch) { // ริกภาพ: ปกติใช้ปากในภาพ · ตกใจ/มึนค่อยแปะปากใหม่
+        const show = f === 'normal' ? 'none' : 'inline';
+        S.mouthPatch.setAttribute('display', show);
+        S.mouth.setAttribute('display', show);
+      }
       S.mouth.setAttribute('fill', f === 'surprised' ? '#111' : 'none');
       gsap.to(eyeGs, { scale: f === 'surprised' ? 1.2 : 1, transformOrigin: '50% 50%', duration: 0.15, overwrite: 'auto' });
       gsap.to([S.browL, S.browR], { y: f === 'surprised' ? -7 : f === 'dizzy' ? 3 : 0, duration: 0.15, overwrite: 'auto' });
@@ -251,9 +256,10 @@
       }
       const dx = pt.x - grab.start.x, dy = pt.y - grab.start.y;
       if (grab.part === 'tail') {
-        const tieX = P.x + body.x + 14, tieY = P.y + body.y - 180;
+        const tp0 = S.tailPivot || [14, -180];
+        const tieX = P.x + body.x + tp0[0], tieY = P.y + body.y + tp0[1];
         const ang = Math.atan2(pt.y - tieY, pt.x - tieX) * 180 / Math.PI;
-        tail.target = clamp(ang + 35, -80, 80);
+        tail.target = S.tailPivot ? clamp(ang + 60, -14, 14) : clamp(ang + 35, -80, 80); // ริกภาพ: หางม้าชี้ขึ้น-ขวา ~60°, แกว่งได้ไม่เกิน 14° กันรอยต่อ
         head.tr = clamp(dx * 0.04, -14, 14);
         body.tx = clamp(dx * 0.15, -60, 60); body.ty = clamp(dy * 0.1, -40, 30);
       } else {
@@ -363,7 +369,9 @@
       S.armsG.setAttribute('transform', T);
       S.head.setAttribute('transform', `translate(${head.x},${br * -2.5}) rotate(${tilt + head.r} 0 90)`);
       S.torso.setAttribute('transform', `translate(0 ${320 * (1 - s)}) scale(1 ${s})`);
-      S.tail.setAttribute('transform', `rotate(${clamp(tail.a, -85, 85)} 14 -180)`);
+      const tp = S.tailPivot || [14, -180];
+      const lim = S.tailPivot ? 14 : 85;
+      S.tail.setAttribute('transform', `rotate(${clamp(tail.a, -lim, lim)} ${tp[0]} ${tp[1]})`);
       S.arms.forEach((g, i) => g.setAttribute('transform', `rotate(${clamp(arms[i].r, -25, 25)} -140 165)`));
 
       updatePens(dt);

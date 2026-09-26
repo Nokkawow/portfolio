@@ -16,8 +16,8 @@
       const avail=h-top-24, standRatio=.16;
       const endW=mobile?w-margin*2:Math.min(w*.74,(avail/(1+standRatio))*1.72);
       const endH=mobile?avail/(1+standRatio):endW/1.72;
-      const startW=mobile?w*.55:w*.44;
-      const a={x:mobile?w*.42:w*.49,y:mobile?h*.22:h*.21,w:startW,h:startW/1.72};
+      const startW=mobile?w*.6:w*.44;
+      const a={x:mobile?w*.2:w*.42,y:mobile?h*.2:h*.18,w:startW,h:startW/1.72};
       const b={x:(w-endW)/2,y:top+(avail-endH*(1+standRatio))/2,w:endW,h:endH};
       const p=camera.p;
       Object.keys(a).forEach(k=>{const property={x:'left',y:'top',w:'width',h:'height'}[k];shell.style[property]=(a[k]+(b[k]-a[k])*p)+'px';});
@@ -65,10 +65,27 @@
       track.appendChild(panel);
     });
 
+    const ICONS = {
+      instagram: '<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r="1.1" class="fill"/>',
+      facebook: '<path class="fill" d="M13.5 21v-7.2h2.4l.4-2.9h-2.8V9.1c0-.8.3-1.4 1.4-1.4h1.5V5.1c-.3 0-1.2-.1-2.2-.1-2.2 0-3.6 1.3-3.6 3.7v2.2H8.2v2.9h2.4V21z"/>',
+      email: '<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 7l8.5 6 8.5-6"/>',
+      phone: '<path d="M6.5 3.5h3l1.6 4.3-2.2 1.4a11 11 0 0 0 5.9 5.9l1.4-2.2 4.3 1.6v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.5 5.7a2 2 0 0 1 2-2.2z"/>'
+    };
+    const cards = content.contact.items.map((c, i) => {
+      const ext = /^https?:/.test(c.href);
+      return `<div class="c-card" style="--r:${[-3, 2.5, 2, -2.5][i % 4]}deg">
+          <a class="c-inner" href="${esc(c.href)}" ${ext ? 'target="_blank" rel="noopener"' : ''} aria-label="${esc(c.label)}: ${esc(c.value)}">
+            <span class="c-icon"><svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[c.type] || ''}</svg></span>
+            <span class="c-text"><small>${esc(c.label)}</small><b>${esc(c.value)}</b></span>
+            <span class="c-go" aria-hidden="true">↗</span>
+          </a>
+          ${c.copy ? `<button class="c-copy" data-copy="${esc(c.value)}" aria-label="คัดลอก ${esc(c.label)}">คัดลอก</button>` : ''}
+        </div>`;
+    }).join('');
     const contact = document.createElement('article');
     contact.className = 'portfolio-panel monitor-contact';
-    contact.setAttribute('data-lenis-prevent', '');
-    contact.innerHTML = `<div><p class="project-index">LET’S TALK</p><h2>${content.contact.title}</h2><p>${esc(content.contact.sub)}</p></div><div class="monitor-contact-list">${content.contact.items.map((x) => `<a href="${esc(x.href)}" ${x.type === 'email' || x.type === 'phone' ? `data-copy="${esc(x.value)}"` : 'target="_blank" rel="noopener"'}><small>${esc(x.label)}</small><strong>${esc(x.value)}</strong></a>`).join('')}</div>`;
+    contact.innerHTML = `<div class="ct-head"><p class="project-index">LET’S TALK</p><h2>${content.contact.title}</h2><p class="ct-sub">${esc(content.contact.sub)}</p></div>
+      <div class="ct-cards">${cards}</div><div class="toast" role="status" aria-live="polite"></div>`;
     track.appendChild(contact);
 
     const thanks = document.createElement('article');
@@ -142,11 +159,18 @@
         if (!activate(photo)) openBox(photo);
         return;
       }
-      const copy = e.target.closest('[data-copy]');
+      const copy = e.target.closest('.c-copy');
       if (copy) {
         e.preventDefault();
-        try { await navigator.clipboard.writeText(copy.dataset.copy); copy.classList.add('copied'); copy.querySelector('small').textContent = 'คัดลอกแล้ว ✓'; }
-        catch (_) { window.location.href = copy.href; }
+        const toast = copy.closest('.portfolio-panel').querySelector('.toast');
+        let ok = true;
+        try { await navigator.clipboard.writeText(copy.dataset.copy); } catch (_) { ok = false; }
+        toast.textContent = ok ? `คัดลอก ${copy.dataset.copy} แล้ว ✓` : copy.dataset.copy;
+        Sound.play('pop');
+        gsap.killTweensOf(toast);
+        gsap.timeline()
+          .fromTo(toast, { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.25, ease: 'back.out(2)' })
+          .to(toast, { autoAlpha: 0, y: -8, duration: 0.3, delay: 1.6 });
       }
     });
 

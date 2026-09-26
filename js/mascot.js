@@ -5,7 +5,7 @@
    · ท่า: แอบดู = กอดอก / ถูกยก = ยืน / นั่งรอ = นั่งยอง
    ============================================================ */
 (function () {
-  const POSES = { cross: 'assets/mascot/cross.png', stand: 'assets/mascot/stand.png', squat: 'assets/mascot/squat.png' };
+  const POSES = { cross: 'assets/mascot/cross.webp', stand: 'assets/mascot/stand.webp', squat: 'assets/mascot/squat.webp' };
   Object.values(POSES).forEach((src) => { const i = new Image(); i.src = src; });
 
   window.initMascot = function (api) {

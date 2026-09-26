@@ -318,15 +318,47 @@
     Array.from(head.children).forEach(n => { if (n !== tail) n.setAttribute('display', 'none'); });
     Array.from(tail.children).forEach(n => n.setAttribute('display', 'none'));
     [armL,armR].forEach(g => g.setAttribute('opacity','0'));
-    const art = { href:'assets/characters/student-front.png', x:-300, y:-350, width:600, height:900 };
-    // ภาพเต็มชิ้นรักษาเส้นผมและคอไม่ให้แยกเมื่อสปริงทำงาน
-    el('image',{...art,id:'student-portrait'},torso);
+    /* ---------- ริกตัวละครจากภาพเต็ม (แยกชิ้นใน assets/characters/rig) ----------
+       พิกัดต้นฉบับ 1024×1536 → วางที่ x -300, y -350 กว้าง 600 (สเกล rs)
+       ชิ้น: ฐาน (ลบตา+หางม้าแล้ว) / ตาขาว / ม่านตา (ขยับในมาสก์ตา) / หางม้า / ปากสำรองตอนเปลี่ยนสีหน้า
+       ทำชิ้นใหม่: ดูสคริปต์/ค่าใน assets/src/rig/meta.json */
+    const RIG = {
+      L: { x: 335, y: 462, w: 125, h: 83, cx: 411.5, cy: 492.5 },
+      R: { x: 515, y: 445, w: 147, h: 80, cx: 585.5, cy: 469.5 },
+      mouth: { x: 492, y: 557, skin: 'rgb(245,200,178)' },
+      tail: { x: 430, y: 6, w: 417, h: 144, pivot: [595, 138] }
+    };
+    const rs = 600 / 1024, RX = (v) => -300 + v * rs, RY = (v) => -350 + v * rs;
+    const rigDir = 'assets/characters/rig/';
+    const rig = el('g', { id: 'student-rig' }, torso);
+    el('image', { href: rigDir + 'base.webp', x: -300, y: -350, width: 600, height: 900, id: 'student-portrait' }, rig);
+    // หางม้า: ย้ายกลุ่มเดิมมาอยู่ในริก (หมุนรอบยางรัดผม)
+    rig.appendChild(tail);
+    const rt = RIG.tail;
+    el('image', { href: rigDir + 'tail.webp', x: RX(rt.x), y: RY(rt.y), width: rt.w * rs, height: rt.h * rs }, tail);
+    const tailPivot = [RX(rt.pivot[0]), RY(rt.pivot[1])];
+    // ตา 2 ข้าง: ตาขาว + ม่านตาที่ขยับได้ภายในมาสก์รูปตา
+    const rigEyes = ['L', 'R'].map((k) => {
+      const e = RIG[k], box = { x: RX(e.x), y: RY(e.y), width: e.w * rs, height: e.h * rs };
+      const m = el('mask', { id: 'rig-eyemask-' + k, maskUnits: 'userSpaceOnUse', ...box }, defs);
+      el('image', { href: rigDir + 'eyemask-' + k + '.png', ...box }, m);
+      const g = el('g', { id: 'rig-eye-' + k }, rig);
+      el('image', { href: rigDir + 'eye-' + k + '.webp', ...box }, g);
+      const inner = el('g', { mask: `url(#rig-eyemask-${k})` }, g);
+      const pupil = el('g', { class: 'pupil' }, inner);
+      el('image', { href: rigDir + 'iris-' + k + '.webp', ...box }, pupil);
+      return { g, pupil, cx: pos.x + RX(e.cx), cy: pos.y + RY(e.cy) };
+    });
+    // ปากตอนตกใจ/มึน: แปะสีผิวทับปากเดิม แล้ววาดปากใหม่ (ปกติซ่อน ใช้ปากในภาพ)
+    const mouthPatch = el('ellipse', { cx: RX(RIG.mouth.x), cy: RY(RIG.mouth.y), rx: 12, ry: 8, fill: RIG.mouth.skin, display: 'none' }, rig);
+    const rigMouth = el('path', { d: '', fill: 'none', stroke: '#3a1d1d', 'stroke-width': 2.4, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', display: 'none',
+      transform: `translate(${RX(RIG.mouth.x)},${RY(RIG.mouth.y)}) scale(.7) translate(0,-73)` }, rig);
     el('ellipse',{cx:0,cy:-90,rx:190,ry:220,fill:'transparent','pointer-events':'all'},head);
     // ตำแหน่งสลับตามคำแก้: ชื่ออยู่ขวาของภาพ ตราอยู่ซ้ายของภาพ
-    const embroidery=el('g',{'font-family':'Noto Sans Thai,sans-serif','font-weight':800,fill:'#43215c'},torso);
-    const printedName=el('text',{x:52,y:113,'text-anchor':'middle','font-size':9,textLength:92,lengthAdjust:'spacingAndGlyphs'},embroidery);
+    const embroidery=el('g',{'font-family':'Noto Sans Thai,sans-serif','font-weight':900,fill:'#2a0f3a'},torso);
+    const printedName=el('text',{x:54,y:114,'text-anchor':'middle','font-size':12,textLength:104,lengthAdjust:'spacingAndGlyphs'},embroidery);
     printedName.textContent=content.name;
-    const crest=el('text',{x:-58,y:112,'text-anchor':'middle','font-size':13},embroidery);
+    const crest=el('text',{x:-58,y:114,'text-anchor':'middle','font-size':15},embroidery);
     crest.textContent='บป.';
 
     // เลเยอร์เอฟเฟกต์ (ปากกาที่ถูกหยิบ + ประกายตอนโดน) อยู่บนสุด
@@ -334,8 +366,9 @@
 
     return {
       svg, defs, el, line,
-      char, armsG: arms, head, tail, torso, arms: [armL, armR], bangs, browL, browR, mouth,
-      eyes: [eyeL, eyeR],
+      char, armsG: arms, head, tail, torso, arms: [armL, armR], bangs, browL, browR,
+      mouth: rigMouth, mouthPatch, tailPivot,
+      eyes: rigEyes,
       book, bookInk, pens, fx,
       qWrap, qFloat, qShadow,
       nameText

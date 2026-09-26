@@ -1,0 +1,90 @@
+/* ============================================================
+   MONITOR v2 — หน้าผลงาน/ติดต่อ/ขอบคุณในจอคอม + ห้องทำงาน
+   ขนาดตัวอักษรทั้งหมดอิงขนาดจอคอม (cqw/cqh ของ #monitor-screen)
+   → จอคอมเล็กหรือใหญ่ ข้อความก็พอดีจอ ไม่ล้นกรอบ
+   ============================================================ */
+
+/* ---------- ห้องทำงาน: คอมอยู่ตรงหน้า เห็นข้ามไหล่ ---------- */
+#work-desk { left: 26%; right: 4%; bottom: 25%; height: 9%; }
+#work-chair { left: 37%; width: 31%; height: 72%; bottom: 2%; perspective: 1100px; }
+.work-pose { backface-visibility: hidden; transform-origin: 50% 60%; }
+.room-caption { left: 4%; max-width: 30%; }
+
+/* ---------- จอก่อนซูม: หน้าจอกำลังทำเกม ---------- */
+#monitor-idle {
+  position: absolute; inset: 0; z-index: 5;
+  display: grid; grid-template-rows: auto 1fr; overflow: hidden;
+  background: #16101c; color: #d9c9e6; font-family: ui-monospace, Consolas, monospace;
+}
+.idle-bar { display: flex; align-items: center; gap: 1.2cqw; padding: 1.4cqh 2cqw; background: #0d0911; font-size: clamp(7px, 2.6cqh, 13px); }
+.idle-bar i { width: 1.1cqw; aspect-ratio: 1; border-radius: 50%; background: #444; }
+.idle-bar i:first-child { background: var(--purple-2); }
+.idle-bar span { margin-left: auto; color: #9b86ad; }
+.idle-body { display: grid; grid-template-columns: 1fr 1.1fr; gap: 3cqw; padding: 4cqh 3cqw; align-items: center; }
+.idle-code { display: grid; gap: 2.2cqh; }
+.idle-code b { display: block; height: 2.2cqh; border-radius: 99px; background: #3a2a47; transform-origin: left; animation: type 3.2s ease-in-out infinite; }
+.idle-code b:nth-child(3n) { background: #7b1fa2; } .idle-code b:nth-child(4n) { background: #5c5c6b; }
+.idle-code b:nth-child(2) { animation-delay: .3s; } .idle-code b:nth-child(3) { animation-delay: .6s; } .idle-code b:nth-child(4) { animation-delay: .9s; }
+.idle-code b:nth-child(5) { animation-delay: 1.2s; } .idle-code b:nth-child(6) { animation-delay: 1.5s; } .idle-code b:nth-child(7) { animation-delay: 1.8s; }
+.idle-game { position: relative; aspect-ratio: 16/10; border: 2px solid #3a2a47; background: repeating-linear-gradient(0deg, #1e1626 0 12%, #221a2b 12% 24%); overflow: hidden; }
+.idle-game i { position: absolute; bottom: 18%; width: 12%; aspect-ratio: 1; background: #c28be0; animation: hop 1.2s ease-in-out infinite; left: 20%; }
+.idle-game em { position: absolute; left: 0; right: 0; bottom: 0; height: 18%; background: #3a2a47; }
+.idle-caret { font-size: clamp(8px, 3cqh, 15px); grid-column: 1 / -1; }
+.idle-caret::after { content: '▍'; color: #c28be0; animation: blink 1s steps(1) infinite; }
+@keyframes type { 0% { transform: scaleX(.15); } 50%, 100% { transform: scaleX(1); } }
+@keyframes hop { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(180%, -120%) rotate(90deg); } }
+@keyframes blink { 50% { opacity: 0; } }
+
+/* ---------- หน้าผลงาน ---------- */
+.portfolio-panel { padding: 7cqh 4cqw 5cqh; }
+.project-panel { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 4cqw; align-items: center; }
+.project-index { position: absolute; left: 4cqw; top: 2.4cqh; font-size: clamp(7px, min(1.1cqw, 2.4cqh), 13px); }
+.project-gallery { height: 70%; width: 84%; margin: 0 0 0 auto; }
+.project-copy { display: flex; flex-direction: column; gap: 1.5cqh; max-height: 100%; overflow: hidden; padding: 0; }
+.project-copy > * { margin: 0; }
+.project-copy h2 { font-size: clamp(13px, min(3.1cqw, 6.4cqh), 46px); line-height: 1.15; }
+.project-date { font-size: clamp(7px, min(1.15cqw, 2.5cqh), 14px); }
+.project-about { font-size: clamp(9px, min(1.5cqw, 3.2cqh), 19px); line-height: 1.35; }
+.project-copy dl { font-size: clamp(7px, min(1.2cqw, 2.6cqh), 15px); gap: 1.2cqh; }
+.project-copy dl div { padding-top: .7cqh; }
+.project-copy dd { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.project-actions { margin-top: .4cqh; gap: 1cqw; }
+.project-actions a, .coming-link { font-size: clamp(8px, min(1.15cqw, 2.5cqh), 14px); padding: .55em .9em; }
+.winner-stamp { align-self: flex-start; font-size: clamp(7px, min(1.05cqw, 2.3cqh), 13px); }
+
+/* ---------- ติดต่อ: การ์ดแปะแบบเดิม ย้ายมาอยู่ในจอ ---------- */
+.monitor-contact { grid-template-columns: minmax(0, .9fr) minmax(0, 1.3fr); gap: 4cqw; align-items: center; overflow: visible; }
+.monitor-contact .project-index { position: static; display: block; margin-bottom: 1.5cqh; }
+.monitor-contact h2 { font-size: clamp(16px, min(4cqw, 8cqh), 52px); line-height: 1.15; margin: 0 0 1.5cqh; }
+.monitor-contact .ct-sub { font-size: clamp(9px, min(1.5cqw, 3.2cqh), 18px); line-height: 1.5; color: #444; }
+.monitor-contact .ct-cards { gap: 5cqh 2.4cqw; }
+.monitor-contact .c-inner { font-size: clamp(8px, min(1.35cqw, 3cqh), 16px); padding: .8em .9em; }
+.monitor-contact .c-copy { font-size: clamp(7px, min(1cqw, 2.3cqh), 12px); }
+.monitor-contact .toast { bottom: 4cqh; font-size: clamp(9px, min(1.3cqw, 2.8cqh), 15px); }
+
+/* ---------- ปฏิทิน: ไม่ให้ Nav บัง + พอดีจอเตี้ย ---------- */
+#time-layer { padding-top: 70px; }
+#calendar-stack { width: min(55vw, 620px, calc((100vh - 200px) * 4 / 3)); }
+
+@media (max-aspect-ratio: 1/1) {
+  #work-chair { left: 20%; width: 60%; height: 55%; bottom: 3%; }
+  #work-desk { left: 6%; right: -6%; bottom: 50%; height: 6%; }
+  .project-panel { grid-template-columns: minmax(0, 1fr); grid-template-rows: 36% minmax(0, 1fr); gap: 3cqh; }
+  .project-gallery { width: 78%; height: 88%; margin: auto; }
+  .project-copy h2 { font-size: clamp(16px, 6.4cqw, 28px); }
+  .project-about { font-size: clamp(11px, 3.8cqw, 16px); }
+  .project-copy dl { font-size: clamp(10px, 3.3cqw, 14px); }
+  .project-date, .project-actions a, .coming-link { font-size: clamp(10px, 3.3cqw, 13px); }
+  .monitor-contact { grid-template-columns: minmax(0, 1fr); align-content: center; gap: 3cqh; }
+  .monitor-contact h2 { font-size: clamp(18px, 7cqw, 30px); }
+  .monitor-contact .ct-sub { font-size: clamp(11px, 3.6cqw, 15px); }
+  .monitor-contact .ct-cards { grid-template-columns: 1fr; gap: 3cqh; }
+  .monitor-contact .c-inner { font-size: clamp(11px, 3.6cqw, 15px); }
+  .monitor-contact .c-copy { font-size: 11px; }
+  .idle-body { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .idle-code b, .idle-game i, .idle-caret::after { animation: none; }
+}
+/* เทปแปะการ์ดในจอ: ย่อตามขนาดการ์ด ไม่ให้บังชื่อช่องทาง */
+.monitor-contact .c-card::before { width: 16%; height: 11%; min-height: 6px; top: -6%; right: 7%; }
