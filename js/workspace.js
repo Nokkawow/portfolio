@@ -123,7 +123,7 @@
           <div class="na-copy">
             <span class="nw-tag">${esc(n.tag)}</span>
             <h2>${esc(n.headline)}</h2>
-            <p class="na-by">${esc(p.date)} · ใช้เวลา ${esc(p.duration)} · โดยกองบรรณาธิการ ${esc(site.name)}</p>
+            <p class="na-by">${[p.date, p.duration && 'ใช้เวลา ' + p.duration, 'โดยกองบรรณาธิการ ' + site.name].filter(Boolean).map(esc).join(' · ')}</p>
             <p class="na-deck">${esc(n.deck)}</p>
             <h3>${esc(p.title)}</h3>
             <p>${p.about || ''}</p>
