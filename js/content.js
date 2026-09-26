@@ -30,7 +30,7 @@ window.CONTENT = {
 
   // ผลงาน — เรียงจากอดีต → ปัจจุบัน (เพิ่มชิ้นใหม่ต่อท้ายได้เลย)
   // ช่องไหนเว้นว่าง ('') จะไม่แสดงบนเว็บ
-  // ลำดับไทม์ไลน์ (เจ้าของกำหนด): Penguin Five Days → Humannoid a → Too Ka Jok → Look Up, Don't let go → 404 Reborn → Hide The Cloth
+  // ลำดับไทม์ไลน์ (เจ้าของกำหนด): Penguin Five Days → Humanoid A → Too Ka Jok → Look Up, Don't let go → 404 Reborn → Hide The Cloth
   projects: [
     {
       id: 'penguin',
@@ -64,12 +64,12 @@ window.CONTENT = {
       video: ''
     },
     {
-      id: 'humannoid',
-      title: 'Humannoid a',
-      short: 'Humannoid a',
+      id: 'humanoid',
+      title: 'Humanoid A',
+      short: 'Humanoid A',
       news: {
         tag: 'เกมเดี่ยว',
-        headline: 'หุ่นยนต์ที่ถูกทิ้งลุกขึ้นทวงคืน: Humannoid a เกมที่ต้องถอดชิ้นส่วนตัวเองเพื่อไปต่อ',
+        headline: 'หุ่นยนต์ที่ถูกทิ้งลุกขึ้นทวงคืน: Humanoid A เกมที่ต้องถอดชิ้นส่วนตัวเองเพื่อไปต่อ',
         deck: 'ทำคนเดียวทุกส่วนใน 3–4 วัน ตั้งแต่คิดไอเดียจนเล่นได้ — เกมที่ชวนถามว่ามนุษย์ทิ้งของที่ยังใช้ได้ไปมากแค่ไหน'
       },
       date: '',                     // ⚠️ เจ้าของจำวันที่ไม่ได้ (ว่าง = ไม่แสดง) · ลำดับอยู่ระหว่าง Penguin กับ Too Ka Jok
@@ -82,11 +82,11 @@ window.CONTENT = {
       role: 'ทำทุกส่วน ตั้งแต่คิดไอเดียจนลงมือสร้าง',
       award: '',
       images: [
-        'assets/projects/humannoid/shot1.jpg',
-        'assets/projects/humannoid/shot2.jpg',
-        'assets/projects/humannoid/shot3.jpg',
-        'assets/projects/humannoid/shot4.jpg',
-        'assets/projects/humannoid/shot5.jpg'
+        'assets/projects/humanoid/shot1.jpg',
+        'assets/projects/humanoid/shot2.jpg',
+        'assets/projects/humanoid/shot3.jpg',
+        'assets/projects/humanoid/shot4.jpg',
+        'assets/projects/humanoid/shot5.jpg'
       ],
       link: '',                     // ยังไม่ได้อัปโหลด
       linkLabel: 'เล่นบน itch.io',
@@ -120,6 +120,36 @@ window.CONTENT = {
       linkLabel: 'เล่นบน itch.io',
       uploadedBy: '',               // ถ้าเพื่อน/ทีมเป็นคนอัปโหลด ใส่ชื่อที่นี่
       award: ''                     // รางวัล (ถ้ามี) — ขึ้นเป็นตราประทับสีม่วง
+    },
+    {
+      id: 'lookup',
+      title: "Look Up, Don't let go",
+      short: 'Look Up',
+      news: {
+        tag: 'รางวัล',
+        headline: 'ปวดท้องแค่ไหนก็ห้ามพลาด! Look Up, Don\'t let go คว้าอันดับ 3 Game Rainy Jam',
+        deck: 'เกมสุดฮาจากทีม 4 คน ทำเสร็จใน 72 ชั่วโมง: แหงนมองฟ้าเพื่อลืมอาการปวดท้อง แต่บนฟ้ากลับมีบางอย่างผิดปกติ — ถ่ายรูปมันไว้ให้ได้ก่อนจะกลั้นไม่ไหว'
+      },
+      date: '31 ก.ค. – 2 ส.ค. 2569',
+      duration: '72 ชั่วโมง (3 วัน)',
+      award: 'อันดับ 3 • Game Rainy Jam',
+      about: 'คุณกำลัง<em>ปวดท้องสุดขีด</em>และต้องกลั้นไว้ให้ได้ วิธีคลายเครียดคือแหงนมองท้องฟ้า… แต่ดันเห็น<em>สิ่งผิดปกติ</em>ลอยอยู่ ต้องสังเกตให้ดีแล้วถ่ายรูปเก็บไว้ ก่อนความกังวลจะทำให้ "แตก" ซะก่อน',
+      why: 'ไฮไลต์: ดูแลระบบเกมทั้งหมด พร้อมเทสต์และไล่แก้บั๊กไปในตัว — และนี่คือ<em>เกมแรกที่ได้รางวัล</em>',
+      goal: 'เปลี่ยนความเครียดเล็กๆ ในชีวิตให้กลายเป็นเสียงหัวเราะ',   // เขียนโดย Claude (เจ้าของให้เขียนแทน)
+      team: 'ฤดูร้อนไม่มีเธอ เหมือนก่อน เหมือนเก่า ขาดเธอเฮ้อเฮ้อเฮอเฮ้อเฮอ',
+      teamSize: 4,
+      role: 'Dev ระบบเกมทั้งหมด · Testing & Debugging',
+      images: [
+        'assets/projects/lookup/shot1.jpg',
+        'assets/projects/lookup/shot2.jpg',     // ป้ายรางวัลอันดับ 3
+        'assets/projects/lookup/shot3.jpg',
+        'assets/projects/lookup/shot4.jpg',
+        'assets/projects/lookup/shot5.jpg'
+      ],
+      link: 'https://tanny-th22.itch.io/look-up-dont-let-go',
+      linkLabel: 'เล่นบน itch.io',
+      uploadedBy: 'เพื่อนในทีม',
+      video: ''
     },
     {
       id: '404reborn',
