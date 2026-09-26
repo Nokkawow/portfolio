@@ -211,7 +211,6 @@
   tl.to(Workspace.camera, {p:1,duration:2.2,ease:'power3.inOut',onUpdate:Workspace.renderCamera},'monitor');
   tl.to('#work-chair', {autoAlpha:0,xPercent:-15,duration:.8},'monitor');
   tl.to(['#work-desk', '.room-tone'], { autoAlpha: 0, duration: .8 }, 'monitor+=.5');
-  tl.to('.monitor-stand', {autoAlpha:0,duration:.6},'monitor+=.4');
   tl.to({}, { duration: .5 });
 
   // 9) เลื่อนแนวตั้งคุมหน้าในจอให้เดินแนวนอน
@@ -219,6 +218,12 @@
     const label = i < C.projects.length ? 'project-' + i : (i === C.projects.length ? 'contact' : 'thanks');
     if (i > 0) tl.to('#portfolio-track', { xPercent: -100 * i, duration: 2, ease: 'power2.inOut' });
     tl.addLabel(label);
+    // ภาพขึ้นก่อน (ระหว่างหน้าเลื่อนเข้ามา) แล้วตัวอักษรตามมาทีหลัง — ย้อนได้ตามการเลื่อน
+    const at = i === 0 ? 'monitor+=1.3' : label + '-=0.9';
+    const photos = panel.querySelectorAll('.stack-photo');
+    const copy = panel.querySelectorAll('.project-index, .project-copy > *, .monitor-contact > * , .monitor-thanks > div > *');
+    if (photos.length) tl.fromTo(photos, { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: .6, stagger: .1, ease: 'back.out(1.6)' }, at);
+    if (copy.length) tl.fromTo(copy, { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: .5, stagger: .08, ease: 'power2.out' }, photos.length ? label + '+=0.1' : at);
     tl.to({}, { duration: i < C.projects.length ? 3.2 : 2.5 });
   });
 

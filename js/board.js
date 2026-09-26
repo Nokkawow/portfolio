@@ -162,12 +162,9 @@
         stagger: { each: 0.035, onStart: () => { if (n++ % 3 === 0) Sound.play('squeak', 0.05); } } };
       const popIn = { opacity: 1, scale: 1, y: 0, duration: 0.45, ease: 'back.out(1.8)', stagger: 0.12, onStart: () => Sound.play('pop') };
       writeTl = gsap.timeline();
-      if (s.classList.contains('slide-question')) {
-        // หน้าคำถาม: ภาพแปะขึ้นก่อน แล้วค่อยเขียนข้อความ
-        writeTl.to(pops, popIn).to(chars, writeChars, '+=0.15');
-      } else {
-        writeTl.to(chars, writeChars).to(pops, popIn, '-=0.3');
-      }
+      // ทุกสไลด์: ภาพ/ของแปะขึ้นก่อน แล้วค่อยเขียนข้อความ
+      if (pops.length) writeTl.to(pops, popIn).to(chars, writeChars, '+=0.15');
+      else writeTl.to(chars, writeChars);
       // การ์ดติดต่อ: ลอยลงมาแปะกระดานทีละใบ
       cardsEl.forEach((c, i) => {
         writeTl.to(c, {

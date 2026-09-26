@@ -12,11 +12,13 @@
     function layout() {
       const w=stage.clientWidth,h=stage.clientHeight,mobile=w<h;
       const margin=mobile?12:Math.max(24,w*.035), top=mobile?90:100;
-      const endW=mobile?w-margin*2:Math.min(w-margin*2,(h-top-30)*1.72);
-      const endH=mobile?h-top-35:endW/1.72;
+      // จบการซูม: เห็นคอมทั้งเครื่อง (กรอบจอครบ + ขาตั้ง + ที่ว่างรอบๆ) ไม่ให้จอเต็มหน้า
+      const avail=h-top-24, standRatio=.16;
+      const endW=mobile?w-margin*2:Math.min(w*.74,(avail/(1+standRatio))*1.72);
+      const endH=mobile?avail/(1+standRatio):endW/1.72;
       const startW=mobile?w*.55:w*.44;
       const a={x:mobile?w*.42:w*.49,y:mobile?h*.22:h*.21,w:startW,h:startW/1.72};
-      const b={x:(w-endW)/2,y:top+(h-top-30-endH)/2,w:endW,h:endH};
+      const b={x:(w-endW)/2,y:top+(avail-endH*(1+standRatio))/2,w:endW,h:endH};
       const p=camera.p;
       Object.keys(a).forEach(k=>{const property={x:'left',y:'top',w:'width',h:'height'}[k];shell.style[property]=(a[k]+(b[k]-a[k])*p)+'px';});
     }
