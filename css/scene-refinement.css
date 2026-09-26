@@ -51,3 +51,23 @@
 }
 
 .monitor-thanks .project-index { position:static; margin:0 0 1em; }
+
+/* กองภาพผลงาน: ตำแหน่ง/มุมคุมด้วย GSAP ใน workspace.js (ปิด transform จาก CSS เดิม) */
+.project-gallery { isolation: isolate; }
+.stack-photo, .stack-photo:nth-child(n), .stack-photo.active { transform: none; transition: none; cursor: pointer; }
+.stack-photo.active { box-shadow: 10px 12px 0 rgba(123,31,162,.35); border-color: #111; }
+.stack-photo:focus-visible { outline: 3px solid var(--purple-2); outline-offset: 3px; }
+
+/* ดูภาพขนาดใหญ่ */
+#photo-lightbox {
+  position: fixed; inset: 0; z-index: 200;
+  display: grid; place-items: center; align-content: center; gap: 14px;
+  padding: 5vh 5vw; background: rgba(0,0,0,.9); cursor: zoom-out;
+}
+#photo-lightbox[hidden] { display: none; }
+#photo-lightbox img { max-width: 100%; max-height: 80vh; border: 5px solid #fff; box-shadow: 12px 14px 0 rgba(123,31,162,.55); }
+#photo-lightbox p { color: #fff; font-weight: 700; font-size: 14px; text-align: center; }
+#photo-lightbox button {
+  position: absolute; top: 20px; right: 20px; width: 46px; height: 46px; border-radius: 50%;
+  background: #fff; color: #111; border: 2.5px solid #111; font-size: 18px; font-weight: 900;
+}

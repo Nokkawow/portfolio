@@ -74,16 +74,70 @@
     thanks.innerHTML = `<div><p class="project-index">THE END</p><h2>${content.thanks.title}</h2><p>${esc(content.thanks.sub)}</p><div class="mini-mascot" aria-hidden="true">?</div></div>`;
     track.appendChild(thanks);
 
+    /* ---------- กองภาพ: ชี้ภาพไหน ภาพนั้นออกมาหน้าสุด ภาพก่อนหน้าเขยิบไปเก็บที่ขอบซ้าย ---------- */
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function layoutStack(gallery, active, instant) {
+      const photos = [...gallery.querySelectorAll('.stack-photo')];
+      gallery.dataset.active = active;
+      photos.forEach((ph, i) => {
+        const d = i - active;
+        let v;
+        if (d === 0) v = { xPercent: 0, yPercent: -3, rotation: 0, scale: 1.04, zIndex: 50 };                    // หน้าสุด
+        else if (d < 0) v = { xPercent: -36 - (-d - 1) * 5, yPercent: 4 - d, rotation: -6 + d * 2, scale: 0.8, zIndex: 40 + d }; // เก็บที่ขอบซ้าย
+        else v = { xPercent: 6 * d, yPercent: 3 * d, rotation: d % 2 ? 3 + d : -2 - d, scale: 1 - 0.05 * d, zIndex: 40 - d };    // ซ้อนรออยู่ด้านหลังขวา
+        ph.classList.toggle('active', d === 0);
+        ph.setAttribute('aria-pressed', d === 0);
+        if (instant || reduce) gsap.set(ph, v);
+        else gsap.to(ph, { ...v, duration: 0.5, ease: 'power3.out', overwrite: 'auto' });
+      });
+    }
+    track.querySelectorAll('[data-gallery]').forEach((g) => layoutStack(g, 0, true));
+
+    let lastSwap = 0;
+    function activate(photo) {
+      const gallery = photo.closest('[data-gallery]');
+      const i = +photo.dataset.image;
+      if (+gallery.dataset.active === i) return false;
+      lastSwap = performance.now();
+      layoutStack(gallery, i);
+      Sound.play('tick', 0.05);
+      return true;
+    }
+    // เมาส์: ชี้แล้วสลับทันที (หน่วงนิดกันภาพสลับไปมาตอนภาพเลื่อนผ่านใต้เมาส์)
     track.addEventListener('pointerover', (e) => {
+      if (e.pointerType !== 'mouse') return;
       const photo = e.target.closest('.stack-photo');
-      if (!photo) return;
-      photo.parentElement.querySelectorAll('.stack-photo').forEach((p) => p.classList.toggle('active', p === photo));
+      if (photo && performance.now() - lastSwap > 220) activate(photo);
     });
+
+    /* ---------- ดูภาพขนาดใหญ่ ---------- */
+    const box = document.createElement('div');
+    box.id = 'photo-lightbox';
+    box.setAttribute('role', 'dialog');
+    box.setAttribute('aria-modal', 'true');
+    box.setAttribute('data-lenis-prevent', '');
+    box.hidden = true;
+    box.innerHTML = '<img alt=""><p></p><button type="button" aria-label="ปิด">✕</button>';
+    document.body.appendChild(box);
+    const boxImg = box.querySelector('img'), boxCap = box.querySelector('p');
+    function openBox(photo) {
+      const img = photo.querySelector('img');
+      const all = photo.closest('[data-gallery]').querySelectorAll('.stack-photo');
+      boxImg.src = img.src; boxImg.alt = img.alt;
+      boxCap.textContent = `${img.alt} · ${+photo.dataset.image + 1} / ${all.length}`;
+      box.hidden = false;
+      if (!reduce) gsap.fromTo(boxImg, { scale: 0.85, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.35, ease: 'back.out(1.6)' });
+      box.querySelector('button').focus();
+    }
+    function closeBox() { box.hidden = true; }
+    box.addEventListener('click', closeBox);
+    window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !box.hidden) closeBox(); });
+
     track.addEventListener('click', async (e) => {
       const photo = e.target.closest('.stack-photo');
       if (photo) {
-        photo.parentElement.querySelectorAll('.stack-photo').forEach((p) => p.classList.toggle('active', p === photo));
-        photo.classList.toggle('full');
+        // แตะภาพที่ยังไม่อยู่หน้าสุด = ดึงออกมาก่อน · กดภาพหน้าสุด = เปิดดูใหญ่
+        if (!activate(photo)) openBox(photo);
         return;
       }
       const copy = e.target.closest('[data-copy]');
