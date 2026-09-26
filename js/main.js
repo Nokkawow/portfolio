@@ -77,7 +77,7 @@
   window.initCharacter(S, api);
   const Board = window.initBoard(C, api);
   const Workspace = window.initWorkspace(C);
-  const VHS = window.initVHS();
+  const VHS = window.initVHS(Workspace.calendarPages);
   Effects.tiltCards(document.getElementById('slides'));   // 3D Card
   Effects.sparkles(document.getElementById('slides'));    // Sparkles
   const Mascot = window.initMascot(api);
@@ -229,25 +229,33 @@
   tl.to(['#work-desk', '.room-tone'], { autoAlpha: 0, duration: .8 }, 'monitor+=.5');
   tl.to({}, { duration: .5 });
 
-  // 9) เลื่อนแนวตั้งคุมหน้าในจอให้เดินแนวนอน
-  Workspace.panels.forEach((panel, i) => {
-    const label = i < C.projects.length ? 'project-' + i : (i === C.projects.length ? 'contact' : 'thanks');
-    if (i > 0) tl.to('#portfolio-track', { xPercent: -100 * i, duration: 2, ease: 'power2.inOut' });
-    tl.addLabel(label);
-    // ภาพขึ้นก่อน (ระหว่างหน้าเลื่อนเข้ามา) แล้วตัวอักษรตามมาทีหลัง — ย้อนได้ตามการเลื่อน
-    const at = i === 0 ? 'monitor+=1.3' : label + '-=0.9';
-    const photos = panel.querySelectorAll('.stack-photo');
-    const copy = panel.querySelectorAll('.project-index, .project-copy > *, .ct-head > *, .monitor-thanks > div > *');
-    if (photos.length) tl.fromTo(photos, { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: .6, stagger: .1, ease: 'back.out(1.6)' }, at);
-    if (copy.length) tl.fromTo(copy, { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: .5, stagger: .08, ease: 'power2.out' }, photos.length ? label + '+=0.1' : at);
-    const cards = panel.querySelectorAll('.c-card');
-    cards.forEach((c, k) => {
-      const r = parseFloat(c.style.getPropertyValue('--r')) || 0;
-      tl.fromTo(c, { autoAlpha: 0, y: -60, scale: 1.2, rotation: k % 2 ? 20 : -20 },
-        { autoAlpha: 1, y: 0, scale: 1, rotation: r, duration: .5, ease: 'back.out(2)' }, label + '+=' + (0.4 + k * 0.18));
-    });
-    tl.to({}, { duration: i < C.projects.length ? 3.2 : 2.5 });
+  // 9) ในจอ = เบราว์เซอร์ Nokkawow News — กดอ่านข่าวได้อิสระ (ไม่กดก็เลื่อนผ่านได้)
+  tl.fromTo('#browser', { autoAlpha: 0, scale: .96 }, { autoAlpha: 1, scale: 1, duration: .6, ease: 'back.out(1.5)' }, 'monitor+=1.2');
+  tl.addLabel('news', 'monitor+=1.9');
+  tl.to({}, { duration: 5 }, 'news');   // ค้างให้เลือกอ่านข่าว
+
+  // 10) ซูมออกจากจอ → เจอมาสคอตนั่งหน้าคอม ทักทาย + บัตรขูดติดต่อ
+  tl.addLabel('zoomout');
+  tl.to(Workspace.camera, { p: 0, duration: 1.6, ease: 'power3.inOut', onUpdate: Workspace.renderCamera }, 'zoomout');
+  tl.to(['#work-desk', '.room-tone'], { autoAlpha: 1, duration: .8 }, 'zoomout+=.4');
+  tl.to('#work-chair', { autoAlpha: 1, xPercent: 0, duration: .8 }, 'zoomout+=.6');
+  tl.addLabel('contact');
+  tl.fromTo('#fin-bubble', { autoAlpha: 0, scale: .6, y: 20 }, { autoAlpha: 1, scale: 1, y: 0, duration: .5, ease: 'back.out(2)' }, 'contact');
+  tl.fromTo('#fin-bubble .b1', { autoAlpha: 1 }, { autoAlpha: 1, duration: .01 }, 'contact');
+  tl.fromTo('#fin-cards > h2, #fin-cards > p', { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: .5, stagger: .1 }, 'contact+=.2');
+  Workspace.cards.forEach((c, k) => {
+    tl.fromTo(c, { autoAlpha: 0, y: -50, rotation: k % 2 ? 14 : -14, scale: 1.15 },
+      { autoAlpha: 1, y: 0, rotation: [-2, 2, 1.5, -1.5][k % 4], scale: 1, duration: .5, ease: 'back.out(2)' }, 'contact+=' + (0.4 + k * .15));
   });
+  tl.set('#fin-cards', { autoAlpha: 1 }, 'contact');
+  cues.push({ label: 'contact', fwd: () => { document.body.classList.add('finale'); Workspace.repaintCovers(); Sound.play('pop'); }, back: () => document.body.classList.remove('finale') });
+  tl.to({}, { duration: 3.5 });
+  tl.addLabel('thanks');
+  tl.to('#fin-bubble .b1', { autoAlpha: 0, duration: .25 }, 'thanks');
+  tl.fromTo('#fin-bubble .b2', { autoAlpha: 0 }, { autoAlpha: 1, duration: .3, immediateRender: true }, 'thanks+=.2');
+  tl.fromTo('#fin-thanks', { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: .7, ease: 'power3.out' }, 'thanks+=.3');
+  tl.fromTo('.work-turned', { y: 0 }, { y: -14, duration: .2, yoyo: true, repeat: 3, ease: 'sine.inOut', immediateRender: false }, 'thanks+=.3');
+  tl.to({}, { duration: 2.5 });
 
   /* ---------- ScrollTrigger ตัวเดียวคุมทั้งเว็บ ---------- */
   let lastTime = 0;
@@ -269,6 +277,9 @@
   const cueTimes = () => cues.forEach((c) => (c.time = tl.labels[c.label]));
   cueTimes();
   ranges.forEach((r) => { r.a = tl.labels[r.from] + r.offFrom; r.b = tl.labels[r.to] + r.offTo; r.in = false; });
+  // เวลาที่หน้าปฏิทินแต่ละหน้าหลุดเสร็จ (ใช้เปลี่ยนวันที่บน HUD เทป)
+  const calTimes = Workspace.calendarPages.slice(0, -1).map((_, i) => tl.labels.time + i * .62 + .75);
+
   /* ---------- เคอร์เซอร์เปลี่ยนตามฉาก: ดินสอ (ห้องเรียน) / ชอล์ก (กระดาน) / เมาส์คอม (ห้องทำงาน) ---------- */
   const CURSORS = {
     pencil: ["<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><g stroke='#111' stroke-width='1.6' stroke-linejoin='round'><path d='M3 29l2-7L22 5l5 5-17 17z' fill='#fff'/><path d='M22 5l3-3 5 5-3 3z' fill='#7b1fa2'/><path d='M3 29l2-7 5 5z' fill='#f2d7b5'/><path d='M3 29l1-3.4 2.4 2.4z' fill='#111'/><path d='M8.5 19.5l4 4' fill='none'/></g></svg>", 3, 29],
@@ -287,6 +298,7 @@
   gsap.ticker.add(() => {
     const t = tl.time();
     setScene(t);
+    VHS.update(t, tl.labels, calTimes);
     if (t !== lastTime) {
       // ไปข้างหน้า: เรียงตามลำดับ / ถอยหลัง: เรียงย้อนกลับ (กันสไลด์ผิดตอนกระโดดข้ามหลายฉาก)
       if (t > lastTime) cues.forEach((c) => { if (lastTime < c.time && t >= c.time) c.fwd(); });
@@ -309,6 +321,7 @@
     { label: C.nav.start, target: 'start' },
     { label: C.nav.question, target: 'question' },
     { label: C.nav.workspace, target: 'workspace' },
+    { label: C.nav.news, target: 'news' },
     ...C.projects.map((p, i) => ({ label: p.short || p.title, target: 'project-' + i })),
     { label: C.nav.contact, target: 'contact' }
   ].filter((n) => n.target === 'start' || tl.labels[n.target] !== undefined)

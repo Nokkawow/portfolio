@@ -1,0 +1,112 @@
+/* ============================================================
+   V2 — เบราว์เซอร์ Nokkawow News (ในจอคอม) + ฉากสุดท้าย (บัตรขูด + มาสคอตทักทาย)
+   ขนาดตัวอักษรในเบราว์เซอร์อิงขนาดจอคอม (em จาก cqw/cqh ของ #monitor-screen)
+   ============================================================ */
+
+/* ---------- ② เบราว์เซอร์ ---------- */
+#browser { position: absolute; inset: 0; z-index: 4; display: grid; grid-template-rows: auto auto 1fr; background: #fff; color: #111; font-size: clamp(8px, min(1.35cqw, 2.9cqh), 16px); }
+.br-top { display: flex; align-items: flex-end; gap: .5em; padding: .5em .8em 0; background: #e4e1e8; }
+.br-top > i { width: .75em; height: .75em; margin-bottom: .75em; border-radius: 50%; background: #bbb; flex: none; }
+.br-top > i:first-child { background: var(--purple-2); }
+.br-tabs { display: flex; gap: .3em; min-width: 0; overflow: hidden; margin-left: .6em; }
+.br-tab { display: flex; align-items: center; gap: .45em; max-width: 16em; min-width: 0; padding: .55em .8em; border: 2px solid #111; border-bottom: 0; border-radius: .7em .7em 0 0; background: #f4f2f6; cursor: pointer; font-weight: 700; }
+.br-tab span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.br-tab img { width: 1.3em; height: 1.3em; flex: none; }
+.br-tab.active { background: #fff; position: relative; top: 2px; }
+.br-close { flex: none; width: 1.5em; height: 1.5em; border-radius: 50%; font-size: .85em; line-height: 1; }
+.br-close:hover { background: #111; color: #fff; }
+.br-bar { display: flex; align-items: center; gap: .6em; padding: .45em .8em; border-top: 2px solid #111; border-bottom: 2px solid #111; }
+.br-home { font-size: 1.25em; width: 1.6em; }
+.br-lock { width: 1.1em; height: 1.1em; fill: none; stroke: #2e7d32; stroke-width: 2.4; flex: none; }
+.br-url { flex: 1; padding: .3em .9em; border-radius: 999px; background: #f1eff3; font-family: ui-monospace, Consolas, monospace; color: #444; white-space: nowrap; overflow: hidden; }
+.br-view { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+.br-page { padding: 1.6em 2em 2.4em; }
+
+/* หน้าแรก: พาดหัวข่าว */
+.nw-mast { text-align: center; border-bottom: 4px double #111; padding-bottom: .6em; }
+.nw-mast h1 { font-size: 3.1em; font-weight: 900; letter-spacing: -.02em; line-height: 1.05; }
+.nw-mast p { font-size: .9em; color: #555; font-weight: 700; }
+.nw-ticker { display: flex; align-items: center; gap: .8em; margin: .8em 0 1.2em; border: 2px solid #111; overflow: hidden; }
+.nw-ticker b { flex: none; padding: .35em .8em; background: var(--purple-2); color: #fff; }
+.nw-ticker div { overflow: hidden; white-space: nowrap; flex: 1; }
+.nw-ticker span { display: inline-block; padding-left: 100%; animation: ticker 22s linear infinite; font-weight: 700; }
+@keyframes ticker { to { transform: translateX(-100%); } }
+.nw-lead, .nw-card { display: grid; gap: 1.2em; cursor: pointer; border: 2.5px solid #111; padding: .9em; margin-bottom: 1.2em; background: #fff; transition: transform .2s ease, box-shadow .2s ease; }
+.nw-lead { grid-template-columns: 1.35fr 1fr; align-items: center; }
+.nw-card { grid-template-columns: .8fr 1.6fr; align-items: center; }
+.nw-lead:hover, .nw-card:hover, .nw-lead:focus-visible, .nw-card:focus-visible { transform: translate(-3px, -3px); box-shadow: 6px 6px 0 var(--purple-2); outline: none; }
+.nw-lead img, .nw-card img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border: 2px solid #111; filter: grayscale(.35); transition: filter .2s ease; }
+.nw-lead:hover img, .nw-card:hover img { filter: none; }
+.nw-tag { display: inline-block; padding: .15em .7em; background: #111; color: #fff; font-weight: 800; font-size: .85em; margin-bottom: .5em; }
+.nw-lead h2 { font-size: 1.75em; line-height: 1.25; font-weight: 900; }
+.nw-card h3 { font-size: 1.25em; line-height: 1.3; font-weight: 900; }
+.nw-lead p, .nw-card p { color: #444; margin-top: .4em; line-height: 1.45; }
+.nw-lead em { display: inline-block; margin-top: .6em; color: var(--purple-2); font-weight: 900; font-style: normal; }
+.nw-foot { text-align: center; color: #888; font-size: .85em; }
+
+/* หน้าข่าวแต่ละเกม */
+.news-article { display: grid; grid-template-columns: 1fr 1.1fr; gap: 2em; align-items: start; }
+.na-gallery { position: relative; aspect-ratio: 16 / 11; padding: 0 12% 0 12%; }
+.na-gallery .project-gallery { width: 100%; height: 100%; margin: 0; }
+.na-gallery .winner-stamp { position: absolute; left: 0; bottom: -1.8em; z-index: 60; font-size: .95em; }
+.na-copy h2 { font-size: 1.7em; line-height: 1.25; font-weight: 900; }
+.na-copy h3 { margin-top: .8em; font-size: 1.2em; font-weight: 900; }
+.na-by { color: #777; font-size: .85em; font-weight: 700; margin: .4em 0 .6em; }
+.na-deck { font-weight: 800; line-height: 1.45; border-left: 4px solid var(--purple-2); padding-left: .7em; }
+.na-copy p { line-height: 1.55; margin-top: .5em; }
+.na-copy dl { display: grid; grid-template-columns: 1fr 1fr; gap: .6em; margin: .9em 0; }
+.na-copy dl div { border-top: 2px solid #111; padding-top: .3em; }
+.na-copy dt { font-weight: 900; }
+.na-copy dd { color: #555; }
+.na-copy blockquote { font-style: italic; color: #555; margin: .6em 0; }
+.news-article .project-actions a, .news-article .coming-link { font-size: 1em; }
+
+/* ---------- ③ ฉากสุดท้าย ---------- */
+#fin-cards { position: absolute; z-index: 6; left: 3%; top: 16%; width: 34%; visibility: hidden; color: #111; }
+#fin-cards > h2 { font-size: clamp(22px, 2.6vw, 44px); font-weight: 900; }
+#fin-cards > p { font-weight: 700; color: #555; margin-bottom: 1.2em; font-size: clamp(12px, 1.1vw, 17px); }
+.sc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.sc-card { position: relative; border: 3px solid #111; border-radius: 14px; background: #fff; box-shadow: 5px 6px 0 rgba(0,0,0,.14); min-height: clamp(62px, 7.5vw, 96px); }
+.sc-inner { display: flex; align-items: center; gap: .7em; height: 100%; padding: .8em; color: #111; text-decoration: none; font-size: clamp(11px, 1vw, 15px); }
+.sc-logo { flex: none; width: 2.8em; height: 2.8em; transition: transform .25s ease; }
+.sc-logo svg { width: 100%; height: 100%; display: block; border-radius: 22%; }
+.sc-inner:hover .sc-logo { transform: rotate(-10deg) scale(1.1); }
+.sc-text { display: grid; min-width: 0; }
+.sc-text small { color: #777; font-weight: 700; }
+.sc-text b { font-weight: 900; overflow-wrap: anywhere; }
+.sc-copy { position: absolute; right: 8px; bottom: -12px; padding: .2em .8em; border: 2px solid #111; border-radius: 999px; background: #fff; font-weight: 800; font-size: 11px; }
+.sc-copy:hover { background: var(--purple-2); color: #fff; border-color: var(--purple-2); }
+.sc-cover { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 11px; cursor: crosshair; touch-action: none; z-index: 2; }
+.sc-spark { position: absolute; z-index: 3; width: 12px; height: 12px; margin: -6px 0 0 -6px; background: var(--purple-2); pointer-events: none;
+  clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%); }
+#fin-cards .toast { position: absolute; left: 0; bottom: -44px; padding: .5em 1em; border-radius: 999px; background: #111; color: #fff; font-weight: 700; font-size: 13px; opacity: 0; visibility: hidden; }
+#fin-bubble {
+  position: absolute; z-index: 7; left: 38%; top: 13%; max-width: min(24vw, 320px);
+  padding: .8em 1.1em; background: #fff; color: #111; border: 3px solid #111; border-radius: 18px;
+  box-shadow: 5px 6px 0 rgba(123,31,162,.35); font-weight: 800; font-size: clamp(13px, 1.2vw, 18px); line-height: 1.45;
+  visibility: hidden; transform-origin: 70% 100%;
+}
+#fin-bubble::after { content: ''; position: absolute; right: 22%; bottom: -21px; border: 9px solid transparent; border-top: 12px solid #111; }
+#fin-bubble .b2 { position: absolute; inset: .8em 1.1em; }
+#fin-thanks { position: absolute; z-index: 6; right: 4%; bottom: 6%; margin: 0; font-weight: 900; color: #111; font-size: clamp(26px, 4vw, 68px); visibility: hidden; text-align: right; }
+
+@media (max-aspect-ratio: 1/1) {
+  #fin-cards { left: 4%; right: 4%; width: auto; top: 12%; }
+  .sc-grid { gap: 10px; }
+  #fin-bubble { left: 6%; top: auto; bottom: 57%; max-width: 70vw; }
+  #fin-thanks { left: 4%; right: 4%; bottom: 3%; text-align: center; font-size: 30px; }
+  .br-page { padding: 1.2em 1.1em 2em; }
+  .nw-lead, .nw-card, .news-article { grid-template-columns: 1fr; }
+  #browser { font-size: clamp(10px, 3.2cqw, 14px); }
+}
+@media (prefers-reduced-motion: reduce) { .nw-ticker span { animation: none; padding-left: 0; } }
+
+/* ปุ่มคัดลอกโผล่หลังขูดแล้วเท่านั้น */
+.sc-card:not(.revealed) .sc-copy { visibility: hidden; }
+
+/* มือถือ: ฉากสุดท้ายซ่อนจอคอม ให้การ์ด/คำพูดไม่ซ้อนกัน */
+@media (max-aspect-ratio: 1/1) {
+  body.finale #monitor-shell { opacity: 0; transition: opacity .4s ease; }
+  #fin-bubble { top: 40%; bottom: auto; }
+  #fin-thanks { background: rgba(247,247,244,.9); border-radius: 14px; padding: .15em .3em; }
+}
