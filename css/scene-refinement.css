@@ -1,5 +1,9 @@
 /* Camera rectangles are measured in workspace.js. No whole-page scaling. */
 #workspace-layer { transform-origin: center; }
+#classroom-bg, #workspace-bg { position:absolute; inset:-2%; z-index:0; pointer-events:none; background-position:center; background-size:cover; will-change:transform; }
+#classroom-bg { background-image:url('../assets/backgrounds/classroom-v52.png'); }
+#workspace-bg { background-image:url('../assets/backgrounds/workspace-v52.png'); opacity:.8; }
+#scene { z-index:1; }
 #work-desk { z-index:1; left:30%; right:5%; bottom:25%; height:9%; }
 #work-desk i { left:5%; width:13%; height:55%; }
 #work-chair { z-index:3; left:25%; bottom:2%; width:32%; height:72%; transform:none; }

@@ -246,6 +246,26 @@
     document.querySelector('#fin-bubble .b1').textContent = fin.hello;
     document.querySelector('#fin-bubble .b2').textContent = fin.bye;
     document.getElementById('fin-thanks').innerHTML = content.thanks.title;
+    const contactMascot = document.getElementById('contact-mascot');
+    let mascotDrag = null;
+    contactMascot.addEventListener('pointerdown', (e) => {
+      mascotDrag = { x: e.clientX, y: e.clientY };
+      contactMascot.setPointerCapture(e.pointerId);
+      Sound.play('pop', .12);
+    });
+    contactMascot.addEventListener('pointermove', (e) => {
+      if (!mascotDrag) return;
+      const x = Math.max(-65, Math.min(65, (e.clientX - mascotDrag.x) * .42));
+      const y = Math.max(-45, Math.min(45, (e.clientY - mascotDrag.y) * .35));
+      gsap.set(contactMascot.querySelector('img'), { x, y, rotation: x * .08 });
+    });
+    const releaseMascot = () => {
+      if (!mascotDrag) return;
+      mascotDrag = null;
+      gsap.to(contactMascot.querySelector('img'), { x: 0, y: 0, rotation: 0, duration: reduce ? .01 : .65, ease: 'elastic.out(1,.45)' });
+    };
+    contactMascot.addEventListener('pointerup', releaseMascot);
+    contactMascot.addEventListener('pointercancel', releaseMascot);
 
     // ชั้นเงินสำหรับขูด
     const covers = [...finCards.querySelectorAll('.sc-cover')].map((cv) => ({ cv, ctx: cv.getContext('2d'), done: false, last: null, moves: 0 }));

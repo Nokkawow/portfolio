@@ -3,8 +3,8 @@
   window.initParallax = function initParallax(reduce) {
     if (reduce) return;
     const targets = [
-      ['#classroom-furniture', -18, -10], ['#student-chair', -10, -5], ['#desk', 7, 4],
-      ['.room-tone', -14, -8], ['#work-cpu', -7, -4], ['#work-papers', 9, 5]
+      ['#classroom-bg', -22, -12], ['#student-chair', -8, -4], ['#desk', 6, 3],
+      ['#workspace-bg', -20, -10], ['#work-cpu', -7, -4], ['#work-papers', 9, 5]
     ].map(([selector, mx, my]) => {
       const el = document.querySelector(selector);
       return el && { el, mx, my, x: gsap.quickTo(el, 'x', { duration: .65, ease: 'power3.out' }), y: gsap.quickTo(el, 'y', { duration: .65, ease: 'power3.out' }) };

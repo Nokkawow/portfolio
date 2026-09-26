@@ -18,12 +18,13 @@
       const dy = sr.top + sr.height / 2 - (tr.top + tr.height / 2);
       Sound.play('click', .35);
       gsap.timeline({ defaults: { ease: 'power3.inOut' } })
-        .to(tape, { x: `+=${dx}`, y: `+=${dy}`, rotation: 0, scale: .72, duration: reduce ? .05 : .65 })
-        .to(tape, { scaleY: .12, autoAlpha: 0, duration: reduce ? .05 : .38, ease: 'power2.in' })
+        .to(tape, { x: `+=${dx}`, y: `+=${dy}`, rotation: 0, scale: .72, duration: reduce ? .28 : .65 })
+        .to(tape, { scaleY: .12, autoAlpha: 0, duration: reduce ? .18 : .38, ease: 'power2.in' })
         .add(() => { intro.classList.add('playing'); Sound.play('pop', .3); })
-        .to('.theater-screen', { scale: 1.04, duration: reduce ? .05 : .55 }, '<')
-        .to('.theater-screen', { scale: 5.8, duration: reduce ? .05 : 1.15, ease: 'power3.in' }, '+=.35')
-        .to(intro, { autoAlpha: 0, duration: reduce ? .05 : .45 }, '-=.25')
+        .to('.theater-screen', { scale: 1.04, duration: reduce ? .25 : .55 }, '<')
+        .to('.screen-paper', { autoAlpha: 1, duration: reduce ? .38 : .55 }, '+=.15')
+        .to('.theater-screen', { scale: 6.4, duration: reduce ? .95 : 1.6, ease: 'power2.inOut' }, '<')
+        .to(intro, { autoAlpha: 0, duration: reduce ? .55 : .95 }, '-=.3')
         .add(() => { intro.hidden = true; resolveDone(); });
     }
 

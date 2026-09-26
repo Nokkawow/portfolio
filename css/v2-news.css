@@ -54,6 +54,7 @@
 .na-by { color: #777; font-size: .85em; font-weight: 700; margin: .4em 0 .6em; }
 .na-deck { font-weight: 800; line-height: 1.45; border-left: 4px solid var(--purple-2); padding-left: .7em; }
 .na-copy p { line-height: 1.55; margin-top: .5em; }
+.br-page[hidden] { display:none !important; }
 .na-copy dl { display: grid; grid-template-columns: 1fr 1fr; gap: .6em; margin: .9em 0; }
 .na-copy dl div { border-top: 2px solid #111; padding-top: .3em; }
 .na-copy dt { font-weight: 900; }
@@ -90,21 +91,33 @@
 #fin-bubble .b2 { position: absolute; inset: .8em 1.1em; }
 #fin-thanks { position: absolute; z-index: 6; right: 4%; bottom: 6%; margin: 0; font-weight: 900; color: #111; font-size: clamp(26px, 4vw, 68px); visibility: hidden; text-align: right; }
 .work-front { opacity: 0; pointer-events: none; }
+#contact-mascot { position:absolute; z-index:6; right:5%; bottom:1%; width:min(40vw,640px); height:78%; opacity:0; visibility:hidden; touch-action:none; cursor:grab; }
+#contact-mascot:active { cursor:grabbing; }
+#contact-mascot img { display:block; width:100%; height:100%; object-fit:contain; object-position:center bottom; filter:drop-shadow(0 18px 15px #1b102844); }
+body.finale #fin-cards { left:5%; top:13%; width:48%; }
+body.finale .sc-grid { gap:18px; }
+body.finale .sc-card { min-height:clamp(96px,10vw,146px); }
+body.finale .sc-inner { font-size:clamp(14px,1.25vw,20px); }
+body.finale #fin-bubble { left:auto; right:13%; top:10%; max-width:min(30vw,400px); }
+body.finale #workspace-bg { opacity:.36; }
+body.finale #workspace-layer { background:radial-gradient(circle at 83% 75%,#f1e5fa 0,#faf7fc 35%,#fff 80%); }
 #thanks-stage { position:absolute; inset:0; z-index:20; display:grid; place-items:center; overflow:hidden; background:radial-gradient(circle at 50% 38%,#5a2a83 0,#1b1028 45%,#08060d 100%); opacity:0; visibility:hidden; pointer-events:none; }
 .stage-spotlight { position:absolute; width:55vw; height:110vh; top:-28vh; background:linear-gradient(180deg,rgba(255,255,255,.72),rgba(255,255,255,.06)); clip-path:polygon(42% 0,58% 0,86% 100%,14% 100%); filter:blur(4px); }
-.thanks-mascot { position:absolute; bottom:-4vh; height:min(76vh,760px); filter:drop-shadow(0 16px 14px rgba(0,0,0,.55)); }
+.stage-floor { position:absolute; left:0; right:0; bottom:0; height:21%; background:repeating-linear-gradient(90deg,#201527 0 110px,#2c1b34 110px 113px); transform:perspective(500px) rotateX(40deg); transform-origin:bottom; border-top:8px solid #ac80cf; box-shadow:0 -16px 45px #c7a1eb55; }
+.thanks-mascot { position:absolute; bottom:7%; height:min(72vh,720px); filter:drop-shadow(0 16px 14px rgba(0,0,0,.55)); }
 .thanks-copy { position:absolute; bottom:7%; color:#fff; text-align:center; display:grid; gap:.25em; font-weight:900; text-shadow:0 3px 10px #000; }
 .thanks-copy b { font-size:clamp(28px,4vw,68px); }
 .thanks-copy small { font-size:clamp(14px,1.5vw,24px); letter-spacing:.12em; }
-.stage-curtain { position:absolute; top:0; bottom:0; width:24%; background:repeating-linear-gradient(90deg,#170b25 0 22px,#3f185c 22px 48px); z-index:2; transition:transform .8s ease; }
+.stage-curtain { position:absolute; top:0; bottom:0; width:50.5%; background:repeating-linear-gradient(90deg,#170b25 0 22px,#3f185c 22px 48px); z-index:3; box-shadow:inset 0 0 30px #09040c; }
 .stage-curtain-left { left:0; transform:translateX(-100%); }
 .stage-curtain-right { right:0; transform:translateX(100%); }
-body.stage-closed .stage-curtain-left { transform:translateX(0); } body.stage-closed .stage-curtain-right { transform:translateX(0); }
-body.finale #work-desk, body.finale #work-cpu, body.finale #work-papers, body.finale #monitor-shell { opacity:0!important; pointer-events:none; }
-body.finale .work-front { opacity:1; }
-body.finale #work-chair { z-index:8; }
 
 @media (max-aspect-ratio: 1/1) {
+  body.finale #fin-cards { left:4%; right:4%; width:auto; top:6%; }
+  body.finale .sc-card { min-height:72px; }
+  body.finale #fin-bubble { right:5%; top:51%; max-width:62vw; }
+  #contact-mascot { right:18%; bottom:-9%; width:65%; height:52%; }
+  .thanks-mascot { height:55vh; bottom:14%; }
   #fin-cards { left: 4%; right: 4%; width: auto; top: 12%; }
   .sc-grid { gap: 10px; }
   #fin-bubble { left: 6%; top: auto; bottom: 57%; max-width: 70vw; }

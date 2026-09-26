@@ -38,6 +38,8 @@ js/mascot.js        มาสคอตแอบดูขอบจอ (จับ/
 js/workspace.js     ห้องทำงาน + จอคอม: ปฏิทิน, กองภาพผลงาน, หน้าติดต่อในจอ, กล้องซูมเข้าจอ
 css/monitor.css     สไตล์ในจอคอม/ห้องทำงาน (ขนาดอิงจอคอมด้วย cqw/cqh)
 assets/characters/rig/  ตัวละครแยกชิ้น (ฐาน/ตา/ม่านตา/หางม้า) ให้ตาขยับ กะพริบ หางม้าแกว่งได้
+assets/backgrounds/  ภาพพื้นหลังห้องเรียนและห้องคอม 2D (v52) ขยับตามเมาส์ผ่าน js/parallax.js
+assets/characters/student-wave-v52.png, student-wai-v52.png  มาสคอตฉากติดต่อและเวทีขอบคุณ
 js/effects.js       Text Generate, Flip Words, 3D Card, Sparkles
 js/sound.js         เสียงสังเคราะห์ + ปุ่มเปิด/ปิด
 assets/logo.png     โลโก้มาสคอต (วงกลม)

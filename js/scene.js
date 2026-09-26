@@ -87,7 +87,7 @@
     const T = `translate(${pos.x},${pos.y})`;
 
     // ห้องเรียนมีระยะลึก เก้าอี้และโต๊ะว่างอยู่หลังตัวละคร
-    const room = el('g', { id: 'classroom-furniture' }, svg);
+    const room = el('g', { id: 'classroom-furniture', display: 'none' }, svg);
     fillLine(room, 'M0,0 H1920 V1080 H0 Z', '#fafaf8', 0);
     line(room, 'M0,650 H1920 M960,650 L0,1080 M960,650 L1920,1080', 2, {opacity:.18});
     const windows = el('g', {opacity:.48}, room);
@@ -101,8 +101,8 @@
       line(furniture,'M-20,46 v290 M268,46 v290',6);
     });
     const seat=el('g',{id:'student-chair'},svg);
-    fillLine(seat,'M780,510 Q920,485 1060,510 L1050,835 H790 Z','#e2e2e2',4);
-    line(seat,'M804,800 L785,1010 M1036,800 L1055,1010',6);
+    fillLine(seat,'M800,520 Q920,480 1040,520 Q1055,620 1030,770 Q920,802 810,770 Q785,620 800,520 Z','#dfd8d5',5);
+    line(seat,'M803,760 Q920,785 1037,760 M820,794 L804,1005 M1020,794 L1036,1005',6);
 
     /* ============================================================
        CHARACTER — ส่วนหลังโต๊ะ
@@ -349,23 +349,18 @@
       // ไฟล์ม่านตาต้นฉบับมีเส้นขอบตาติดมาด้วย จึงครอปเฉพาะแกนม่านตา
       // เพื่อให้สิ่งที่ขยับตามเมาส์มีเพียงลูกตา ส่วนขอบตาและคิ้วอยู่นิ่งกับใบหน้า
       el('image', { href: rigDir + 'iris-' + k + '.webp', ...box,
-        style: `clip-path:ellipse(${k === 'L' ? '25% 41% at 61% 61%' : '24% 42% at 48% 58%'})` }, pupil);
+        style: `clip-path:ellipse(${k === 'L' ? '20% 32% at 61% 66%' : '21% 32% at 49% 65%'})` }, pupil);
       return { g, pupil, cx: pos.x + RX(e.cx), cy: pos.y + RY(e.cy) };
     });
-    // คิ้วเป็นเลเยอร์ของริกจริง แยกจากลูกตา จึงเปลี่ยนสีหน้าได้โดยไม่ดึงตาหลุดจากเบ้า
-    const rigBrows = el('g', { id: 'rig-brows', fill: 'none', stroke: '#25131f', 'stroke-width': 5, 'stroke-linecap': 'round', style: 'transform-box:fill-box;transform-origin:center' }, rig);
-    const rigBrowL = el('path', { d: `M${RX(337)},${RY(425)} Q${RX(386)},${RY(395)} ${RX(445)},${RY(420)}` }, rigBrows);
-    const rigBrowR = el('path', { d: `M${RX(518)},${RY(410)} Q${RX(566)},${RY(378)} ${RX(625)},${RY(397)}` }, rigBrows);
+    // คิ้วและขนตาเดิมอยู่ใน base.webp กับ eye-L/R.webp แล้ว: ไม่วาดทับให้เป็นคิ้วสองชั้น
     // ปากตอนตกใจ/มึน: แปะสีผิวทับปากเดิม แล้ววาดปากใหม่ (ปกติซ่อน ใช้ปากในภาพ)
     const mouthPatch = el('ellipse', { cx: RX(RIG.mouth.x), cy: RY(RIG.mouth.y), rx: 12, ry: 8, fill: RIG.mouth.skin, display: 'none' }, rig);
     const rigMouth = el('path', { d: '', fill: 'none', stroke: '#3a1d1d', 'stroke-width': 2.4, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', display: 'none',
       transform: `translate(${RX(RIG.mouth.x)},${RY(RIG.mouth.y)}) scale(.7) translate(0,-73)` }, rig);
-    // คิ้วต้องอยู่บนสุดของเลเยอร์ใบหน้าเสมอ เพื่อไม่ถูกภาพตาหรือปากบัง
-    rig.appendChild(rigBrows);
     el('ellipse',{cx:0,cy:-90,rx:190,ry:220,fill:'transparent','pointer-events':'all'},head);
     // ตำแหน่งสลับตามคำแก้: ชื่ออยู่ขวาของภาพ ตราอยู่ซ้ายของภาพ
     const embroidery=el('g',{'font-family':'Noto Sans Thai,sans-serif','font-weight':900,fill:'#2a0f3a'},torso);
-    const printedName=el('text',{x:RX(610),y:RY(790),'text-anchor':'middle','font-size':10,textLength:86,lengthAdjust:'spacingAndGlyphs'},embroidery);
+    const printedName=el('text',{x:RX(600),y:RY(790),'text-anchor':'middle','font-size':8,textLength:62,lengthAdjust:'spacingAndGlyphs'},embroidery);
     printedName.textContent=content.name;
     const crest=el('text',{x:RX(420),y:RY(790),'text-anchor':'middle','font-size':14},embroidery);
     crest.textContent='บป.';
@@ -375,7 +370,7 @@
 
     return {
       svg, defs, el, line,
-      char, armsG: arms, head, tail, torso, arms: [armL, armR], bangs, browL: rigBrowL, browR: rigBrowR,
+      char, armsG: arms, head, tail, torso, arms: [armL, armR], bangs, browL: null, browR: null,
       mouth: rigMouth, mouthPatch, tailPivot,
       eyes: rigEyes,
       imageRig: true,

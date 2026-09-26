@@ -9,12 +9,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <!-- ฟอนต์ชั่วคราว: Noto Sans Thai (UI) + Mali (ลายมือบนกระดาน) — จะเปลี่ยนเมื่อเลือกฟอนต์จริงแล้ว -->
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;700;800;900&family=Mali:wght@500;700&family=VT323&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=51">
-  <link rel="stylesheet" href="css/scene-refinement.css?v=51">
-  <link rel="stylesheet" href="css/monitor.css?v=51">
-  <link rel="stylesheet" href="css/v2.css?v=51">
-  <link rel="stylesheet" href="css/v2-news.css?v=51">
-  <link rel="stylesheet" href="css/theater.css?v=51">
+  <link rel="stylesheet" href="css/style.css?v=52">
+  <link rel="stylesheet" href="css/scene-refinement.css?v=52">
+  <link rel="stylesheet" href="css/monitor.css?v=52">
+  <link rel="stylesheet" href="css/v2.css?v=52">
+  <link rel="stylesheet" href="css/v2-news.css?v=52">
+  <link rel="stylesheet" href="css/theater.css?v=52">
 </head>
 <body class="is-loading">
 
@@ -61,6 +61,7 @@
       <div class="stage">
         <!-- ห้องเรียน (SVG) -->
         <div id="classroom">
+          <div id="classroom-bg" aria-hidden="true"></div>
           <svg id="scene" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" aria-label="ห้องเรียน"></svg>
           <div class="s3-text"><p id="path-line"></p></div>
           <p class="play-hint" id="play-hint">ลองหยิบปากกาปา · ขีดเขียนบนหนังสือ · จับหัวดึงดู</p>
@@ -94,6 +95,7 @@
 
         <!-- ห้องทำงาน + จอผลงาน -->
         <div id="workspace-layer">
+          <div id="workspace-bg" aria-hidden="true"></div>
           <div class="room-tone" aria-hidden="true"></div>
           <div class="room-caption"><small>3 ปีต่อมา</small><strong>จากคนที่เคยมองสิ่งที่อยู่บนหน้าจอ<br>ผมเริ่มเรียนรู้วิธี<em>สร้างสิ่งที่อยู่หลังจอ</em></strong></div>
           <div id="work-desk" aria-hidden="true"><i></i></div>
@@ -143,7 +145,8 @@
           <!-- ฉากสุดท้าย: ซูมออกจากจอ มาสคอตทักทาย + บัตรขูดติดต่อ -->
           <div id="fin-cards"></div>
           <div id="fin-bubble"><span class="b1"></span><span class="b2"></span></div>
-          <div id="thanks-stage" aria-hidden="true"><i class="stage-spotlight"></i><div class="stage-curtain stage-curtain-left"></div><div class="stage-curtain stage-curtain-right"></div><img src="assets/characters/student-front.webp" alt="" class="thanks-mascot"><div class="thanks-copy"><b>ขอบคุณที่มารับชม</b><small>Thank you for watching</small></div></div>
+          <div id="contact-mascot" aria-label="มาสคอตนั่งโบกมือ"><img src="assets/characters/student-wave-v52.png" alt=""></div>
+          <div id="thanks-stage"><i class="stage-spotlight"></i><div class="stage-floor"></div><div class="stage-curtain stage-curtain-left"></div><div class="stage-curtain stage-curtain-right"></div><img src="assets/characters/student-wai-v52.png" alt="มาสคอตยืนไหว้ขอบคุณ" class="thanks-mascot"><div class="thanks-copy"><b>ขอบคุณที่มารับชม</b><small>Thank you for watching</small></div></div>
           <h2 id="fin-thanks"></h2>
         </div>
 
@@ -167,7 +170,7 @@
         <!-- ฉากโรงหนัง: ลากเทปเข้าเครื่องก่อนเริ่มเรื่อง -->
         <section id="theater-intro" aria-label="เครื่องเล่นเทปเปิดเรื่อง">
           <div class="theater-room" aria-hidden="true"><i></i><b></b><span></span></div>
-          <div class="theater-screen" aria-hidden="true"><div class="screen-noise"></div><strong>NOK PRESENTS</strong><small>INSERT TAPE</small></div>
+          <div class="theater-screen" aria-hidden="true"><div class="screen-noise"></div><strong>NOK PRESENTS</strong><small>INSERT TAPE</small><div class="screen-paper"></div></div>
           <div class="vcr-unit" aria-label="ช่องใส่เทป VHS">
             <div class="vcr-slot"><i></i></div><span>VHS HQ</span><b>POWER</b><em></em>
           </div>
@@ -195,18 +198,18 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
-  <script src="js/content.js?v=51"></script>
-  <script src="js/sound.js?v=51"></script>
-  <script src="js/effects.js?v=51"></script>
-  <script src="js/scene.js?v=51"></script>
-  <script src="js/character.js?v=51"></script>
-  <script src="js/board.js?v=51"></script>
-  <script src="js/mascot.js?v=51"></script>
-  <script src="js/theater.js?v=51"></script>
-  <script src="js/parallax.js?v=51"></script>
-  <script src="js/workspace.js?v=51"></script>
-  <script src="js/vhs.js?v=51"></script>
-  <script src="js/matches.js?v=51"></script>
-  <script src="js/main.js?v=51"></script>
+  <script src="js/content.js?v=52"></script>
+  <script src="js/sound.js?v=52"></script>
+  <script src="js/effects.js?v=52"></script>
+  <script src="js/scene.js?v=52"></script>
+  <script src="js/character.js?v=52"></script>
+  <script src="js/board.js?v=52"></script>
+  <script src="js/mascot.js?v=52"></script>
+  <script src="js/theater.js?v=52"></script>
+  <script src="js/parallax.js?v=52"></script>
+  <script src="js/workspace.js?v=52"></script>
+  <script src="js/vhs.js?v=52"></script>
+  <script src="js/matches.js?v=52"></script>
+  <script src="js/main.js?v=52"></script>
 </body>
 </html>

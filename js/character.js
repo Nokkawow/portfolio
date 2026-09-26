@@ -48,7 +48,7 @@
       }
       S.mouth.setAttribute('fill', f === 'surprised' ? '#111' : 'none');
       gsap.to(eyeGs, { scale: f === 'surprised' ? 1.2 : 1, transformOrigin: '50% 50%', duration: 0.15, overwrite: 'auto' });
-      gsap.to([S.browL, S.browR], { y: f === 'surprised' ? -7 : f === 'dizzy' ? 3 : 0, duration: 0.15, overwrite: 'auto' });
+      if (S.browL && S.browR) gsap.to([S.browL, S.browR], { y: f === 'surprised' ? -7 : f === 'dizzy' ? 3 : 0, duration: 0.15, overwrite: 'auto' });
       if (faceTimer) faceTimer.kill();
       if (holdFor) faceTimer = gsap.delayedCall(holdFor, () => setFace('normal'));
     }

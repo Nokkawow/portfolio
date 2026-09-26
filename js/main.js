@@ -244,8 +244,8 @@
   tl.to(['#work-desk', '#work-cpu', '#work-papers', '.room-tone'], { autoAlpha: 1, duration: .8 }, 'zoomout+=.4');
   tl.to('#work-chair', { autoAlpha: 1, xPercent: 0, duration: .8 }, 'zoomout+=.6');
   tl.addLabel('contact');
-  tl.to(['#work-desk', '#work-cpu', '#work-papers', '#monitor-shell', '.room-tone', '.room-caption', '.turn-hint', '.work-turned'], { autoAlpha: 0, duration: .45 }, 'contact');
-  tl.fromTo('.work-front', { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: .55, ease: 'back.out(1.4)' }, 'contact');
+  tl.to(['#work-desk', '#work-cpu', '#work-papers', '#monitor-shell', '#work-chair', '.room-tone', '.room-caption', '.turn-hint'], { autoAlpha: 0, duration: .45 }, 'contact');
+  tl.fromTo('#contact-mascot', { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: .6, ease: 'back.out(1.4)' }, 'contact');
   tl.fromTo('#fin-bubble', { autoAlpha: 0, scale: .6, y: 20 }, { autoAlpha: 1, scale: 1, y: 0, duration: .5, ease: 'back.out(2)' }, 'contact');
   tl.fromTo('#fin-bubble .b1', { autoAlpha: 1 }, { autoAlpha: 1, duration: .01 }, 'contact');
   tl.fromTo('#fin-cards > h2, #fin-cards > p', { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: .5, stagger: .1 }, 'contact+=.2');
@@ -257,14 +257,13 @@
   cues.push({ label: 'contact', fwd: () => { document.body.classList.add('finale'); Workspace.repaintCovers(); Sound.play('pop'); }, back: () => document.body.classList.remove('finale') });
   tl.to({}, { duration: 3.5 });
   tl.addLabel('thanks');
-  tl.to(['#fin-cards', '#fin-bubble', '.work-front'], { autoAlpha: 0, duration: .45 }, 'thanks');
-  tl.fromTo('#thanks-stage', { autoAlpha: 0, scale: 1.04 }, { autoAlpha: 1, scale: 1, duration: .8, ease: 'power2.out' }, 'thanks+=.1');
-  tl.call(() => document.body.classList.add('stage-closed'), [], 'thanks+=2.1');
-  tl.to('#fin-bubble .b1', { autoAlpha: 0, duration: .25 }, 'thanks');
-  tl.fromTo('#fin-bubble .b2', { autoAlpha: 0 }, { autoAlpha: 1, duration: .3, immediateRender: true }, 'thanks+=.2');
-  tl.fromTo('#fin-thanks', { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: .7, ease: 'power3.out' }, 'thanks+=.3');
-  tl.fromTo('.work-turned', { y: 0 }, { y: -14, duration: .2, yoyo: true, repeat: 3, ease: 'sine.inOut', immediateRender: false }, 'thanks+=.3');
-  tl.to({}, { duration: 2.5 });
+  tl.to(['#fin-cards', '#fin-bubble', '#contact-mascot'], { autoAlpha: 0, duration: .5 }, 'thanks');
+  tl.fromTo('#thanks-stage', { autoAlpha: 0 }, { autoAlpha: 1, duration: .75, immediateRender: false }, 'thanks+=.1');
+  tl.fromTo('.thanks-mascot', { autoAlpha: 0, y: 45, rotation: -5 }, { autoAlpha: 1, y: 0, rotation: 0, duration: .85, ease: 'back.out(1.3)' }, 'thanks+=.65');
+  tl.fromTo('.thanks-copy', { autoAlpha: 0, y: 26 }, { autoAlpha: 1, y: 0, duration: .7 }, 'thanks+=1.4');
+  tl.to({}, { duration: 1.3 });
+  tl.to({}, { duration: 1.4 }, 'thanks+=3.0');
+  tl.to({}, { duration: .5 });
 
   /* ---------- ScrollTrigger ตัวเดียวคุมทั้งเว็บ ---------- */
   let lastTime = 0, storyReady = false;
@@ -306,6 +305,9 @@
 
   gsap.ticker.add(() => {
     const t = tl.time();
+    const curtain = gsap.utils.clamp(0, 1, (t - tl.labels.thanks - 3) / 1.4);
+    document.querySelector('.stage-curtain-left').style.transform = `translateX(${-100 + curtain * 100}%)`;
+    document.querySelector('.stage-curtain-right').style.transform = `translateX(${100 - curtain * 100}%)`;
     setScene(t);
     VHS.update(t, tl.labels, calTimes);
     if (storyReady && t !== lastTime) {
@@ -467,7 +469,9 @@
      ============================================================ */
   function loaded(img) { return new Promise((r) => (img.complete ? r() : (img.onload = img.onerror = r))); }
   // โหลดภาพหลักๆ ไว้ก่อน % จะได้สะท้อนการโหลดจริง
-  const preload = ['assets/characters/student-front.webp', 'assets/characters/student-back.webp', 'assets/characters/student-turn.webp']
+  const preload = ['assets/characters/student-front.webp', 'assets/characters/student-back.webp', 'assets/characters/student-turn.webp',
+    'assets/backgrounds/classroom-v52.png', 'assets/backgrounds/workspace-v52.png',
+    'assets/characters/student-wave-v52.png', 'assets/characters/student-wai-v52.png']
     .map((src) => { const im = new Image(); im.src = src; return loaded(im); });
   const tasks = [
     document.fonts.ready,
