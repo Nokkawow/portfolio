@@ -305,13 +305,24 @@
     const qFloat = el('g', { id: 'qmark-float' }, qPos);
     const qShadow = el('g', { id: 'qmark-shadow' }, qFloat);
     const qFront = el('g', {}, qFloat);
-    const qHook = 'M1188,236 C1172,160 1230,114 1286,120 C1350,128 1372,190 1344,236 C1322,270 1280,264 1262,292';
-    const qDot = 'M1232,342 m-17,0 a17,17 0 1,0 34,0 a17,17 0 1,0 -34,0';
-    el('path', { d: qHook, fill: 'none', stroke: 'url(#tone)', 'stroke-width': 34, 'stroke-linecap': 'round' }, qShadow);
-    el('path', { d: qDot, fill: 'url(#tone)' }, qShadow);
-    el('path', { d: qHook, fill: 'none', stroke: INK, 'stroke-width': 30, 'stroke-linecap': 'round' }, qFront);
-    el('path', { d: qDot, fill: INK }, qFront);
-    el('path', { d: 'M1206,200 C1212,164 1240,140 1270,138', fill: 'none', stroke: '#fff', 'stroke-width': 5, 'stroke-linecap': 'round', opacity: 0.9 }, qFront);
+    // เครื่องหมาย ? ทรงมาตรฐาน: ตะขอโค้งบน → ลำตัวตรงลง → จุด (หมึกดำขอบขาวแบบมังงะ) + ? เล็กสีม่วงเอียงข้างๆ
+    const qHook = 'M1196,212 C1196,150 1238,116 1272,116 C1314,116 1346,146 1346,190 C1346,230 1314,246 1292,262 C1276,274 1270,288 1270,312';
+    const qDot = 'M1270,366 m-21,0 a21,21 0 1,0 42,0 a21,21 0 1,0 -42,0';
+    const drawQ = (g, ink, halo = true) => {
+      if (halo) {
+        el('path', { d: qHook, fill: 'none', stroke: '#fff', 'stroke-width': 54, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, g);
+        el('path', { d: qDot, fill: '#fff', stroke: '#fff', 'stroke-width': 20 }, g);
+      }
+      el('path', { d: qHook, fill: 'none', stroke: ink, 'stroke-width': 34, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, g);
+      el('path', { d: qDot, fill: ink }, g);
+    };
+    el('path', { d: qHook, fill: 'none', stroke: 'url(#tone)', 'stroke-width': 40, 'stroke-linecap': 'round' }, qShadow);
+    el('path', { d: qDot, fill: 'url(#tone)', stroke: 'url(#tone)', 'stroke-width': 6 }, qShadow);
+    drawQ(qFront, INK);
+    // ไฮไลต์เงาวาวบนตะขอ
+    el('path', { d: 'M1214,196 C1218,160 1242,138 1270,136', fill: 'none', stroke: '#fff', 'stroke-width': 6, 'stroke-linecap': 'round', opacity: 0.85 }, qFront);
+    const qMini = el('g', { transform: 'translate(1392 250) rotate(18) scale(.46) translate(-1270 -240)' }, qFront);
+    drawQ(qMini, '#7b1fa2');
 
     // ภาพมาสคอตท่านั่งปกติแยกเป็นลำตัว หัว/ผม และม่านตา โดยใช้ภาพต้นฉบับเดียวกัน
     Array.from(torso.children).forEach(n => n.setAttribute('display', 'none'));
@@ -351,22 +362,28 @@
     el('image', { href: portrait, ...imageBox, id: 'student-head-art' }, headLayer);
     // กลุ่มหัวผมเป็นลูกของ head จึงหมุน/เอียงไปพร้อมศีรษะ โดยไม่ทำให้ตัวหรือเสื้อขยับตาม
     const tailPivot = [RX(RIG.tail.pivot[0]), RY(RIG.tail.pivot[1])];
-    // ตา 2 ข้าง: ตาขาว + ม่านตาที่ขยับได้ภายในมาสก์รูปตา
+    // ตา 2 ข้าง: ภาพฐาน v56 มีตาขาวเปล่า · มาสก์ตาขาวตัดจากภาพจริง (ผมที่พาดตาและขนตาจึงบังลูกตาเอง)
+    // ในมาสก์มี: ลูกตา (ขยับตามเมาส์) → เงาใต้หนังตา → หนังตา (ใช้กะพริบ) → เส้นขนตาที่ขอบหนังตา
+    const EYE = {
+      L: { x: 346, y: 489, w: 103, h: 43, cx: 397.5, cy: 507.9 },
+      R: { x: 533, y: 457, w: 116, h: 49, cx: 593.2, cy: 483.3 }
+    };
+    const IRIS = 36;                                  // เส้นผ่านศูนย์กลางลูกตา (หน่วยฉาก) ใหญ่กว่าช่องตา เหมือนภาพต้นฉบับ
+    const shade = el('linearGradient', { id: 'eye-lid-shade', x1: 0, y1: 0, x2: 0, y2: 1 }, defs);
+    [['0', '#2b1245', .55], ['.45', '#2b1245', 0]].forEach(([o, c, a]) => el('stop', { offset: o, 'stop-color': c, 'stop-opacity': a }, shade));
     const rigEyes = ['L', 'R'].map((k) => {
-      const e = RIG[k], box = { x: RX(e.x), y: RY(e.y), width: e.w * rs, height: e.h * rs };
+      const e = EYE[k], bx = RX(e.x), by = RY(e.y), bw = e.w * rs, bh = e.h * rs;
       const eyeCx = RX(e.cx), eyeCy = RY(e.cy);
-      const clip = el('clipPath', { id: 'student-eye-clip-' + k, clipPathUnits: 'userSpaceOnUse' }, defs);
-      el('ellipse', { cx: eyeCx, cy: eyeCy + 2, rx: e.w * rs * .36, ry: e.h * rs * .27 }, clip);
-      const g = el('g', { id: 'rig-eye-' + k, style: 'transform-box:fill-box;transform-origin:center' }, head);
-      el('image', { href: rigDir + 'eye-' + k + '.webp', ...box }, g);
-      const inner = el('g', { 'clip-path': `url(#student-eye-clip-${k})` }, g);
-      const pupil = el('g', { class: 'pupil' }, inner);
-      // ลูกตาเป็นไฟล์แยกจริง ไม่มีขนตา คิ้ว หรือผิวหน้าติดมาด้วย
-      el('image', {
-        href: rigDir + 'student-iris-' + k + '.svg',
-        x: eyeCx - 12, y: eyeCy - 12, width: 24, height: 30
-      }, pupil);
-      return { g, pupil, cx: pos.x + RX(e.cx), cy: pos.y + RY(e.cy) };
+      const mask = el('mask', { id: 'student-eye-mask-' + k, maskUnits: 'userSpaceOnUse', x: bx, y: by, width: bw, height: bh }, defs);
+      el('image', { href: rigDir + 'v56-eyemask-' + k + '.png', x: bx, y: by, width: bw, height: bh, preserveAspectRatio: 'none' }, mask);
+      const g = el('g', { id: 'rig-eye-' + k, mask: `url(#student-eye-mask-${k})` }, head);
+      const pupil = el('g', { class: 'pupil' }, g);
+      const iw = IRIS * 64 / 48, ih = iw * 76 / 64;
+      el('image', { href: rigDir + 'student-iris-' + k + '.svg', x: eyeCx - iw / 2, y: eyeCy - ih * 38 / 76, width: iw, height: ih }, pupil);
+      el('rect', { x: bx, y: by, width: bw, height: bh, fill: 'url(#eye-lid-shade)' }, g);
+      const lid = el('rect', { x: bx, y: by, width: bw, height: 0, fill: 'rgb(254,203,172)' }, g);
+      const lash = el('rect', { x: bx, y: by - 1.4, width: bw, height: 2.2, fill: '#2a1418', opacity: 0 }, g);
+      return { g, pupil, lid, lash, top: by, h: bh, cx: pos.x + eyeCx, cy: pos.y + eyeCy };
     });
     // คิ้วอยู่ในภาพหัว ขนตาอยู่กับ eye-L/R: ไม่วาดซ้ำให้เป็นสองชั้น
     // ปากตอนตกใจ/มึน: แปะสีผิวทับปากเดิม แล้ววาดปากใหม่ (ปกติซ่อน ใช้ปากในภาพ)

@@ -229,7 +229,8 @@
   tl.addLabel('monitor');
   tl.to(Workspace.camera, {p:1,duration:2.2,ease:'power3.inOut',onUpdate:Workspace.renderCamera},'monitor');
   tl.to('#monitor-idle', { autoAlpha: 0, duration: .5 }, 'monitor+=1.0');
-  tl.to('#work-chair', {autoAlpha:0,xPercent:-15,duration:.8},'monitor');
+  // กล้องพุ่งผ่านหัวมาสคอตเข้าหาจอ: ตัวที่อยู่ใกล้กล้องจึงขยายและเลื่อนหลุดขอบล่าง
+  tl.to('#work-chair', { autoAlpha: 0, yPercent: 38, scale: 1.3, transformOrigin: '50% 100%', duration: 1, ease: 'power2.in' }, 'monitor');
   tl.to(['#work-desk', '#work-cpu', '#work-papers', '.room-tone'], { autoAlpha: 0, duration: .8 }, 'monitor+=.5');
   tl.to({}, { duration: .5 });
 
@@ -242,7 +243,7 @@
   tl.addLabel('zoomout');
   tl.to(Workspace.camera, { p: 0, duration: 1.6, ease: 'power3.inOut', onUpdate: Workspace.renderCamera }, 'zoomout');
   tl.to(['#work-desk', '#work-cpu', '#work-papers', '.room-tone'], { autoAlpha: 1, duration: .8 }, 'zoomout+=.4');
-  tl.to('#work-chair', { autoAlpha: 1, xPercent: 0, duration: .8 }, 'zoomout+=.6');
+  tl.to('#work-chair', { autoAlpha: 1, yPercent: 0, scale: 1, duration: .8 }, 'zoomout+=.6');
   tl.addLabel('contact');
   tl.to(['#work-desk', '#work-cpu', '#work-papers', '#monitor-shell', '#work-chair', '.room-tone', '.room-caption', '.turn-hint'], { autoAlpha: 0, duration: .45 }, 'contact');
   tl.fromTo('#contact-mascot', { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: .6, ease: 'back.out(1.4)' }, 'contact');

@@ -24,8 +24,15 @@
     const cpu = document.getElementById('work-cpu');
     const stage = document.querySelector('.stage');
 
-    /* ---------- กล้อง (ตำแหน่ง/ขนาดจอคอม) ---------- */
+    /* ---------- กล้อง + จัดฉากโต๊ะทำงาน (คำนวณจากเส้นขอบโต๊ะเส้นเดียว ทุกชิ้นจึงสมส่วนกันทุกขนาดจอ) ----------
+       จอคอมตั้งกลางโต๊ะ · มาสคอตนั่งหันหลังทำงานอยู่หน้าจอพอดี · CPU ตั้งข้างจอ · กองเอกสารอีกฝั่งของโต๊ะ */
     const camera = { p: 0 };
+    const desk = document.getElementById('work-desk');
+    const chairEl = document.getElementById('work-chair');
+    const papersEl = document.getElementById('work-papers');
+    const rageEl = document.getElementById('mascot-rage');
+    const px = (el, box) => { for (const k in box) el.style[k] = box[k] + 'px'; };
+    let stageBox = null;
     function layout() {
       const w = stage.clientWidth, h = stage.clientHeight, mobile = w < h;
       const margin = mobile ? 12 : Math.max(24, w * .035), top = mobile ? 90 : 100;
@@ -33,9 +40,12 @@
       const avail = h - top - 24, standRatio = .16;
       const endW = mobile ? w - margin * 2 : Math.min(w * .74, (avail / (1 + standRatio)) * 1.72);
       const endH = mobile ? avail / (1 + standRatio) : endW / 1.72;
-      const startW = mobile ? w * .56 : w * .34;
-      // มุมกว้าง: จออยู่ด้านขวาและเล็กพอให้เห็นหลังมาสคอต โต๊ะ ขาโต๊ะ และ CPU ฝั่งซ้าย
-      const a = { x: mobile ? w * .31 : w * .54, y: mobile ? h * .29 : h * .27, w: startW, h: startW / 1.72 };
+      // มุมกว้าง: ขอบโต๊ะอยู่ราว 2/3 ของจอ จอคอมวางบนโต๊ะ
+      const deskTop = h * (mobile ? .6 : .67);
+      const startW = mobile ? w * .52 : Math.min(w * .34, (deskTop - h * .14) / (1 + standRatio) * 1.72);
+      const startH = startW / 1.72;
+      const cx = w * (mobile ? .52 : .55);    // เยื้องขวานิดๆ เว้นมุมซ้ายบนให้กล่องข้อความ
+      const a = { x: cx - startW / 2, y: deskTop - startH * (1 + standRatio) + h * .012, w: startW, h: startH };
       const b = { x: (w - endW) / 2, y: top + (avail - endH * (1 + standRatio)) / 2, w: endW, h: endH };
       const p = camera.p;
       const frame = {};
@@ -43,17 +53,27 @@
         frame[k] = a[k] + (b[k] - a[k]) * p;
         shell.style[prop] = frame[k] + 'px';
       });
-      // CPU อยู่ข้างจอจริงและฐานเสมอกับโต๊ะ ไม่ลอยแยกจากชุดคอม
-      const cpuW = mobile ? Math.max(64, w * .15) : Math.max(76, Math.min(126, frame.w * .22));
-      const cpuH = cpuW * 1.48, gap = mobile ? 8 : 14;
-      const rightX = frame.x + frame.w + gap;
-      const cpuX = rightX + cpuW < w - margin ? rightX : Math.max(margin, frame.x - cpuW - gap);
-      cpu.style.left = cpuX + 'px';
-      cpu.style.top = Math.max(top, frame.y + frame.h - cpuH) + 'px';
-      cpu.style.width = cpuW + 'px';
-      cpu.style.height = cpuH + 'px';
+      if (stageBox && stageBox.w === w && stageBox.h === h) return;   // ส่วนอื่นขยับเฉพาะตอนขนาดจอเปลี่ยน
+      stageBox = { w, h };
+      // โต๊ะ: กว้างเกือบเต็มฉาก หน้าโต๊ะหนาพอดีตา
+      px(desk, { left: w * .05, top: deskTop, width: w * .9, height: h * (mobile ? .07 : .1) });
+      desk.style.right = desk.style.bottom = 'auto';
+      // CPU ตั้งบนโต๊ะข้างจอ (ขวา)
+      const cpuW = Math.max(46, startW * (mobile ? .24 : .2)), cpuH = cpuW * 1.5;
+      px(cpu, { left: a.x + startW + startW * .07, top: deskTop - cpuH + h * .012, width: cpuW, height: cpuH });
+      // มาสคอตนั่งเก้าอี้ตรงหน้าจอ: หัวอยู่ราวครึ่งล่างของจอ ตัวบังโต๊ะนิดๆ เหมือนนั่งทำงานจริง
+      const chairH = mobile ? h * .5 : h * .6, chairW = chairH * 720 / 1080;
+      px(chairEl, { left: cx - chairW / 2, top: h - chairH - h * .01, width: chairW, height: chairH });
+      chairEl.style.right = chairEl.style.bottom = 'auto';
+      // กองเอกสาร: ฝั่งซ้ายของโต๊ะ (จอแนวตั้ง) / ขวาถัดจาก CPU (จอแนวนอน · เว้นมุมซ้ายบนให้ข้อความ)
+      const pw = mobile ? w * .2 : Math.min(w * .1, startW * .3), ph = pw * 1.35;
+      const paperLeft = mobile ? w * .03 : Math.min(w * .95 - pw, a.x + startW + startW * .07 + cpuW + w * .025);
+      px(papersEl, { left: paperLeft, top: deskTop - ph + h * .012, width: pw, height: ph });
+      papersEl.style.right = papersEl.style.bottom = 'auto';
+      // ฟองคำพูดตอนโกรธ: เหนือหัวมาสคอต
+      px(rageEl, { left: cx - chairW * .15, top: h - chairH - h * .1 });
     }
-    window.addEventListener('resize', layout);
+    window.addEventListener('resize', () => { stageBox = null; layout(); });
     layout();
 
     /* ---------- ปฏิทิน ---------- */
@@ -507,143 +527,155 @@
       gsap.timeline().fromTo(toast, { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: .25 }).to(toast, { autoAlpha: 0, duration: .3, delay: 1.6 });
     });
 
-    /* ---------- เอกสารบนโต๊ะ: แผ่นบนโยนได้ · ดึงฐานแล้วกองเอน/ทยอยตกตามแรงโน้มถ่วง ---------- */
+    /* ---------- กองเอกสารบนโต๊ะ ----------
+       · หยิบแผ่นบนสุดแล้วปาได้: กระดาษพุ่งตามแรงเหวี่ยง พลิ้วไปมา แล้วปลิวหายไป
+       · ดึงแผ่นฐาน (มีป้าย "ดึงฐาน"): ฐานหลุดออก กองล้มไปทางที่ดึง ทุกแผ่นร่วงแล้วปลิวหายไป
+       · กระดาษหมดโต๊ะเมื่อไหร่ กองใหม่จะร่วงลงมาเรียงให้เล่นได้อีก (ไม่มีกระดาษค้างบนพื้น) */
     const paperWrap = document.getElementById('work-papers');
     const papers = [...paperWrap.querySelectorAll('.work-paper')];
-    let dropped = 0;
-    const floorPose = (paper, slot, velocity = { x: 0, y: 0 }, thrown = false) => {
-      const r = paper.getBoundingClientRect(), sr = stage.getBoundingClientRect();
-      const columns = [0.08,0.15,0.23,0.31,0.39,0.18,0.35,0.11,0.28,0.44,0.2,0.36,0.13,0.32];
-      const currentX = Number(gsap.getProperty(paper, 'x')) || 0;
-      const currentY = Number(gsap.getProperty(paper, 'y')) || 0;
-      if (thrown) {
-        return {
-          x: currentX + gsap.utils.clamp(-sr.width * 1.35, sr.width * 1.35, velocity.x * .7),
-          y: currentY + sr.height * .92 + Math.max(0, velocity.y * .16),
-          rotation: (Number(gsap.getProperty(paper, 'rotation')) || 0) + gsap.utils.clamp(-720,720,velocity.x * .28)
-        };
-      }
-      return {
-        x: currentX + sr.left + sr.width * columns[slot % columns.length] - r.left + gsap.utils.clamp(-130,130,velocity.x * .14),
-        y: currentY + sr.bottom - Math.max(r.height,62) - 18 - (slot % 4) * 4 - r.top,
-        rotation: [-25,13,-9,21,-16,7,28,-12,17,-6,23,-18,9,-22][slot % 14]
-      };
-    };
-    function dropPaper(paper, velocity = { x: 0, y: 0 }, delay = 0) {
-      if (paper.classList.contains('dropped')) return;
-      const slot = dropped++;
-      const thrown = Math.hypot(velocity.x,velocity.y) > 850;
-      const pose = floorPose(paper,slot,velocity,thrown);
-      paper.classList.add('dropped');
-      paper.classList.remove('dragging');
-      if (reduce) { gsap.set(paper,pose); return; }
-      const x0 = Number(gsap.getProperty(paper,'x')) || 0;
-      const y0 = Number(gsap.getProperty(paper,'y')) || 0;
-      const r0 = Number(gsap.getProperty(paper,'rotation')) || 0;
-      const lift = thrown ? Math.min(-90,velocity.y * .1) : -18 - (slot % 3) * 8;
-      gsap.timeline({ delay })
-        .to(paper,{ x:x0 + gsap.utils.clamp(-90,90,velocity.x * .08), y:y0 + lift, rotation:r0 + gsap.utils.clamp(-22,22,velocity.x * .018), duration:thrown ? .2 : .16, ease:'power2.out' })
-        .to(paper,{ ...pose, duration:thrown ? .7 : .48 + (slot % 4) * .04, ease:'power2.in' })
-        .to(paper,{ y:'-=8', duration:.08, ease:'power1.out' })
-        .to(paper,{ y:'+=8', duration:.1, ease:'bounce.out' });
-    }
-    function toppleStack(direction = 1, speed = 700) {
-      const standing = papers.filter((paper) => !paper.classList.contains('dropped'));
-      if (!standing.length) return;
-      Sound.play('paper', .25);
+    const onDesk = () => papers.filter((p) => !p.classList.contains('gone') && !p.classList.contains('flying'));
+    const topPaper = () => onDesk().at(-1);
+    let refillTimer = null;
+    function refill() {
+      refillTimer = null;
+      papers.forEach((p) => { p.classList.remove('gone', 'flying', 'dragging'); gsap.killTweensOf(p); gsap.set(p, { clearProps: 'transform,opacity,visibility' }); });
       paperWrap.classList.remove('stack-dragging');
-      // ฐานหลุดก่อน จากนั้นน้ำหนักด้านบนพาแต่ละแผ่นไหลและตกตามกัน
-      standing.forEach((paper,i) => {
-        const heightFactor = i / Math.max(1,standing.length - 1);
-        dropPaper(paper,{ x:direction * (speed * (.35 + heightFactor * .55) + i * 28), y:80 + i * 18 },reduce ? 0 : i * .075);
+      markTop();
+      if (reduce) return;
+      // กองใหม่ร่วงลงมาเรียงจากล่างขึ้นบน
+      gsap.from(papers, { y: -stage.clientHeight * .45, rotation: () => gsap.utils.random(-25, 25), autoAlpha: 0, duration: .45, stagger: .045, ease: 'back.out(1.3)' });
+      Sound.play('paper', .2);
+    }
+    function scheduleRefill() {
+      if (!onDesk().length && !refillTimer) refillTimer = setTimeout(refill, reduce ? 300 : 1500);
+    }
+    // ป้ายและ aria ตามหน้าที่ของแต่ละแผ่นตอนนี้
+    function markTop() {
+      const desk = onDesk(), t = desk.at(-1), base = desk[0];
+      papers.forEach((p) => {
+        p.classList.toggle('is-top', p === t);
+        p.classList.toggle('is-base', p === base && desk.length > 1);
+        p.tabIndex = p === t || p === base ? 0 : -1;
+        p.setAttribute('aria-label', p === t ? 'หยิบเอกสารแผ่นบนสุดมาปา' : p === base ? 'ดึงเอกสารแผ่นฐานให้กองล้ม' : 'เอกสารในกอง');
       });
     }
-    const topStandingPaper = () => papers.filter((paper) => !paper.classList.contains('dropped')).at(-1);
+    // กระดาษพุ่งไปตามแรง แล้วพลิ้ว (พลิก 3 มิติ + ส่ายซ้ายขวา) ลอยลงและจางหาย
+    function blowAway(paper, vx, vy, delay = 0) {
+      paper.classList.add('flying');
+      paper.classList.remove('dragging', 'is-top', 'is-base');
+      paper.tabIndex = -1;
+      const dir = Math.sign(vx) || (Math.random() < .5 ? -1 : 1);
+      const W = stage.clientWidth, H = stage.clientHeight;
+      if (reduce) { gsap.to(paper, { autoAlpha: 0, duration: .2, delay, onComplete: () => { paper.classList.add('gone'); scheduleRefill(); } }); return; }
+      const sway = gsap.utils.random(40, 90);
+      gsap.timeline({ delay, onComplete: () => { paper.classList.add('gone'); scheduleRefill(); } })
+        .to(paper, { x: `+=${gsap.utils.clamp(-W * .5, W * .5, vx * .32)}`, y: `+=${gsap.utils.clamp(-H * .4, H * .2, vy * .22) - 40}`,
+          rotation: `+=${gsap.utils.clamp(-160, 160, vx * .12)}`, duration: .4, ease: 'power2.out' })
+        .to(paper, { keyframes: [
+          { x: `+=${dir * sway}`, y: `+=${H * .1}`, rotation: `+=${dir * 30}`, rotationX: 55, duration: .45, ease: 'sine.inOut' },
+          { x: `+=${dir * sway * .4}`, y: `+=${H * .08}`, rotation: `-=${dir * 45}`, rotationX: -40, duration: .45, ease: 'sine.inOut' },
+          { x: `+=${dir * sway * 1.4}`, y: `+=${H * .12}`, rotation: `+=${dir * 60}`, rotationX: 70, autoAlpha: 0, duration: .55, ease: 'sine.in' }
+        ] });
+    }
+    function toppleStack(dir) {
+      const stack = onDesk();
+      if (!stack.length) return;
+      Sound.play('paper', .3);
+      paperWrap.classList.remove('stack-dragging');
+      // ฐานหลุดก่อน แล้วแผ่นบนๆ ค่อยเอนตามและร่วงตามกัน (แผ่นสูงยิ่งเหวี่ยงไกล)
+      stack.forEach((p, i) => {
+        const k = i / Math.max(1, stack.length - 1);
+        blowAway(p, dir * (380 + k * 900 + gsap.utils.random(-120, 120)), -120 - k * 260, reduce ? 0 : .04 + i * .05);
+      });
+      markTop();
+    }
     papers.forEach((paper) => {
       let drag = null;
       paper.addEventListener('pointerdown', (e) => {
-        if (paper.classList.contains('dropped')) return;
-        if (Number(paper.dataset.depth) <= 2) {
-          drag = { stack:true, px:e.clientX, py:e.clientY, x0:e.clientX, y0:e.clientY, t:performance.now(), vx:0, vy:0 };
-          paperWrap.classList.add('stack-dragging');
-          try { paper.setPointerCapture(e.pointerId); } catch (_) {}
-          e.preventDefault();
-          return;
-        }
-        if (paper !== topStandingPaper()) return;
-        drag = { px: e.clientX, py: e.clientY, t: performance.now(), vx: 0, vy: 0 };
-        paper.classList.add('dragging');
-        gsap.killTweensOf(paper);
-        try { paper.setPointerCapture(e.pointerId); } catch (_) {}
+        if (paper.classList.contains('flying') || paper.classList.contains('gone')) return;
+        const desk = onDesk();
+        const isBase = paper === desk[0] && desk.length > 1, isTop = paper === desk.at(-1);
+        if (!isBase && !isTop) return;
         e.preventDefault();
+        drag = { base: isBase, x0: e.clientX, y0: e.clientY, px: e.clientX, py: e.clientY, t: performance.now(), vx: 0, vy: 0 };
+        try { paper.setPointerCapture(e.pointerId); } catch (_) {}
+        gsap.killTweensOf(paper);
+        if (isBase) paperWrap.classList.add('stack-dragging'); else paper.classList.add('dragging');
       });
       paper.addEventListener('pointermove', (e) => {
         if (!drag) return;
-        const now = performance.now(), dt = Math.max(16, now - drag.t);
-        drag.vx = (e.clientX - drag.px) / dt * 1000;
-        drag.vy = (e.clientY - drag.py) / dt * 1000;
-        if (drag.stack) {
-          const dx=e.clientX-drag.px,dy=e.clientY-drag.py;
-          papers.filter(p=>!p.classList.contains('dropped')).forEach((p,i)=>gsap.set(p,{ x:`+=${dx * (.62 + i * .025)}`, y:`+=${dy * .35}`, rotation:`+=${dx * .018 * (i / papers.length)}` }));
-          drag.px=e.clientX; drag.py=e.clientY; drag.t=now;
+        const now = performance.now(), dt = Math.max(8, now - drag.t);
+        drag.vx = drag.vx * .5 + (e.clientX - drag.px) / dt * 1000 * .5;
+        drag.vy = drag.vy * .5 + (e.clientY - drag.py) / dt * 1000 * .5;
+        const dx = e.clientX - drag.px, dy = e.clientY - drag.py;
+        drag.px = e.clientX; drag.py = e.clientY; drag.t = now;
+        if (drag.base) {
+          // ดึงฐาน: ฐานเลื่อนตามมือ กองด้านบนเอนตามนิดๆ พอดึงเกินระยะก็ล้มทันที
+          const pulled = e.clientX - drag.x0;
+          gsap.set(paper, { x: `+=${dx}` });
+          onDesk().slice(1).forEach((p, i) => gsap.set(p, { rotation: gsap.utils.clamp(-14, 14, pulled * .05 * (1 + i * .08)), transformOrigin: pulled > 0 ? '100% 100%' : '0% 100%' }));
+          if (Math.abs(pulled) > paper.offsetWidth * .35) { const d = Math.sign(pulled); drag = null; toppleStack(d); }
           return;
         }
-        gsap.set(paper, { x: `+=${e.clientX - drag.px}`, y: `+=${e.clientY - drag.py}`, rotation: gsap.utils.clamp(-18, 18, drag.vx * .018) });
-        drag.px = e.clientX; drag.py = e.clientY; drag.t = now;
+        gsap.set(paper, { x: `+=${dx}`, y: `+=${dy}`, rotation: gsap.utils.clamp(-25, 25, drag.vx * .02) });
       });
       const release = () => {
         if (!drag) return;
-        const velocity = { x: drag.vx, y: drag.vy };
-        const stack = drag.stack;
-        const moved = stack ? Math.hypot(drag.px-drag.x0,drag.py-drag.y0) : 0;
-        drag = null;
-        Sound.play('paper', .3);
-        if (stack) {
-          if (moved > 28 || Math.abs(velocity.x) > 260) toppleStack(Math.sign(velocity.x || 1),Math.max(420,Math.abs(velocity.x)));
-          else {
-            paperWrap.classList.remove('stack-dragging');
-            papers.filter(p=>!p.classList.contains('dropped')).forEach(p=>gsap.to(p,{x:0,y:0,rotation:0,duration:.45,ease:'elastic.out(1,.55)'}));
-          }
+        const d = drag; drag = null;
+        paperWrap.classList.remove('stack-dragging');
+        paper.classList.remove('dragging');
+        const moved = Math.hypot(d.px - d.x0, d.py - d.y0);
+        if (d.base) {
+          if (Math.abs(d.vx) > 500) { toppleStack(Math.sign(d.vx)); return; }
+          onDesk().forEach((p) => gsap.to(p, { x: 0, rotation: 0, duration: .5, ease: 'elastic.out(1,.5)' }));
           return;
         }
-        dropPaper(paper, velocity);
+        if (moved < 6) { Sound.play('paper', .2); gsap.to(paper, { x: 0, y: 0, rotation: 0, duration: .3 }); return; }
+        Sound.play('paper', .3);
+        blowAway(paper, d.vx || (d.px - d.x0) * 6, d.vy || (d.py - d.y0) * 6);
+        markTop();
       };
       paper.addEventListener('pointerup', release);
       paper.addEventListener('pointercancel', release);
+      // คีย์บอร์ด: Enter บนแผ่นบนสุด = ปาออก · บนแผ่นฐาน = ดึงให้ล้ม
+      paper.addEventListener('click', (e) => {
+        if (e.detail !== 0) return;
+        const desk = onDesk();
+        if (paper === desk[0] && desk.length > 1) toppleStack(1);
+        else if (paper === desk.at(-1)) { blowAway(paper, 900, -200); markTop(); }
+      });
     });
+    markTop();
 
-    /* ---------- ปุ่มคอม: คนดูกดปิด แล้วมาสคอตเอื้อมไปเปิดกลับ ---------- */
+    /* ---------- CPU: คนดูกดปิดคอม → จอดับ → มาสคอตหัวร้อน เอื้อมไปกดเปิดเอง → จอติดขึ้นมาทำงานต่อ ---------- */
     const workspace = document.getElementById('workspace-layer');
     const monitorPower = document.getElementById('monitor-power');
     const chair = document.getElementById('work-chair');
-    let powerOn = true, wakeTimer = null;
-    function setPower(on, mascotAction) {
+    let powerOn = true, gag = null;
+    function setPower(on) {
       powerOn = on;
       workspace.classList.toggle('computer-off', !on);
+      workspace.classList.toggle('computer-boot', on);
+      if (on) setTimeout(() => workspace.classList.remove('computer-boot'), 700);
       cpu.setAttribute('aria-pressed', String(!on));
       cpu.setAttribute('aria-label', on ? 'แกล้งปิดคอมพิวเตอร์' : 'มาสคอตกำลังเปิดคอมพิวเตอร์');
-      monitorPower.setAttribute('aria-pressed',String(!on));
-      if (mascotAction) {
-        workspace.classList.add('mascot-angry');
-        chair.classList.remove('power-reaching');
-        void chair.offsetWidth;
-        chair.classList.add('power-angry');
-        chair.classList.add('power-reaching');
-        setTimeout(()=>chair.classList.remove('power-angry'),reduce ? 30 : 800);
-        setTimeout(()=>{ chair.classList.remove('power-reaching'); workspace.classList.remove('mascot-angry'); },reduce ? 40 : 1900);
-      }
+      monitorPower.setAttribute('aria-pressed', String(!on));
       Sound.play(on ? 'pop' : 'click', .35);
     }
     cpu.addEventListener('click', () => {
-      if (wakeTimer) { clearTimeout(wakeTimer); wakeTimer = null; }
-      if (!powerOn) { setPower(true, true); return; }
-      setPower(false, false);
-      // ปิดได้จริงชั่วครู่ จากนั้นน้องไม่ยอมให้งานดับและเอื้อมมาเปิดกลับเอง
+      if (!powerOn || gag) return;              // กำลังเล่นมุกอยู่ รอให้จบก่อน
+      setPower(false);
       workspace.classList.add('mascot-angry');
-      chair.classList.add('power-angry');
-      wakeTimer = setTimeout(() => { wakeTimer = null; setPower(true, true); }, reduce ? 250 : 900);
+      if (reduce) { gag = setTimeout(() => { gag = null; setPower(true); workspace.classList.remove('mascot-angry'); }, 400); return; }
+      // สั่นเพราะโกรธ → เอนตัวเอื้อมไปทาง CPU → กดเปิด → กลับมานั่งทำงานต่อ
+      const reach = cpu.getBoundingClientRect().left - chair.getBoundingClientRect().right;
+      gag = gsap.timeline({ onComplete: () => { gag = null; workspace.classList.remove('mascot-angry'); } })
+        .to(chair, { keyframes: [{ x: -5, rotation: -1.5 }, { x: 5, rotation: 1.5 }, { x: -4, rotation: -1 }, { x: 4, rotation: 1 }, { x: 0, rotation: 0 }], duration: .5, ease: 'none' })
+        .to(chair, { x: Math.max(30, reach * .6 + chair.offsetWidth * .2), y: -8, rotation: 9, transformOrigin: '50% 90%', duration: .38, ease: 'power2.out' })
+        .add(() => setPower(true))
+        .to(chair, { x: 0, y: 0, rotation: 0, duration: .55, ease: 'back.out(1.6)' }, '+=.12');
     });
-    // ไฟบนกรอบจอเป็นเพียงสถานะ ปุ่มเล่นจริงอยู่ที่ CPU ตามมุมกล้องใหม่
+    // ไฟบนกรอบจอเป็นเพียงสถานะ ปุ่มเล่นจริงอยู่ที่ CPU
     monitorPower.tabIndex = -1;
     monitorPower.setAttribute('aria-hidden','true');
 

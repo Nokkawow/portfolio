@@ -36,7 +36,6 @@
       surprised: 'M-7,73 C-7,63 7,63 7,73 C7,83 -7,83 -7,73 Z',
       dizzy: 'M-15,74 C-10,67 -5,81 0,74 C5,67 10,81 15,74'
     };
-    const eyeGs = S.eyes.map((e) => e.g);
     let face = 'normal', faceTimer = null;
     function setFace(f, holdFor) {
       face = f;
@@ -47,20 +46,36 @@
         S.mouth.setAttribute('display', show);
       }
       S.mouth.setAttribute('fill', f === 'surprised' ? '#111' : 'none');
-      gsap.to(eyeGs, { scale: f === 'surprised' ? 1.2 : 1, transformOrigin: '50% 50%', duration: 0.15, overwrite: 'auto' });
+      // ตกใจ = ลูกตาหดเล็กลง (ไม่ขยายทั้งดวง ซึ่งทำให้ตาหลุดออกนอกเบ้า)
+      gsap.to(S.eyes.map((e) => e.pupil.firstChild), { scale: f === 'surprised' ? 0.72 : 1, transformOrigin: '50% 50%', duration: 0.15, overwrite: 'auto' });
       if (S.browL && S.browR) gsap.to([S.browL, S.browR], { y: f === 'surprised' ? -7 : f === 'dizzy' ? 3 : 0, duration: 0.15, overwrite: 'auto' });
       if (faceTimer) faceTimer.kill();
       if (holdFor) faceTimer = gsap.delayedCall(holdFor, () => setFace('normal'));
     }
 
     /* ---------- กะพริบตา ---------- */
+    // หนังตาสีผิวเลื่อนลงมาปิดตาขาว พร้อมเส้นขนตาที่ขอบ แล้วเปิดขึ้น
+    function blinkEyes() {
+      const tl = gsap.timeline();
+      S.eyes.forEach((e) => {
+        if (!e.lid) return;
+        const st = { p: 0 };
+        const draw = () => {
+          const h = e.h * st.p;
+          e.lid.setAttribute('height', h);
+          e.lash.setAttribute('y', e.top + h - 1.4);
+          e.lash.setAttribute('opacity', st.p > 0.05 ? 1 : 0);
+        };
+        tl.to(st, { p: 1, duration: 0.07, ease: 'power2.in', onUpdate: draw }, 0)
+          .to(st, { p: 0, duration: 0.12, ease: 'power2.out', onUpdate: draw }, 0.09);
+      });
+      return tl;
+    }
     if (!reduce) {
       (function blink() {
         gsap.delayedCall(gsap.utils.random(2.2, 5.5), () => {
           if (face === 'normal') {
-            gsap.timeline()
-              .to(eyeGs, { scaleY: 0.08, transformOrigin: '50% 40%', duration: 0.07, ease: 'power2.in' })
-              .to(eyeGs, { scaleY: 1, duration: 0.12, ease: 'power2.out' });
+            blinkEyes();
           }
           blink();
         });
