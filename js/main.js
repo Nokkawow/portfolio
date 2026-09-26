@@ -137,8 +137,9 @@
   tl.to('.scroll-hint', { autoAlpha: 0, duration: 0.3 }, 0);
   // เปิดเว็บ = กระดาษขาวเต็มจอ ต้องจุดไม้ขีดเผา (หรือเลื่อนลงแล้วไหม้เอง) ถึงเห็นจอดำเปิดเรื่อง
   const Matches = window.initMatches(lines, api);
-  const bp = { p: 0 };
-  tl.fromTo(bp, { p: 0 }, { p: 1, duration: 1.6, ease: 'none', immediateRender: false, onUpdate: () => Matches.setAuto(0, bp.p) }, 0.2);
+  tl.addLabel('burn', 0.12);
+  cues.push({ label: 'burn', fwd: () => Matches.autoIgnite(), back: () => {} }); // เริ่มเลื่อน = มาสคอตจุดไฟให้
+  tl.to({}, { duration: 1.6 }, 0.2);  // เวลาให้ไฟลามก่อนประโยคถัดไป
   lines.forEach((line, i) => {
     if (i > 0) {
       // Text Generate: คำค่อยๆ ปรากฏจากเบลอ ทีละคำตามการเลื่อน

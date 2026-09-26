@@ -224,7 +224,25 @@
       gsap.fromTo(hint, { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: .5, delay: 1.9 });
     }
 
+    // เลื่อนผ่านโดยไม่เผาเอง → มาสคอตโยนไม้ขีดที่จุดแล้วลงกระดาษให้ (ไฟลามจนหมดจอ)
+    function autoIgnite() {
+      const s = sheets[0];
+      if (s.manual > 0) return;
+      const from = box.getBoundingClientRect(), paper = s.cv.getBoundingClientRect();
+      const tx = paper.left + paper.width * 0.7, ty = paper.top + paper.height * 0.85;
+      const m = document.createElement('div');
+      m.className = 'match held lit';
+      m.innerHTML = '<i class="flame"></i>';
+      document.body.appendChild(m);
+      Sound.play('strike', 0.2);
+      gsap.timeline({ onComplete: () => { m.remove(); ignite(s, tx); } })
+        .fromTo(m, { x: from.left + from.width * .5, y: from.top, rotation: -20 },
+          { x: tx, y: ty, rotation: -200, duration: reduce ? 0.05 : 0.5, ease: 'power1.in' });
+      if (hint) gsap.to(hint, { autoAlpha: 0, duration: .3 });
+    }
+
     return {
+      autoIgnite,
       setAuto(i, p) { if (sheets[i]) sheets[i].auto = p; },
       burned: (i) => sheets[i] && Math.max(sheets[i].manual, sheets[i].auto) >= 1,
       walkIn, layout
