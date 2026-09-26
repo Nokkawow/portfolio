@@ -55,7 +55,7 @@
     return d + ' Z';
   }
 
-  window.CHAR_POS = { x: 920, y: 400 }; // ตำแหน่งกลางหน้าในฉาก
+  window.CHAR_POS = { x: 920, y: 450 }; // ลดตัวลงหลังโต๊ะให้เห็นว่านั่งจริง
 
   window.buildScene = function (svg, content) {
     /* ---------- defs ---------- */
@@ -342,13 +342,17 @@
       const e = RIG[k], box = { x: RX(e.x), y: RY(e.y), width: e.w * rs, height: e.h * rs };
       const m = el('mask', { id: 'rig-eyemask-' + k, maskUnits: 'userSpaceOnUse', ...box }, defs);
       el('image', { href: rigDir + 'eyemask-' + k + '.png', ...box }, m);
-      const g = el('g', { id: 'rig-eye-' + k }, rig);
+      const g = el('g', { id: 'rig-eye-' + k, style: 'transform-box:fill-box;transform-origin:center' }, rig);
       el('image', { href: rigDir + 'eye-' + k + '.webp', ...box }, g);
       const inner = el('g', { mask: `url(#rig-eyemask-${k})` }, g);
       const pupil = el('g', { class: 'pupil' }, inner);
       el('image', { href: rigDir + 'iris-' + k + '.webp', ...box }, pupil);
       return { g, pupil, cx: pos.x + RX(e.cx), cy: pos.y + RY(e.cy) };
     });
+    // คิ้วเป็นเลเยอร์ของริกจริง แยกจากลูกตา จึงเปลี่ยนสีหน้าได้โดยไม่ดึงตาหลุดจากเบ้า
+    const rigBrows = el('g', { id: 'rig-brows', fill: 'none', stroke: '#25131f', 'stroke-width': 5, 'stroke-linecap': 'round', style: 'transform-box:fill-box;transform-origin:center' }, rig);
+    const rigBrowL = el('path', { d: `M${RX(337)},${RY(425)} Q${RX(386)},${RY(395)} ${RX(445)},${RY(420)}` }, rigBrows);
+    const rigBrowR = el('path', { d: `M${RX(518)},${RY(410)} Q${RX(566)},${RY(378)} ${RX(625)},${RY(397)}` }, rigBrows);
     // ปากตอนตกใจ/มึน: แปะสีผิวทับปากเดิม แล้ววาดปากใหม่ (ปกติซ่อน ใช้ปากในภาพ)
     const mouthPatch = el('ellipse', { cx: RX(RIG.mouth.x), cy: RY(RIG.mouth.y), rx: 12, ry: 8, fill: RIG.mouth.skin, display: 'none' }, rig);
     const rigMouth = el('path', { d: '', fill: 'none', stroke: '#3a1d1d', 'stroke-width': 2.4, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', display: 'none',
@@ -366,9 +370,10 @@
 
     return {
       svg, defs, el, line,
-      char, armsG: arms, head, tail, torso, arms: [armL, armR], bangs, browL, browR,
+      char, armsG: arms, head, tail, torso, arms: [armL, armR], bangs, browL: rigBrowL, browR: rigBrowR,
       mouth: rigMouth, mouthPatch, tailPivot,
       eyes: rigEyes,
+      imageRig: true,
       book, bookInk, pens, fx,
       qWrap, qFloat, qShadow,
       nameText

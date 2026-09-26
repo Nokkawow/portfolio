@@ -322,6 +322,64 @@
       gsap.timeline().fromTo(toast, { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: .25 }).to(toast, { autoAlpha: 0, duration: .3, delay: 1.6 });
     });
 
+    /* ---------- เอกสารบนโต๊ะ: กดให้หล่นลงพื้น กดกองเพื่อเก็บกลับ ---------- */
+    const paperWrap = document.getElementById('work-papers');
+    const paperPile = document.getElementById('paper-pile');
+    const papers = [...paperWrap.querySelectorAll('.work-paper')];
+    let dropped = 0;
+    function dropPaper(paper) {
+      if (paper.classList.contains('dropped')) return;
+      const r = paper.getBoundingClientRect(), sr = stage.getBoundingClientRect();
+      const slot = dropped++;
+      paper.classList.add('dropped');
+      Sound.play('paper', .3);
+      gsap.to(paper, {
+        x: sr.left + sr.width * (.16 + slot * .035) - r.left,
+        y: sr.bottom - Math.max(r.height, 70) - 38 - r.top + slot * 2,
+        rotation: -14 + slot * 12,
+        duration: reduce ? .01 : .72,
+        ease: 'bounce.out',
+        onComplete: () => paperPile.classList.add('has-paper')
+      });
+    }
+    papers.forEach((paper) => paper.addEventListener('click', () => dropPaper(paper)));
+    paperPile.addEventListener('click', () => {
+      dropped = 0;
+      Sound.play('paper', .25);
+      papers.forEach((paper, i) => gsap.to(paper, {
+        x: 0, y: 0, rotation: [-8, 3, 9][i], duration: reduce ? .01 : .55,
+        delay: reduce ? 0 : i * .07, ease: 'back.out(1.7)',
+        onComplete: () => paper.classList.remove('dropped')
+      }));
+      paperPile.classList.remove('has-paper');
+    });
+
+    /* ---------- ปุ่มคอม: คนดูกดปิด แล้วมาสคอตเอื้อมไปเปิดกลับ ---------- */
+    const workspace = document.getElementById('workspace-layer');
+    const power = document.getElementById('monitor-power');
+    const chair = document.getElementById('work-chair');
+    let powerOn = true, wakeTimer = null;
+    function setPower(on, mascotAction) {
+      powerOn = on;
+      workspace.classList.toggle('computer-off', !on);
+      power.setAttribute('aria-pressed', String(!on));
+      power.setAttribute('aria-label', on ? 'ปิดคอมพิวเตอร์' : 'เปิดคอมพิวเตอร์');
+      if (mascotAction) {
+        chair.classList.remove('power-reaching');
+        void chair.offsetWidth;
+        chair.classList.add('power-reaching');
+        setTimeout(() => chair.classList.remove('power-reaching'), reduce ? 30 : 1500);
+      }
+      Sound.play(on ? 'pop' : 'click', .35);
+    }
+    power.addEventListener('click', () => {
+      if (wakeTimer) { clearTimeout(wakeTimer); wakeTimer = null; }
+      if (!powerOn) { setPower(true, true); return; }
+      setPower(false, false);
+      // ปิดได้จริงชั่วครู่ จากนั้นน้องไม่ยอมให้งานดับและเอื้อมมาเปิดกลับเอง
+      wakeTimer = setTimeout(() => { wakeTimer = null; setPower(true, true); }, reduce ? 250 : 1250);
+    });
+
     return {
       calendarPages: Array.from(calendars.children),
       camera, renderCamera: layout, layout,

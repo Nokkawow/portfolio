@@ -9,11 +9,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <!-- ฟอนต์ชั่วคราว: Noto Sans Thai (UI) + Mali (ลายมือบนกระดาน) — จะเปลี่ยนเมื่อเลือกฟอนต์จริงแล้ว -->
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;700;800;900&family=Mali:wght@500;700&family=VT323&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=47">
-  <link rel="stylesheet" href="css/scene-refinement.css?v=47">
-  <link rel="stylesheet" href="css/monitor.css?v=47">
-  <link rel="stylesheet" href="css/v2.css?v=47">
-  <link rel="stylesheet" href="css/v2-news.css?v=47">
+  <link rel="stylesheet" href="css/style.css?v=48">
+  <link rel="stylesheet" href="css/scene-refinement.css?v=48">
+  <link rel="stylesheet" href="css/monitor.css?v=48">
+  <link rel="stylesheet" href="css/v2.css?v=48">
+  <link rel="stylesheet" href="css/v2-news.css?v=48">
 </head>
 <body class="is-loading">
 
@@ -96,6 +96,12 @@
           <div class="room-tone" aria-hidden="true"></div>
           <div class="room-caption"><small>3 ปีต่อมา</small><strong>จากคนที่เคยมองสิ่งที่อยู่บนหน้าจอ<br>ผมเริ่มเรียนรู้วิธี<em>สร้างสิ่งที่อยู่หลังจอ</em></strong></div>
           <div id="work-desk" aria-hidden="true"><i></i></div>
+          <div id="work-papers" aria-label="เอกสารบนโต๊ะ">
+            <button class="work-paper p1" type="button" aria-label="ปัดเอกสารแผ่นที่ 1 ลงพื้น"><span></span><span></span><span></span></button>
+            <button class="work-paper p2" type="button" aria-label="ปัดเอกสารแผ่นที่ 2 ลงพื้น"><span></span><span></span><span></span></button>
+            <button class="work-paper p3" type="button" aria-label="ปัดเอกสารแผ่นที่ 3 ลงพื้น"><span></span><span></span><span></span></button>
+          </div>
+          <button id="paper-pile" type="button" aria-label="เก็บเอกสารกลับขึ้นโต๊ะ"><span>กดเพื่อเก็บเอกสาร</span></button>
           <div id="work-chair" aria-hidden="true">
             <img class="work-pose work-back" src="assets/characters/student-back.webp" alt="">
             <img class="work-pose work-turned" src="assets/characters/student-turn.webp" alt="">
@@ -121,6 +127,7 @@
                 </div>
               </div>
               <div class="monitor-brand">NOK MAKE GAME</div>
+              <button id="monitor-power" type="button" aria-label="ปิดคอมพิวเตอร์" aria-pressed="false"><i></i></button>
             </div>
             <div class="monitor-stand"></div>
           </div>
@@ -166,16 +173,16 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
-  <script src="js/content.js?v=47"></script>
-  <script src="js/sound.js?v=47"></script>
-  <script src="js/effects.js?v=47"></script>
-  <script src="js/scene.js?v=47"></script>
-  <script src="js/character.js?v=47"></script>
-  <script src="js/board.js?v=47"></script>
-  <script src="js/mascot.js?v=47"></script>
-  <script src="js/workspace.js?v=47"></script>
-  <script src="js/vhs.js?v=47"></script>
-  <script src="js/matches.js?v=47"></script>
-  <script src="js/main.js?v=47"></script>
+  <script src="js/content.js?v=48"></script>
+  <script src="js/sound.js?v=48"></script>
+  <script src="js/effects.js?v=48"></script>
+  <script src="js/scene.js?v=48"></script>
+  <script src="js/character.js?v=48"></script>
+  <script src="js/board.js?v=48"></script>
+  <script src="js/mascot.js?v=48"></script>
+  <script src="js/workspace.js?v=48"></script>
+  <script src="js/vhs.js?v=48"></script>
+  <script src="js/matches.js?v=48"></script>
+  <script src="js/main.js?v=48"></script>
 </body>
 </html>
