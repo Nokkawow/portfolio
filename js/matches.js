@@ -69,6 +69,7 @@
       const c = s.ctx, W = s.W, H = s.H;
       c.setTransform(1, 0, 0, 1, 0, 0);
       c.clearRect(0, 0, s.cv.width, s.cv.height);
+      if (!s.paper) return;
       if (p >= 1 && !alive) return;
       c.setTransform(s.dpr, 0, 0, s.dpr, 0, 0);
       if (p < 1) {
