@@ -1,0 +1,53 @@
+/* Camera rectangles are measured in workspace.js. No whole-page scaling. */
+#workspace-layer { transform-origin: center; }
+#work-desk { z-index:1; left:30%; right:5%; bottom:25%; height:9%; }
+#work-desk i { left:5%; width:13%; height:55%; }
+#work-chair { z-index:3; left:25%; bottom:2%; width:32%; height:72%; transform:none; }
+.work-pose { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; object-position:center bottom; }
+.work-turned { opacity:0; visibility:hidden; }
+#monitor-shell { z-index:2; right:auto; aspect-ratio:auto; transform:none; }
+.monitor-bezel { inset:0; padding:18px 18px 28px; border:5px solid #111; border-radius:18px; box-shadow:8px 10px 0 #0002; }
+.monitor-stand { top:100%; height:10%; bottom:auto; }
+.monitor-camera { top:4px; width:5px; height:5px; }
+.monitor-brand { bottom:5px; font-size:8px; }
+#monitor-screen { container-type:size; }
+#portfolio-track { width:100%; height:100%; }
+.portfolio-panel { width:100%; min-width:0; flex:0 0 100%; height:100%; padding:6cqh 4cqw 4cqh; }
+.project-panel { grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:6cqw; }
+.project-gallery { height:65%; min-width:0; width:88%; margin:auto; }
+.stack-photo { inset:0; border-width:2px; background:#f0eeee; }
+.stack-photo img { object-fit:contain; }
+.stack-photo.active { transform:translateY(-2%) scale(1); }
+.project-copy { min-width:0; max-height:100%; overflow-y:auto; overscroll-behavior:contain; padding:1cqh 0; }
+.project-copy h2,.monitor-contact h2,.monitor-thanks h2 { font-size:clamp(18px,min(4cqw,8cqh),54px); line-height:1.2; overflow-wrap:anywhere; }
+.project-date { font-size:clamp(9px,1.3cqw,15px); }
+.project-about { font-size:clamp(11px,1.6cqw,21px); }
+.project-copy dl { font-size:clamp(10px,1.3cqw,16px); }
+.project-actions a,.coming-link { font-size:clamp(10px,1.2cqw,15px); }
+.winner-stamp { font-size:clamp(9px,1.1cqw,14px); }
+.project-index { font-size:clamp(9px,1.2cqw,14px); }
+.room-caption { top:16%; left:5%; max-width:30%; }
+.room-caption strong { font-size:clamp(22px,2.4vw,42px); }
+.turn-hint { bottom:3%; right:8%; }
+@media(max-aspect-ratio:1/1) {
+  #work-chair { left:5%; width:70%; height:60%; bottom:3%; }
+  #work-desk { left:20%; right:-10%; bottom:39%; height:6%; }
+  .room-caption { top:13%; max-width:90%; }
+  .room-caption strong { font-size:24px; }
+  .monitor-bezel { padding:14px 10px 23px; border-width:4px; border-radius:12px; }
+  .project-panel { grid-template-columns:minmax(0,1fr); grid-template-rows:34% minmax(0,1fr); gap:4cqh; }
+  .project-gallery { width:82%; height:90%; margin:auto; }
+  .project-copy h2,.monitor-contact h2,.monitor-thanks h2 { font-size:clamp(18px,7cqw,30px); }
+  .project-copy dl { display:grid; font-size:clamp(11px,3.5cqw,15px); }
+  .project-about { font-size:clamp(12px,4cqw,18px); }
+  .project-date,.project-actions a,.coming-link { font-size:clamp(10px,3.4cqw,14px); }
+  .winner-stamp { font-size:clamp(9px,3cqw,13px); }
+  .monitor-contact { grid-template-columns:1fr; gap:4cqh; overflow-y:auto; }
+  .monitor-contact-list strong { font-size:14px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .stack-photo,.monitor-contact-list a { transition:none; }
+  .mini-mascot { animation:none; }
+}
+
+.monitor-thanks .project-index { position:static; margin:0 0 1em; }

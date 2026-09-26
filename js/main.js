@@ -181,6 +181,7 @@
   tl.fromTo('#chalk-dust', { autoAlpha: 0 }, { autoAlpha: .55, duration: 1.4, yoyo: true, repeat: 1 }, 'erase-board+=.4');
   ranges.push({ from: 'erase-board', offFrom: -0.2, to: 'erase-board', offTo: 3.1, on: () => Mascot.setPeek(true), off: () => Mascot.setPeek(false) });
   tl.addLabel('bell');
+  tl.to(['#mascot','#eraser'],{autoAlpha:0,duration:.3},'bell');
   cues.push({ label: 'bell', fwd: () => Sound.play('bell', 1), back: () => {} });
   tl.to('#board-layer', { backgroundColor: '#000', duration: 1.1, ease: 'power2.in' }, 'bell');
   tl.to('#board', { autoAlpha: 0, scale: 1.03, duration: .75 }, 'bell+=.25');
@@ -201,26 +202,23 @@
   tl.fromTo('.room-caption', { autoAlpha: 0, y: 25 }, { autoAlpha: 1, y: 0, duration: .9 }, 'workspace+=.35');
   tl.to({}, { duration: 1.2 });
   tl.addLabel('turn');
-  tl.to('#work-chair', { rotationY: -90, xPercent: -18, duration: 1.5, ease: 'power3.inOut' }, 'turn');
-  tl.to('.work-face', { autoAlpha: 1, duration: .35 }, 'turn+=.65');
-  tl.to('.work-hair', { rotation: -8, x: -8, duration: .35, yoyo: true, repeat: 3, ease: 'sine.inOut' }, 'turn');
+  tl.to('.work-back', { autoAlpha: 0, xPercent: -4, duration: reduceMotion ? .1 : .85 }, 'turn');
+  tl.fromTo('.work-turned', {autoAlpha:0,xPercent:6}, {autoAlpha:1,xPercent:0,duration:reduceMotion ? .1 : 1.1,immediateRender:false}, 'turn+=.15');
   tl.to(['.room-caption', '.turn-hint'], { autoAlpha: 0, duration: .5 }, 'turn+=.7');
   cues.push({ label: 'turn', fwd: () => Sound.play('whoosh', .5), back: () => Sound.play('whoosh', .5) });
+  tl.to({}, {duration:1.1});
   tl.addLabel('monitor');
-  tl.to('#workspace-layer', {
-    scale: () => window.innerWidth < 700 ? 1.18 : 2.35,
-    xPercent: () => window.innerWidth < 700 ? 0 : -25,
-    yPercent: () => window.innerWidth < 700 ? -5 : 4,
-    duration: 2.2, ease: 'power3.inOut'
-  }, 'monitor');
-  tl.to(['#work-chair', '#work-desk', '.room-tone'], { autoAlpha: 0, duration: .8 }, 'monitor+=1.2');
+  tl.to(Workspace.camera, {p:1,duration:2.2,ease:'power3.inOut',onUpdate:Workspace.renderCamera},'monitor');
+  tl.to('#work-chair', {autoAlpha:0,xPercent:-15,duration:.8},'monitor');
+  tl.to(['#work-desk', '.room-tone'], { autoAlpha: 0, duration: .8 }, 'monitor+=.5');
+  tl.to('.monitor-stand', {autoAlpha:0,duration:.6},'monitor+=.4');
   tl.to({}, { duration: .5 });
 
   // 9) เลื่อนแนวตั้งคุมหน้าในจอให้เดินแนวนอน
   Workspace.panels.forEach((panel, i) => {
     const label = i < C.projects.length ? 'project-' + i : (i === C.projects.length ? 'contact' : 'thanks');
+    if (i > 0) tl.to('#portfolio-track', { xPercent: -100 * i, duration: 2, ease: 'power2.inOut' });
     tl.addLabel(label);
-    if (i > 0) tl.to('#portfolio-track', { xPercent: -(100 / Workspace.panels.length) * i, duration: 2, ease: 'power2.inOut' }, label);
     tl.to({}, { duration: i < C.projects.length ? 3.2 : 2.5 });
   });
 

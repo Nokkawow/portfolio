@@ -86,6 +86,24 @@
     const pos = window.CHAR_POS;
     const T = `translate(${pos.x},${pos.y})`;
 
+    // ห้องเรียนมีระยะลึก เก้าอี้และโต๊ะว่างอยู่หลังตัวละคร
+    const room = el('g', { id: 'classroom-furniture' }, svg);
+    fillLine(room, 'M0,0 H1920 V1080 H0 Z', '#fafaf8', 0);
+    line(room, 'M0,650 H1920 M960,650 L0,1080 M960,650 L1920,1080', 2, {opacity:.18});
+    const windows = el('g', {opacity:.48}, room);
+    [80,320].forEach(x => { fillLine(windows, `M${x},150 h200 v300 h-200 Z`, '#fff', 4); line(windows,`M${x+100},150 v300 M${x},300 h200`,3); });
+    [[120,560,.72],[1490,530,.76],[340,440,.48],[1320,400,.46]].forEach(([x,y,s])=>{
+      const furniture=el('g',{transform:`translate(${x} ${y}) scale(${s})`,opacity:.55},room);
+      fillLine(furniture,'M70,-95 h155 v165 H70 Z','#fff',4);
+      line(furniture,'M82,70 v240 M211,70 v240',5);
+      fillLine(furniture,'M65,60 h165 v25 H65 Z','#e5e5e5',3);
+      fillLine(furniture,'M0,0 L250,0 L280,45 L-30,45 Z','#fff',4);
+      line(furniture,'M-20,46 v290 M268,46 v290',6);
+    });
+    const seat=el('g',{id:'student-chair'},svg);
+    fillLine(seat,'M780,510 Q920,485 1060,510 L1050,835 H790 Z','#e2e2e2',4);
+    line(seat,'M804,800 L785,1010 M1036,800 L1055,1010',6);
+
     /* ============================================================
        CHARACTER — ส่วนหลังโต๊ะ
        ============================================================ */
@@ -294,6 +312,22 @@
     el('path', { d: qHook, fill: 'none', stroke: INK, 'stroke-width': 30, 'stroke-linecap': 'round' }, qFront);
     el('path', { d: qDot, fill: INK }, qFront);
     el('path', { d: 'M1206,200 C1212,164 1240,140 1270,138', fill: 'none', stroke: '#fff', 'stroke-width': 5, 'stroke-linecap': 'round', opacity: 0.9 }, qFront);
+
+    // ภาพมาสคอตละเอียดใช้สปริงลำตัวเดิม ภาพเต็มชิ้นยังไม่ได้ rig ตา/ผมแยก
+    Array.from(torso.children).forEach(n => n.setAttribute('display', 'none'));
+    Array.from(head.children).forEach(n => { if (n !== tail) n.setAttribute('display', 'none'); });
+    Array.from(tail.children).forEach(n => n.setAttribute('display', 'none'));
+    [armL,armR].forEach(g => g.setAttribute('opacity','0'));
+    const art = { href:'assets/characters/student-front.png', x:-300, y:-350, width:600, height:900 };
+    // ภาพเต็มชิ้นรักษาเส้นผมและคอไม่ให้แยกเมื่อสปริงทำงาน
+    el('image',{...art,id:'student-portrait'},torso);
+    el('ellipse',{cx:0,cy:-90,rx:190,ry:220,fill:'transparent','pointer-events':'all'},head);
+    // ตำแหน่งสลับตามคำแก้: ชื่ออยู่ขวาของภาพ ตราอยู่ซ้ายของภาพ
+    const embroidery=el('g',{'font-family':'Noto Sans Thai,sans-serif','font-weight':800,fill:'#43215c'},torso);
+    const printedName=el('text',{x:52,y:113,'text-anchor':'middle','font-size':9,textLength:92,lengthAdjust:'spacingAndGlyphs'},embroidery);
+    printedName.textContent=content.name;
+    const crest=el('text',{x:-58,y:112,'text-anchor':'middle','font-size':13},embroidery);
+    crest.textContent='บป.';
 
     // เลเยอร์เอฟเฟกต์ (ปากกาที่ถูกหยิบ + ประกายตอนโดน) อยู่บนสุด
     const fx = el('g', { id: 'fx' }, svg);

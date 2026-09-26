@@ -5,6 +5,23 @@
   window.initWorkspace = function initWorkspace(content) {
     const track = document.getElementById('portfolio-track');
     const calendars = document.getElementById('calendar-stack');
+    const shell = document.getElementById('monitor-shell');
+
+    const stage = document.querySelector('.stage');
+    const camera = { p: 0 };
+    function layout() {
+      const w=stage.clientWidth,h=stage.clientHeight,mobile=w<h;
+      const margin=mobile?12:Math.max(24,w*.035), top=mobile?90:100;
+      const endW=mobile?w-margin*2:Math.min(w-margin*2,(h-top-30)*1.72);
+      const endH=mobile?h-top-35:endW/1.72;
+      const startW=mobile?w*.55:w*.44;
+      const a={x:mobile?w*.42:w*.49,y:mobile?h*.22:h*.21,w:startW,h:startW/1.72};
+      const b={x:(w-endW)/2,y:top+(h-top-30-endH)/2,w:endW,h:endH};
+      const p=camera.p;
+      Object.keys(a).forEach(k=>{const property={x:'left',y:'top',w:'width',h:'height'}[k];shell.style[property]=(a[k]+(b[k]-a[k])*p)+'px';});
+    }
+    window.addEventListener('resize',layout);
+    layout();
     const dates = [
       ['26', 'กันยายน', '2566'], ['01', 'มกราคม', '2567'], ['14', 'มิถุนายน', '2567'],
       ['03', 'กุมภาพันธ์', '2568'], ['19', 'พฤศจิกายน', '2568'], ['27', 'กันยายน', '2569']
@@ -35,7 +52,7 @@
       panel.innerHTML = `
         <div class="project-index">PROJECT 0${index + 1}</div>
         ${gallery(p)}
-        <div class="project-copy">
+        <div class="project-copy" data-lenis-prevent>
           ${p.award ? `<div class="winner-stamp">${esc(p.award)}</div>` : ''}
           <p class="project-date">${esc(p.date)} · ${esc(p.duration)}</p>
           <h2>${esc(p.title)}</h2>
@@ -48,6 +65,7 @@
 
     const contact = document.createElement('article');
     contact.className = 'portfolio-panel monitor-contact';
+    contact.setAttribute('data-lenis-prevent', '');
     contact.innerHTML = `<div><p class="project-index">LET’S TALK</p><h2>${content.contact.title}</h2><p>${esc(content.contact.sub)}</p></div><div class="monitor-contact-list">${content.contact.items.map((x) => `<a href="${esc(x.href)}" ${x.type === 'email' || x.type === 'phone' ? `data-copy="${esc(x.value)}"` : 'target="_blank" rel="noopener"'}><small>${esc(x.label)}</small><strong>${esc(x.value)}</strong></a>`).join('')}</div>`;
     track.appendChild(contact);
 
@@ -79,8 +97,9 @@
     return {
       panels: Array.from(track.children),
       calendarPages: Array.from(calendars.children),
+      camera, renderCamera: layout,
       setX(percent) { gsap.set(track, { xPercent: percent }); },
-      layout() { return Math.max(0, track.children.length - 1); }
+      layout
     };
   };
 })();
