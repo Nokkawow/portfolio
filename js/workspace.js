@@ -331,6 +331,68 @@
           <canvas class="sc-cover" aria-label="ขูดเพื่อดู ${esc(c.label)}"></canvas>
         </div>`;
     }).join('')}</div><div class="toast" role="status" aria-live="polite"></div>`;
+
+    /* ---------- ฉากติดต่อ: ทางเดินภาพผลงานไหลเข้าหาคนดู (พอร์ตจาก Image Stream Hero ของ ruixen.ui เป็น JS ธรรมดา) ----------
+       ภาพสองแถวเกิดที่จุดลับตาตรงกลาง แล้วพุ่งออกซ้าย-ขวาเข้าหาจอ · ขนาดเป็น cqw จึงคงสัดส่วนทุกขนาดจอ
+       ทุกครั้งที่ภาพวิ่งครบรอบจะเปลี่ยนเป็นภาพถัดไป เลยวนครบทุกภาพของทุกเกม · เล่นเฉพาะตอนอยู่ในฉากติดต่อ */
+    (function initStream() {
+      const P = { perspective: 30, cardWidth: 18, cardHeight: 25, cardRadius: 0.4, birthHeight: 2.6, exitHeight: 46,
+        railBirth: -11, railExit: 44, fan: 3.3, turnBirth: 6, turnExit: 28, stops: 24 };
+      const CARDS = 9, SPEED = 22, AXIS = 52;
+      // จุดลับตาอยู่ในช่องว่างระหว่างการ์ดติดต่อกับมาสคอต (จอแนวตั้งกลับมาอยู่กลาง)
+      const CENTER = matchMedia('(max-aspect-ratio: 1/1)').matches ? 50 : 59;
+      const imgs = content.projects.flatMap((p) => (p.images || []).map((src) => ({ src, alt: p.title })));
+      if (!imgs.length) return;
+      // สุ่มสลับลำดับครั้งเดียว ภาพจากเกมเดียวกันจะได้ไม่เรียงติดกัน
+      for (let i = imgs.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [imgs[i], imgs[j]] = [imgs[j], imgs[i]]; }
+      function keyframes(dir, name) {
+        const steps = [];
+        for (let s = 0; s <= P.stops; s++) {
+          const u = s / P.stops;
+          const scale = (P.birthHeight / P.cardHeight) * Math.pow(P.exitHeight / P.birthHeight, u);
+          const z = P.perspective * (1 - 1 / scale);
+          const rail = P.railExit - (P.railExit - P.railBirth) * Math.pow(1 - u, P.fan);
+          const turn = P.turnBirth + (P.turnExit - P.turnBirth) * u;
+          steps.push(`${(u * 100).toFixed(2)}%{transform:translate3d(${(dir * rail).toFixed(2)}cqw,0,${z.toFixed(2)}cqw) rotateY(${(-dir * turn).toFixed(2)}deg)}`);
+        }
+        return `@keyframes ${name}{${steps.join('')}}`;
+      }
+      const wrap = document.createElement('div');
+      wrap.id = 'fin-stream';
+      wrap.setAttribute('aria-hidden', 'true');
+      const style = document.createElement('style');
+      style.textContent = keyframes(1, 'fs-right') + keyframes(-1, 'fs-left');
+      document.head.appendChild(style);
+      const scene = document.createElement('div');
+      scene.className = 'fs-scene';
+      scene.style.perspective = `${P.perspective}cqw`;
+      scene.style.perspectiveOrigin = `${CENTER}% ${AXIS}%`;
+      const rig = document.createElement('div');
+      rig.className = 'fs-rig';
+      ['fs-right', 'fs-left'].forEach((name, rail) => {
+        for (let i = 0; i < CARDS; i++) {
+          const card = document.createElement('div');
+          card.className = 'fs-card';
+          Object.assign(card.style, {
+            left: `${CENTER}%`, top: `${AXIS}%`, width: `${P.cardWidth}cqw`, height: `${P.cardHeight}cqw`,
+            marginLeft: `${-P.cardWidth / 2}cqw`, marginTop: `${-P.cardHeight / 2}cqw`, borderRadius: `${P.cardRadius}cqw`,
+            animation: `${name} ${SPEED}s linear infinite`, animationDelay: `${-(i * SPEED) / CARDS}s`
+          });
+          // แถวขวาใช้ภาพลำดับคู่ แถวซ้ายใช้ลำดับคี่ · วิ่งครบรอบก็ขยับไปอีก 2×CARDS ภาพ
+          let k = i * 2 + rail;
+          const im = document.createElement('img');
+          im.decoding = 'async'; im.draggable = false; im.alt = '';
+          const put = () => { im.src = imgs[k % imgs.length].src; };
+          put();
+          card.addEventListener('animationiteration', () => { k += CARDS * 2; put(); });
+          card.appendChild(im);
+          rig.appendChild(card);
+        }
+      });
+      scene.appendChild(rig);
+      wrap.appendChild(scene);
+      finCards.parentNode.insertBefore(wrap, finCards);
+    })();
     document.querySelector('#fin-bubble .b1').textContent = fin.hello;
     document.querySelector('#fin-bubble .b2').textContent = fin.bye;
     document.getElementById('fin-thanks').innerHTML = content.thanks.title;
