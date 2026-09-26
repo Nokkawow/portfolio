@@ -77,6 +77,7 @@
   window.initCharacter(S, api);
   const Board = window.initBoard(C, api);
   const Workspace = window.initWorkspace(C);
+  const VHS = window.initVHS();
   Effects.tiltCards(document.getElementById('slides'));   // 3D Card
   Effects.sparkles(document.getElementById('slides'));    // Sparkles
   const Mascot = window.initMascot(api);
@@ -134,13 +135,16 @@
   // 1) Opening แบบ Heal
   tl.addLabel('start', 0);
   tl.to('.scroll-hint', { autoAlpha: 0, duration: 0.3 }, 0);
+  // กระดาษปิดข้อความ: เผาเองด้วยไม้ขีด หรือเลื่อนต่อแล้วไหม้เองตามการเลื่อน
+  const Matches = window.initMatches(lines, api);
   lines.forEach((line, i) => {
+    const paper = line.querySelector('canvas.paper');
     if (i > 0) {
-      // Text Generate: คำค่อยๆ ปรากฏจากเบลอ ทีละคำตามการเลื่อน
-      const ws = line.querySelectorAll('.w');
       tl.set(line, { autoAlpha: 1, y: 0, filter: 'blur(0px)' });
-      tl.fromTo(ws, { opacity: 0, filter: 'blur(10px)' }, { opacity: 1, filter: 'blur(0px)', duration: 0.35, stagger: 0.9 / ws.length, ease: 'none', immediateRender: i > 0 });
+      tl.fromTo(paper, { autoAlpha: 0, y: 50, rotation: -4 }, { autoAlpha: 1, y: 0, rotation: 0, duration: 0.45, ease: 'back.out(1.6)' });
     }
+    const bp = { p: 0 };
+    tl.fromTo(bp, { p: 0 }, { p: 1, duration: 1.2, ease: 'none', immediateRender: false, onUpdate: () => Matches.setAuto(i, bp.p) }, '+=0.5');
     tl.to(line, { autoAlpha: 0, y: -60, filter: 'blur(10px)', duration: 0.6, ease: 'power2.in' }, '+=0.7');
   });
   tl.to('#opening', { autoAlpha: 0, duration: 1, ease: 'none' });
@@ -198,6 +202,10 @@
 
   // 8) ห้องทำงาน: เห็นด้านหลังก่อน แล้วหมุน 90° พร้อมซูมเข้าจอ
   tl.addLabel('workspace');
+  // VHS: กรอเทป (เส้นวิ่งเร็ว + กระตุกแรง) แล้วตัดเข้าภาพชัดของปัจจุบัน
+  tl.fromTo('.vhs-rewind', { autoAlpha: 0 }, { autoAlpha: 1, duration: .35, immediateRender: false }, 'workspace-=0.45');
+  tl.to('#vhs', { autoAlpha: 0, duration: .3 }, 'workspace+=0.1');
+  cues.push({ label: 'workspace', fwd: () => { VHS.glitch(true); Sound.play('whoosh', .3); }, back: () => VHS.glitch(true) });
   tl.fromTo('#workspace-layer', { autoAlpha: 0, xPercent: -8 }, { autoAlpha: 1, xPercent: 0, duration: 1.2, immediateRender: false }, 'workspace');
   tl.to('#time-layer', { autoAlpha: 0, duration: .7 }, 'workspace');
   tl.fromTo('.room-caption', { autoAlpha: 0, y: 25 }, { autoAlpha: 1, y: 0, duration: .9 }, 'workspace+=.35');
@@ -261,8 +269,24 @@
   const cueTimes = () => cues.forEach((c) => (c.time = tl.labels[c.label]));
   cueTimes();
   ranges.forEach((r) => { r.a = tl.labels[r.from] + r.offFrom; r.b = tl.labels[r.to] + r.offTo; r.in = false; });
+  /* ---------- เคอร์เซอร์เปลี่ยนตามฉาก: ดินสอ (ห้องเรียน) / ชอล์ก (กระดาน) / เมาส์คอม (ห้องทำงาน) ---------- */
+  const CURSORS = {
+    pencil: ["<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><g stroke='#111' stroke-width='1.6' stroke-linejoin='round'><path d='M3 29l2-7L22 5l5 5-17 17z' fill='#fff'/><path d='M22 5l3-3 5 5-3 3z' fill='#7b1fa2'/><path d='M3 29l2-7 5 5z' fill='#f2d7b5'/><path d='M3 29l1-3.4 2.4 2.4z' fill='#111'/><path d='M8.5 19.5l4 4' fill='none'/></g></svg>", 3, 29],
+    chalk: ["<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><path d='M5 27l2-6L23 6l4 4-15 15z' fill='#fff' stroke='#111' stroke-width='1.6' stroke-linejoin='round'/><path d='M19 10l3 3' stroke='#bbb' stroke-width='1.2'/><circle cx='3' cy='29' r='1.2' fill='#999'/><circle cx='7' cy='30' r='.9' fill='#bbb'/><circle cx='2' cy='25' r='.8' fill='#bbb'/></svg>", 4, 28],
+    arrow: ["<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><path d='M5 3v22l6-5.5 4 9 4-1.8-4-8.7h8z' fill='#fff' stroke='#111' stroke-width='1.8' stroke-linejoin='round'/><path d='M7 8v12' stroke='#7b1fa2' stroke-width='1.6'/></svg>", 5, 3]
+  };
+  Object.entries(CURSORS).forEach(([k, [svgStr, x, y]]) =>
+    document.documentElement.style.setProperty('--cur-' + k, `url("data:image/svg+xml,${encodeURIComponent(svgStr)}") ${x} ${y}, auto`));
+  let sceneName = '';
+  function setScene(t) {
+    const Lb = tl.labels;
+    const n = t < Lb.whip ? 'class' : t < Lb.bell ? 'board' : t < Lb.workspace ? 'time' : 'work';
+    if (n !== sceneName) { sceneName = n; document.body.dataset.scene = n; }
+  }
+
   gsap.ticker.add(() => {
     const t = tl.time();
+    setScene(t);
     if (t !== lastTime) {
       // ไปข้างหน้า: เรียงตามลำดับ / ถอยหลัง: เรียงย้อนกลับ (กันสไลด์ผิดตอนกระโดดข้ามหลายฉาก)
       if (t > lastTime) cues.forEach((c) => { if (lastTime < c.time && t >= c.time) c.fwd(); });
@@ -366,6 +390,7 @@
     menuBtn.setAttribute('aria-expanded', open);
     menu.setAttribute('aria-hidden', !open);
     document.body.classList.toggle('menu-open', open);
+    open ? openNav() : closeNav();
   }
   menuBtn.addEventListener('click', () => { setMenu(!menu.classList.contains('open')); Sound.play('click'); });
   menu.addEventListener('click', (e) => {
@@ -374,6 +399,37 @@
     else if (e.target === menu) setMenu(false);
   });
   window.addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
+
+  /* ---------- Nav ซ่อนได้: ปกติเห็นแค่ลูกศร ▼ · ชี้/แตะแล้ว Nav + โลโก้ + ปุ่มเสียงเลื่อนลงมา ---------- */
+  const navToggle = $('#nav-toggle');
+  const navZone = ['#nav-toggle', '#topnav', '#logo-btn', '#top-right'].map($);
+  let navCloseT = null;
+  function openNav() {
+    clearTimeout(navCloseT);
+    if (!document.body.classList.contains('nav-open')) {
+      document.body.classList.add('nav-open');
+      navToggle.setAttribute('aria-expanded', 'true');
+      requestAnimationFrame(measureNav);
+    }
+  }
+  function closeNav(delay = 1000) {
+    clearTimeout(navCloseT);
+    navCloseT = setTimeout(() => {
+      if (menu.classList.contains('open')) return;
+      document.body.classList.remove('nav-open');
+      navToggle.setAttribute('aria-expanded', 'false');
+    }, delay);
+  }
+  navZone.forEach((el) => {
+    el.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') openNav(); });
+    el.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') closeNav(); });
+    el.addEventListener('focusin', openNav);
+    el.addEventListener('focusout', () => closeNav(300));
+  });
+  navToggle.addEventListener('click', () => {
+    Sound.play('click');
+    document.body.classList.contains('nav-open') ? closeNav(0) : openNav();
+  });
 
   const soundBtn = $('#sound-btn');
   soundBtn.addEventListener('click', () => {
@@ -420,11 +476,12 @@
       .to(['.loader-pct', '.loader-bar'], { autoAlpha: 0, duration: 0.3 }, '<')
       .to('#loader', { autoAlpha: 0, duration: 0.5 })
       .add(() => { document.body.classList.remove('is-loading'); lenis.start(); })
-      .from(lines[0].querySelectorAll('.w'), { opacity: 0, filter: 'blur(10px)', duration: 0.6, stagger: 0.12, ease: 'power2.out' }, '-=0.2')
+      .from(lines[0].querySelector('canvas.paper'), { autoAlpha: 0, y: 50, rotation: -4, duration: 0.6, ease: 'back.out(1.6)' }, '-=0.2')
+      .add(() => Matches.walkIn(), '<')
       .from('.scroll-hint', { autoAlpha: 0, duration: 0.6 }, '-=0.3')
       .to('.ui', { autoAlpha: 1, duration: 0.6 }, '<');
   }
 
   // สำหรับทดสอบ
-  window.__debug = { tl, st, lenis, Board, Mascot, Workspace, scrollToLabel };
+  window.__debug = { tl, st, lenis, Board, Mascot, Workspace, Matches, scrollToLabel };
 })();

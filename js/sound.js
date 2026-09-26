@@ -62,6 +62,8 @@
     grab() { tone(330, 0.1, { to: 520, gain: 0.15, type: 'triangle' }); },
     boing() { tone(220, 0.35, { to: 660, gain: 0.2, type: 'sine' }); },
     click() { noise(0.03, { f: 2000, q: 3, gain: 0.15 }); },
+    strike() { noise(0.12, { f: 3500, q: 1.5, gain: 0.35, sweepTo: 1200 }); noise(0.5, { f: 900, type: 'lowpass', gain: 0.12, at: 0.08, attack: 0.05 }); },
+    crackle() { noise(0.025, { f: 2500 + Math.random() * 2500, q: 5, gain: 0.12 }); },
     bell() {
       [880, 1174, 1397].forEach((f, i) => tone(f, 1.15, { type: 'sine', gain: 0.16 / (i + 1), at: i * 0.04 }));
       tone(440, 1.35, { type: 'triangle', gain: 0.12, at: 0.02 });

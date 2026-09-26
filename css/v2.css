@@ -1,0 +1,101 @@
+/* ============================================================
+   V2 — ลูกเล่นรอบ 2: Nav ซ่อน · เคอร์เซอร์ตามฉาก · VHS · ไม้ขีด · บัตรขูด · เบราว์เซอร์ข่าว
+   ============================================================ */
+
+/* ---------- ⑤ Nav ซ่อน: เห็นแค่ลูกศร ▼ ---------- */
+#nav-toggle {
+  position: fixed; z-index: 75; top: 0; left: 50%;
+  width: 54px; height: 28px; transform: translateX(-50%);
+  display: grid; place-items: center;
+  background: var(--white); border: 2.5px solid var(--ink); border-top: 0; border-radius: 0 0 16px 16px;
+  box-shadow: 3px 4px 0 rgba(0,0,0,.12);
+  transition: top .45s cubic-bezier(.2,.8,.2,1), transform .3s ease, background .2s ease;
+}
+#nav-toggle svg { width: 18px; height: 18px; fill: none; stroke: var(--ink); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; transition: transform .35s ease; animation: nudge 1.8s ease-in-out infinite; }
+#nav-toggle:hover, #nav-toggle:focus-visible { background: var(--purple-2); outline: none; }
+#nav-toggle:hover svg, #nav-toggle:focus-visible svg { stroke: var(--white); }
+@keyframes nudge { 50% { transform: translateY(3px); } }
+/* เปิดแล้ว: ลูกศรเลื่อนลงไปใต้ Nav กลายเป็นปุ่มเก็บ ▲ */
+body.nav-open #nav-toggle { top: calc(var(--gutter) + 50px); border-top: 2.5px solid var(--ink); border-radius: 16px; }
+body.nav-open #nav-toggle svg { transform: rotate(180deg); animation: none; }
+
+#topnav, #logo-btn, #top-right { transition: transform .45s cubic-bezier(.2,.8,.2,1), opacity .3s ease; }
+body:not(.nav-open) #topnav,
+body:not(.nav-open) #logo-btn,
+body:not(.nav-open) #top-right { transform: translateY(calc(-100% - var(--gutter) - 10px)); opacity: 0; pointer-events: none; }
+/* โลโก้ยังเอียงตอน hover ได้ตอนเปิดอยู่ */
+body.nav-open #logo-btn:hover { transform: scale(1.08) rotate(-6deg); }
+
+/* ---------- ⑥ เคอร์เซอร์ตามฉาก ---------- */
+body[data-scene="class"], body[data-scene="time"] { cursor: var(--cur-pencil); }
+body[data-scene="board"] { cursor: var(--cur-chalk); }
+body[data-scene="work"] { cursor: var(--cur-arrow); }
+body[data-scene="class"] #book { cursor: var(--cur-pencil); }
+body[data-scene="board"] #board-surface { cursor: var(--cur-chalk); }
+button, a, [role="button"] { cursor: pointer; }
+
+@media (prefers-reduced-motion: reduce) {
+  #nav-toggle svg { animation: none; }
+}
+
+/* ---------- ④ VHS: เหมือนนั่งดูเทปอดีต ---------- */
+#vhs { position: absolute; inset: 0; z-index: 30; pointer-events: none; overflow: hidden; }
+#vhs-noise { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .085; image-rendering: pixelated; }
+.vhs-lines { position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(0,0,0,.13) 0 1px, transparent 1px 3px); }
+.vhs-band {  /* แถบภาพกระตุกวิ่งผ่าน */
+  position: absolute; left: 0; right: 0; height: 10%; top: -12%;
+  background: linear-gradient(transparent, rgba(255,255,255,.14) 35%, rgba(0,0,0,.22) 60%, transparent);
+  -webkit-backdrop-filter: blur(1.2px) contrast(1.2); backdrop-filter: blur(1.2px) contrast(1.2);
+  animation: vhs-band 7.5s linear infinite;
+}
+@keyframes vhs-band { 0% { top: -12%; } 28% { top: 108%; } 100% { top: 108%; } }
+.vhs-rewind {  /* กรอเทป: เส้นวิ่งเร็ว */
+  position: absolute; left: 0; right: 0; top: -60px; bottom: -60px; opacity: 0; visibility: hidden;
+  background: repeating-linear-gradient(0deg, rgba(255,255,255,.4) 0 2px, transparent 2px 10px, rgba(0,0,0,.4) 10px 12px, transparent 12px 30px);
+  animation: vhs-rewind .18s linear infinite;
+}
+@keyframes vhs-rewind { to { transform: translateY(30px); } }
+@media (prefers-reduced-motion: reduce) { .vhs-band, .vhs-rewind { animation: none; } }
+
+/* ---------- ① ไม้ขีดเผากระดาษ (ฉากเปิด) ---------- */
+#opening-lines .line canvas.paper { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 2; }
+#match-kit { position: absolute; z-index: 6; right: 3vw; bottom: 0; width: clamp(150px, 17vw, 240px); }
+.kit-mascot { display: block; width: 100%; height: auto; user-select: none; pointer-events: none; filter: drop-shadow(0 0 18px rgba(123,31,162,.35)); }
+.matchbox {
+  position: absolute; left: 4%; bottom: 36%; width: 46%; aspect-ratio: 1.55;
+  background: #fff; border: 3px solid #111; border-radius: 4px; box-shadow: 4px 5px 0 rgba(123,31,162,.5);
+  display: grid; place-items: center; transform: rotate(-8deg);
+}
+.box-label { font-weight: 900; font-size: clamp(9px, 1vw, 13px); line-height: 1.05; text-align: center; color: #111; }
+.box-label b { color: var(--purple-2); }
+.striker {  /* แถบขูดข้างกล่อง */
+  position: absolute; right: -3px; top: 8%; bottom: 8%; width: 22%;
+  background: repeating-linear-gradient(45deg, #5b3a22 0 2px, #3a2414 2px 4px); border: 2px solid #111; border-radius: 0 3px 3px 0;
+  transition: box-shadow .15s ease;
+}
+.striker.rub { box-shadow: 0 0 10px 3px #ff9a3c; }
+.match {
+  position: absolute; right: 30%; bottom: 70%; width: 7px; height: 58px; z-index: 2;
+  background: linear-gradient(90deg, #e9cc97, #d6ac6b); border: 1.5px solid #111; border-radius: 3px;
+  cursor: grab; touch-action: none; transform-origin: 50% 100%; transform: rotate(12deg);
+}
+.match::before { content: ''; position: absolute; left: 50%; top: -12px; width: 13px; height: 16px; margin-left: -6.5px; border-radius: 50% 50% 45% 45%; background: #3a1450; border: 1.5px solid #111; }
+.match.held { position: fixed; left: 0; top: 0; right: auto; bottom: auto; z-index: 220; cursor: grabbing; }
+.match .flame { position: absolute; left: 50%; top: -40px; width: 18px; height: 30px; margin-left: -9px; opacity: 0; border-radius: 50% 50% 45% 45% / 65% 65% 35% 35%;
+  background: radial-gradient(ellipse at 50% 75%, #fff6c8 0 18%, #ffc24a 40%, #ff6a1a 72%, transparent 74%); filter: drop-shadow(0 0 8px #ff9a3c); }
+.match.lit .flame { opacity: 1; animation: flicker .12s ease-in-out infinite alternate; }
+@keyframes flicker { from { transform: scale(1, 1) rotate(-3deg); } to { transform: scale(.9, 1.12) rotate(3deg); } }
+.match-hint {
+  position: absolute; right: 70%; bottom: 58%; width: max-content; max-width: 46vw;
+  padding: 8px 14px; background: #fff; color: #111; border: 2.5px solid #111; border-radius: 14px;
+  font-weight: 800; font-size: clamp(11px, 1.05vw, 14px); opacity: 0; visibility: hidden;
+}
+.match-hint::after { content: ''; position: absolute; right: -10px; bottom: 12px; border: 7px solid transparent; border-left-color: #111; }
+@media (max-aspect-ratio: 1/1) {
+  #match-kit { width: 34vw; right: 2vw; }
+  .match-hint { right: 20%; bottom: 102%; max-width: 70vw; }
+  .match-hint::after { display: none; }
+}
+/* เว้นที่ให้มาสคอตถือไม้ขีด ไม่ให้บังกระดาษ */
+@media (min-aspect-ratio: 1/1) { #opening-lines .line { padding-right: calc(min(17vw, 240px) + 3vw); } }
+@media (max-aspect-ratio: 1/1) { #opening-lines .line { padding-bottom: 30vh; } }
