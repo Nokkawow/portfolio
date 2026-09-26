@@ -135,16 +135,17 @@
   // 1) Opening แบบ Heal
   tl.addLabel('start', 0);
   tl.to('.scroll-hint', { autoAlpha: 0, duration: 0.3 }, 0);
-  // กระดาษปิดข้อความ: เผาเองด้วยไม้ขีด หรือเลื่อนต่อแล้วไหม้เองตามการเลื่อน
+  // เปิดเว็บ = กระดาษขาวเต็มจอ ต้องจุดไม้ขีดเผา (หรือเลื่อนลงแล้วไหม้เอง) ถึงเห็นจอดำเปิดเรื่อง
   const Matches = window.initMatches(lines, api);
+  const bp = { p: 0 };
+  tl.fromTo(bp, { p: 0 }, { p: 1, duration: 1.6, ease: 'none', immediateRender: false, onUpdate: () => Matches.setAuto(0, bp.p) }, 0.2);
   lines.forEach((line, i) => {
-    const paper = line.querySelector('canvas.paper');
     if (i > 0) {
+      // Text Generate: คำค่อยๆ ปรากฏจากเบลอ ทีละคำตามการเลื่อน
+      const ws = line.querySelectorAll('.w');
       tl.set(line, { autoAlpha: 1, y: 0, filter: 'blur(0px)' });
-      tl.fromTo(paper, { autoAlpha: 0, y: 50, rotation: -4 }, { autoAlpha: 1, y: 0, rotation: 0, duration: 0.45, ease: 'back.out(1.6)' });
+      tl.fromTo(ws, { opacity: 0, filter: 'blur(10px)' }, { opacity: 1, filter: 'blur(0px)', duration: 0.35, stagger: 0.9 / ws.length, ease: 'none' });
     }
-    const bp = { p: 0 };
-    tl.fromTo(bp, { p: 0 }, { p: 1, duration: 1.2, ease: 'none', immediateRender: false, onUpdate: () => Matches.setAuto(i, bp.p) }, '+=0.5');
     tl.to(line, { autoAlpha: 0, y: -60, filter: 'blur(10px)', duration: 0.6, ease: 'power2.in' }, '+=0.7');
   });
   tl.to('#opening', { autoAlpha: 0, duration: 1, ease: 'none' });
@@ -489,7 +490,7 @@
       .to(['.loader-pct', '.loader-bar'], { autoAlpha: 0, duration: 0.3 }, '<')
       .to('#loader', { autoAlpha: 0, duration: 0.5 })
       .add(() => { document.body.classList.remove('is-loading'); lenis.start(); })
-      .from(lines[0].querySelector('canvas.paper'), { autoAlpha: 0, y: 50, rotation: -4, duration: 0.6, ease: 'back.out(1.6)' }, '-=0.2')
+      .from(lines[0].querySelectorAll('.w'), { opacity: 0, filter: 'blur(10px)', duration: 0.6, stagger: 0.12, ease: 'power2.out' }, '-=0.2')
       .add(() => Matches.walkIn(), '<')
       .from('.scroll-hint', { autoAlpha: 0, duration: 0.6 }, '-=0.3')
       .to('.ui', { autoAlpha: 1, duration: 0.6 }, '<');

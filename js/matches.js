@@ -16,44 +16,39 @@
     const layer = document.getElementById('opening');
     let match = null;
 
-    /* ---------- กระดาษแต่ละแผ่น ---------- */
-    const MARGIN = 46; // พื้นที่รอบกระดาษให้ไฟ/ขี้เถ้าล้นออกได้
-    const sheets = lines.map((line, i) => {
-      const cv = document.createElement('canvas');
-      cv.className = 'paper';
-      line.appendChild(cv);
-      return { i, line, cv, ctx: cv.getContext('2d'), paper: null, W: 0, H: 0, dpr: 1,
-        manual: 0, auto: 0, ox: 0.5, seed: Math.random() * 1000, parts: [], last: -1 };
-    });
+    /* ---------- กระดาษขาวเต็มจอ ปิดจอดำเปิดเรื่องไว้ ---------- */
+    const MARGIN = 0;
+    const cvFull = document.createElement('canvas');
+    cvFull.className = 'paper full';
+    layer.appendChild(cvFull);
+    const sheets = [{ i: 0, line: layer, cv: cvFull, ctx: cvFull.getContext('2d'), paper: null, W: 0, H: 0, dpr: 1,
+      manual: 0, auto: 0, ox: 0.5, seed: Math.random() * 1000, parts: [], last: -1 }];
 
     function drawPaper(s) {
-      const text = s.line.querySelector('.in').getBoundingClientRect();
-      const pw = Math.max(260, text.width + 90), ph = Math.max(120, text.height + 70);
+      const r = layer.getBoundingClientRect();
+      if (!r.width) return;
+      const pw = r.width, ph = r.height;
       s.W = pw; s.H = ph;
-      s.dpr = Math.min(2, devicePixelRatio || 1);
-      const cw = pw + MARGIN * 2, ch = ph + MARGIN * 2;
-      s.cv.width = cw * s.dpr; s.cv.height = ch * s.dpr;
-      s.cv.style.width = cw + 'px'; s.cv.style.height = ch + 'px';
-      const lr = s.line.getBoundingClientRect();
-      s.cv.style.left = (text.left - lr.left + text.width / 2) + 'px';
-      s.cv.style.top = (text.top - lr.top + text.height / 2) + 'px';
-      // เก็บภาพกระดาษไว้ในแคนวาสแยก
+      s.dpr = Math.min(1.5, devicePixelRatio || 1);
+      s.cv.width = pw * s.dpr; s.cv.height = ph * s.dpr;
+      s.cv.style.width = pw + 'px'; s.cv.style.height = ph + 'px';
       const off = document.createElement('canvas');
       off.width = s.cv.width; off.height = s.cv.height;
       const o = off.getContext('2d');
-      o.scale(s.dpr, s.dpr); o.translate(MARGIN, MARGIN);
+      o.scale(s.dpr, s.dpr);
       o.fillStyle = '#f6f3ec'; o.fillRect(0, 0, pw, ph);
-      // สกรีนโทนมุมกระดาษ
-      o.fillStyle = 'rgba(17,17,17,.18)';
-      for (let y = 6; y < ph; y += 7) for (let x = 6; x < pw; x += 7) {
-        const d = Math.min(x + y, (pw - x) + (ph - y));
-        if (d < 70) { o.beginPath(); o.arc(x, y, 1.3 * (1 - d / 70) + .3, 0, 7); o.fill(); }
+      // สกรีนโทนมังงะไล่จางจากมุมจอ
+      const R = Math.min(pw, ph) * .35;
+      o.fillStyle = 'rgba(17,17,17,.16)';
+      for (let y = 8; y < ph; y += 10) for (let x = 8; x < pw; x += 10) {
+        const d = Math.min(x + y, (pw - x) + (ph - y), (pw - x) + y, x + (ph - y));
+        if (d < R) { o.beginPath(); o.arc(x, y, 1.8 * (1 - d / R) + .3, 0, 7); o.fill(); }
       }
-      o.strokeStyle = '#111'; o.lineWidth = 3; o.strokeRect(1.5, 1.5, pw - 3, ph - 3);
-      o.fillStyle = '#7b1fa2'; o.font = '800 14px "Noto Sans Thai", sans-serif'; o.textAlign = 'center';
-      o.fillText('จุดไฟเผาเพื่ออ่าน', pw / 2, ph / 2 + 5);
-      o.fillStyle = 'rgba(17,17,17,.35)'; o.font = '700 11px "Noto Sans Thai", sans-serif';
-      o.fillText(`ม้วนที่ ${s.i + 1}`, pw / 2, ph - 14);
+      o.textAlign = 'center';
+      o.fillStyle = '#111'; o.font = `900 ${Math.max(26, Math.min(64, pw * .045))}px "Noto Sans Thai", sans-serif`;
+      o.fillText('จุดไฟเผาเพื่อเริ่มเรื่อง', pw / 2, ph / 2);
+      o.fillStyle = '#7b1fa2'; o.font = `800 ${Math.max(13, Math.min(20, pw * .014))}px "Noto Sans Thai", sans-serif`;
+      o.fillText('หยิบไม้ขีดจากมือผม ขูดข้างกล่อง แล้ววางบนกระดาษ — หรือเลื่อนลงก็ได้', pw / 2, ph / 2 + Math.max(34, pw * .03));
       s.paper = off; s.last = -1;
       render(s, true);
     }
@@ -61,12 +56,13 @@
     // ขอบไฟ: ความสูงที่ไหม้ (จากล่าง) ของแต่ละแนว x
     function burnedAt(s, x, p) {
       const n = Math.sin(x * 0.045 + s.seed) * 0.5 + Math.sin(x * 0.13 + s.seed * 2) * 0.3 + Math.sin(x * 0.31 + s.seed * 3) * 0.2;
-      const spread = p * (s.H * 1.45 + s.W * 0.55) - Math.abs(x - s.ox * s.W) * 0.55;
+      const spread = p * (s.H * 1.5 + s.W * 0.6) - Math.abs(x - s.ox * s.W) * 0.6;
       return Math.max(0, Math.min(s.H + 30, spread + n * s.H * 0.09));
     }
 
     function render(s, force) {
       const p = Math.max(s.manual, s.auto);
+      kit.classList.toggle('gone', p >= 1);
       const alive = s.parts.length > 0;
       if (!force && p === s.last && !alive) return;
       s.last = p;
@@ -148,7 +144,7 @@
       const r = s.cv.getBoundingClientRect();
       s.ox = Math.min(1, Math.max(0, (clientX - r.left - MARGIN) / s.W));
       Sound.play('whoosh', 0.2);
-      gsap.to(s, { manual: 1, duration: reduce ? 0.4 : 2.4, ease: 'power1.in' });
+      gsap.to(s, { manual: 1, duration: reduce ? 0.4 : 3.2, ease: 'power1.in' });
       if (hint) gsap.to(hint, { autoAlpha: 0, duration: .3 });
     }
 

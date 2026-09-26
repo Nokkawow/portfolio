@@ -1,6 +1,6 @@
 /* ============================================================
    VHS — ภาพเทปเก่าแบบกล้องวิดีโอ (อ้างอิงภาพของเจ้าของ)
-   · noise + เส้นเทปแนวนอนขยับทุกเฟรม · ภาพสั่นขึ้นลงเบาๆ · กระพริบ · กระตุกเป็นระยะ
+   · เส้นเทปแนวนอน · ภาพสั่นขึ้นลงเบาๆ (เอา noise เม็ดสี่เหลี่ยมออกตามที่เจ้าของขอ) · กระพริบ · กระตุกเป็นระยะ
    · HUD 4 มุม: PLAY ▶ / เวลาเทปเดินตามการเลื่อน / วันที่ตามเรื่อง (พ.ศ.) / TAPE ตามฉาก
    เปิด/ปิดด้วย autoAlpha ของ #vhs ในไทม์ไลน์หลัก (main.js) และ update(t) ทุกเฟรม
    ============================================================ */
@@ -11,9 +11,6 @@
 
   window.initVHS = function (calendarPages) {
     const box = document.getElementById('vhs');
-    const cv = document.getElementById('vhs-noise');
-    const ctx = cv.getContext('2d');
-    const img = ctx.createImageData(cv.width, cv.height);
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const mobile = matchMedia('(pointer: coarse)').matches;
     const layers = ['#opening', '#classroom', '#board-layer', '#time-layer'].map((s) => document.querySelector(s));
@@ -26,22 +23,6 @@
     });
     let frame = 0, nextGlitch = performance.now() + 4000, on = true;
 
-    function noise() {
-      const d = img.data, W = cv.width;
-      for (let i = 0; i < d.length; i += 4) {
-        const v = Math.random() * 255 | 0;
-        d[i] = d[i + 1] = d[i + 2] = v; d[i + 3] = 255;
-      }
-      // เส้นเทปแนวนอนสว่าง/มืด สุ่มตำแหน่งทุกเฟรม
-      for (let k = 0; k < 4; k++) {
-        const y = Math.random() * cv.height | 0, bright = Math.random() < .6;
-        for (let x = 0; x < W; x++) {
-          const i = (y * W + x) * 4, v = bright ? 235 : 20;
-          d[i] = d[i + 1] = d[i + 2] = v;
-        }
-      }
-      ctx.putImageData(img, 0, 0);
-    }
     function visibleLayers() { return layers.filter((l) => l && getComputedStyle(l).visibility !== 'hidden'); }
     // กระตุก: ขยับซ้าย-ขวาเร็วๆ + เอียงนิดเดียว
     function glitch(strong) {
@@ -58,13 +39,11 @@
       on = getComputedStyle(box).visibility !== 'hidden' && +getComputedStyle(box).opacity > 0.01;
       if (!on || reduce) return;
       frame++;
-      if (frame % (mobile ? 3 : 2) === 0) noise();
       // ภาพสั่นขึ้นลงเบาๆ แบบเทป
       if (frame % 3 === 0) gsap.set(visibleLayers(), { y: (Math.random() - .5) * 2.2 });
       const now = performance.now();
       if (now > nextGlitch) { glitch(false); nextGlitch = now + 3200 + Math.random() * 4000; }
     });
-    noise();
 
     const pad = (n) => String(n).padStart(2, '0');
     let last = '';
