@@ -67,8 +67,10 @@
     const newestFirst = [...projects].reverse();
 
     function gallery(p) {
-      return `<div class="project-gallery" data-gallery>${(p.images || []).map((src, i) =>
-        `<button class="stack-photo${i === 0 ? ' active' : ''}" data-image="${i}" aria-label="ดูภาพที่ ${i + 1}"><img src="${esc(src)}" alt="${esc(p.title)} ภาพที่ ${i + 1}"></button>`).join('')}</div>`;
+      const n = (p.images || []).length;
+      return `<div class="polaroid-deck" data-gallery>${(p.images || []).map((src, i) =>
+        `<div class="polaroid" role="button" data-image="${i}" aria-label="ภาพที่ ${i + 1} จาก ${n} · ลากปัดออกเพื่อดูภาพถัดไป กด Enter เพื่อดูภาพใหญ่"><img src="${esc(src)}" alt="${esc(p.title)} ภาพที่ ${i + 1}" draggable="false"><span class="pl-cap"><b>${esc(p.short || p.title)}</b><i>${i + 1}/${n}</i></span></div>`).join('')}</div>${n > 1 ? `
+        <div class="deck-bar"><button type="button" data-deck="prev" aria-label="ภาพก่อนหน้า">‹</button><span class="deck-count">1 / ${n}</span><button type="button" data-deck="next" aria-label="ภาพถัดไป">›</button><small>ลากปัดภาพออกได้เลย</small></div>` : ''}`;
     }
     const newsOf = (p) => p.news || { tag: 'ผลงาน', headline: p.title, deck: '' };
 
@@ -135,11 +137,11 @@
         page.hidden = true;
         view.appendChild(page);
         tabs.push({ id, title: p.short || p.title, page, url: `${site.url}/${p.id}` });
-        layoutStack(page.querySelector('[data-gallery]'), 0, true);
+        layoutStack(page.querySelector('[data-gallery]'), true);
         show(id);
         // ภาพขึ้นก่อน แล้วตัวอักษรตามมา
         if (!reduce) {
-          gsap.fromTo(page.querySelectorAll('.stack-photo'), { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: .5, stagger: .08, ease: 'back.out(1.6)' });
+          gsap.from([...page.querySelectorAll('.polaroid')].reverse(), { autoAlpha: 0, y: -60, duration: .5, stagger: .07, ease: 'back.out(1.6)' });
           gsap.fromTo(page.querySelectorAll('.na-copy > *'), { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: .4, stagger: .05, delay: .35 });
         }
         Sound.play('pop');
@@ -172,36 +174,126 @@
       pass ? view.removeAttribute('data-lenis-prevent') : view.setAttribute('data-lenis-prevent', '');
     }, { capture: true, passive: true });
 
-    /* ---------- กองภาพ: ชี้ภาพไหน ภาพนั้นออกมาหน้าสุด ภาพก่อนหน้าเก็บไปขอบซ้าย ---------- */
-    function layoutStack(gal, act, instant) {
-      if (!gal) return;
-      const photos = [...gal.querySelectorAll('.stack-photo')];
-      gal.dataset.active = act;
-      photos.forEach((ph, i) => {
-        const d = i - act;
-        let v;
-        if (d === 0) v = { xPercent: 0, yPercent: -3, rotation: 0, scale: 1.04, zIndex: 50 };
-        else if (d < 0) v = { xPercent: -36 - (-d - 1) * 5, yPercent: 4 - d, rotation: -6 + d * 2, scale: 0.8, zIndex: 40 + d };
-        else v = { xPercent: 6 * d, yPercent: 3 * d, rotation: d % 2 ? 3 + d : -2 - d, scale: 1 - 0.05 * d, zIndex: 40 - d };
-        ph.classList.toggle('active', d === 0);
-        ph.setAttribute('aria-pressed', d === 0);
-        if (instant || reduce) gsap.set(ph, v);
-        else gsap.to(ph, { ...v, duration: 0.5, ease: 'power3.out', overwrite: 'auto' });
+    /* ---------- กองโพลารอยด์ (แบบ Draggable Card): ลากเอียงได้ · ปัดออกแล้วภาพจะมุดไปอยู่ล่างสุด · ปล่อยเบาๆ เด้งกลับ ---------- */
+    // ตำแหน่งในกอง: k = 0 คือใบบนสุด ใบถัดไปเยื้องและเอียงสลับซ้ายขวาอย่างเป็นระเบียบ
+    const TILT = [0, -4, 3.5, -2.5, 4.5, -3.5, 2.5];
+    function stackPose(k) {
+      if (k === 0) return { xPercent: 0, yPercent: 0, rotation: 0, scale: 1 };
+      return { xPercent: (k % 2 ? -1 : 1) * (2 + k * 1.6), yPercent: k * 2.2, rotation: TILT[k % TILT.length], scale: 1 - k * 0.035 };
+    }
+    function markTop(cards, order) {
+      order.forEach((ci, k) => {
+        const c = cards[ci];
+        c.style.zIndex = 50 - k;
+        c.classList.toggle('top', k === 0);
+        c.tabIndex = k === 0 ? 0 : -1;
+        c.setAttribute('aria-hidden', k === 0 ? 'false' : 'true');
       });
     }
-    let lastSwap = 0;
-    function activatePhoto(photo) {
-      const gal = photo.closest('[data-gallery]'), i = +photo.dataset.image;
-      if (+gal.dataset.active === i) return false;
-      lastSwap = performance.now();
-      layoutStack(gal, i);
-      Sound.play('tick', 0.05);
-      return true;
+    function setCount(gal) {
+      const n = gal.parentElement.querySelector('.deck-count');
+      if (n) n.textContent = `${gal._order[0] + 1} / ${gal._order.length}`;
     }
-    view.addEventListener('pointerover', (e) => {
-      if (e.pointerType !== 'mouse') return;
-      const photo = e.target.closest('.stack-photo');
-      if (photo && performance.now() - lastSwap > 220) activatePhoto(photo);
+    function layoutStack(gal, instant) {
+      if (!gal) return;
+      const cards = [...gal.querySelectorAll('.polaroid')];
+      const order = gal._order || (gal._order = cards.map((_, i) => i));
+      markTop(cards, order);
+      order.forEach((ci, k) => {
+        const v = { ...stackPose(k), x: 0, y: 0, rotationX: 0, rotationY: 0 };
+        if (instant || reduce) gsap.set(cards[ci], v);
+        else gsap.to(cards[ci], { ...v, duration: 0.55, ease: 'back.out(1.5)', overwrite: 'auto' });
+      });
+      setCount(gal);
+    }
+    // ปัดใบบนสุดออกไปทาง dir แล้วให้มุดกลับไปล่างกอง · back = ดึงใบล่างสุดกลับขึ้นมาบนสุด
+    function cycle(gal, dir = { x: 1, y: 0 }, back = false) {
+      const cards = [...gal.querySelectorAll('.polaroid')], order = gal._order;
+      if (cards.length < 2) return;
+      if (back) {
+        order.unshift(order.pop());
+        layoutStack(gal);
+        Sound.play('tick', 0.05);
+        return;
+      }
+      const c = cards[order[0]], w = gal.clientWidth;
+      order.push(order.shift());
+      Sound.play('whoosh', 0.04);
+      if (reduce) { layoutStack(gal, true); return; }
+      markTop(cards, order);
+      c.style.zIndex = 60;                       // ขณะบินออกยังลอยอยู่บนสุด
+      setCount(gal);
+      order.slice(0, -1).forEach((ci, k) => gsap.to(cards[ci], { ...stackPose(k), x: 0, y: 0, duration: 0.5, ease: 'back.out(1.5)', overwrite: 'auto' }));
+      gsap.to(c, { x: dir.x * w * 0.95, y: dir.y * w * 0.6, rotation: (dir.x || 0.4) * 26, rotationX: 0, rotationY: 0, duration: 0.26, ease: 'power2.out', overwrite: true,
+        onComplete: () => { c.style.zIndex = 50 - order.length + 1; layoutStack(gal); } });
+    }
+
+    let drag = null;
+    view.addEventListener('pointerdown', (e) => {
+      const c = e.target.closest('.polaroid.top');
+      if (!c || e.button > 0) return;
+      e.preventDefault();
+      const now = performance.now();
+      drag = { c, gal: c.closest('[data-gallery]'), x0: e.clientX, y0: e.clientY, dx: 0, dy: 0, t0: now, vx: 0, vy: 0, lx: e.clientX, ly: e.clientY, lt: now, id: e.pointerId };
+      try { c.setPointerCapture(e.pointerId); } catch (_) {}
+      c.classList.add('dragging');
+      gsap.killTweensOf(c);
+    });
+    view.addEventListener('pointermove', (e) => {
+      if (drag && e.pointerId === drag.id) {
+        const now = performance.now(), dt = Math.max(1, now - drag.lt);
+        drag.vx = drag.vx * 0.6 + ((e.clientX - drag.lx) / dt) * 0.4;
+        drag.vy = drag.vy * 0.6 + ((e.clientY - drag.ly) / dt) * 0.4;
+        drag.lx = e.clientX; drag.ly = e.clientY; drag.lt = now;
+        drag.dx = e.clientX - drag.x0; drag.dy = e.clientY - drag.y0;
+        // เอียงตามความเร็วที่ลาก เหมือนการ์ดจริงที่ถูกเหวี่ยง
+        gsap.set(drag.c, { x: drag.dx, y: drag.dy, rotation: drag.dx * 0.06, transformPerspective: 700,
+          rotationY: gsap.utils.clamp(-22, 22, drag.vx * 14), rotationX: gsap.utils.clamp(-22, 22, -drag.vy * 14) });
+        return;
+      }
+      // เมาส์ชี้ใบบนสุด: การ์ดเอียงตามตำแหน่งเมาส์
+      if (e.pointerType !== 'mouse' || reduce) return;
+      const c = e.target.closest('.polaroid.top');
+      if (!c) return;
+      const r = c.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width - 0.5, py = (e.clientY - r.top) / r.height - 0.5;
+      gsap.to(c, { rotationY: px * 16, rotationX: -py * 16, transformPerspective: 700, duration: 0.3, overwrite: 'auto' });
+    });
+    view.addEventListener('pointerout', (e) => {
+      const c = e.target.closest('.polaroid.top');
+      if (c && !drag && !c.contains(e.relatedTarget)) gsap.to(c, { rotationX: 0, rotationY: 0, duration: 0.6, ease: 'elastic.out(1, .5)' });
+    });
+    function endDrag(e) {
+      if (!drag || e.pointerId !== drag.id) return;
+      const d = drag; drag = null;
+      d.c.classList.remove('dragging');
+      const dist = Math.hypot(d.dx, d.dy), speed = Math.hypot(d.vx, d.vy);
+      if (dist < 6 && performance.now() - d.t0 < 400) {                          // แตะเฉยๆ = ดูภาพใหญ่
+        gsap.to(d.c, { x: 0, y: 0, rotation: 0, rotationX: 0, rotationY: 0, duration: 0.2 });
+        openBox(d.c);
+      } else if (dist > d.gal.clientWidth * 0.3 || (speed > 0.7 && dist > 20)) {   // ปัดออก
+        const m = dist || 1;
+        cycle(d.gal, { x: d.dx / m, y: d.dy / m });
+      } else {                                                                      // เด้งกลับเข้ากอง
+        gsap.to(d.c, { x: 0, y: 0, rotation: 0, rotationX: 0, rotationY: 0, duration: 0.9, ease: 'elastic.out(1, .45)' });
+      }
+    }
+    view.addEventListener('pointerup', endDrag);
+    view.addEventListener('pointercancel', endDrag);
+    const refocus = (gal) => requestAnimationFrame(() => gal.querySelector('.polaroid.top').focus({ preventScroll: true }));
+    view.addEventListener('keydown', (e) => {
+      const c = e.target.closest('.polaroid.top');
+      if (!c) return;
+      const gal = c.closest('[data-gallery]');
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openBox(c); }
+      else if (e.key === 'ArrowRight') { e.preventDefault(); cycle(gal, { x: 1, y: 0 }); refocus(gal); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); cycle(gal, { x: -1, y: 0 }, true); refocus(gal); }
+    });
+    view.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-deck]');
+      if (!b) return;
+      const gal = b.closest('.na-gallery').querySelector('[data-gallery]');
+      b.dataset.deck === 'next' ? cycle(gal, { x: 1, y: 0 }) : cycle(gal, { x: -1, y: 0 }, true);
     });
 
     /* ---------- ดูภาพขนาดใหญ่ ---------- */
@@ -213,7 +305,7 @@
     document.body.appendChild(box);
     const boxImg = box.querySelector('img'), boxCap = box.querySelector('p');
     function openBox(photo) {
-      const img = photo.querySelector('img'), all = photo.closest('[data-gallery]').querySelectorAll('.stack-photo');
+      const img = photo.querySelector('img'), all = photo.closest('[data-gallery]').querySelectorAll('.polaroid');
       boxImg.src = img.src; boxImg.alt = img.alt;
       boxCap.textContent = `${img.alt} · ${+photo.dataset.image + 1} / ${all.length}`;
       box.hidden = false;
@@ -222,10 +314,6 @@
     }
     box.addEventListener('click', () => { box.hidden = true; });
     window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !box.hidden) box.hidden = true; });
-    view.addEventListener('click', (e) => {
-      const photo = e.target.closest('.stack-photo');
-      if (photo && !activatePhoto(photo)) openBox(photo);
-    });
 
     /* ============================================================
        ฉากสุดท้าย: บัตรขูดช่องทางติดต่อ + มาสคอตทักทาย

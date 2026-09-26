@@ -137,3 +137,31 @@ body.finale #workspace-layer { background:radial-gradient(circle at 83% 75%,#f1e
   #fin-bubble { top: 40%; bottom: auto; }
   #fin-thanks { background: rgba(247,247,244,.9); border-radius: 14px; padding: .15em .3em; }
 }
+
+/* ---------- กองโพลารอยด์ในข่าวผลงาน (ลาก/ปัดออกได้ แบบ Draggable Card) ---------- */
+.polaroid-deck { position: relative; width: 100%; height: 100%; perspective: 900px; }
+.polaroid {
+  position: absolute; left: 4%; right: 4%; top: 2%; bottom: 15%;
+  display: flex; flex-direction: column; gap: 0;
+  padding: 3.2% 3.2% 0; background: #fff; border: 2px solid #111; border-radius: 3px;
+  box-shadow: 5px 6px 0 rgba(123,31,162,.28), 0 10px 22px rgba(0,0,0,.12);
+  cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none;
+  will-change: transform; transform-style: preserve-3d;
+}
+.polaroid.top { box-shadow: 8px 10px 0 rgba(123,31,162,.38), 0 16px 30px rgba(0,0,0,.18); }
+.polaroid.dragging { cursor: grabbing; box-shadow: 14px 18px 0 rgba(123,31,162,.3), 0 26px 40px rgba(0,0,0,.25); }
+.polaroid:not(.top) { pointer-events: none; }
+.polaroid:focus-visible { outline: 3px solid var(--purple-2); outline-offset: 3px; }
+.polaroid img { flex: 1; min-height: 0; width: 100%; object-fit: cover; background: #111; border: 1.5px solid #111; pointer-events: none; }
+.pl-cap { display: flex; align-items: center; justify-content: space-between; gap: .6em; height: 2.3em; padding: 0 .2em; font-family: 'Mali', cursive; }
+.pl-cap b { font-weight: 700; font-size: 1em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pl-cap i { font-style: normal; font-weight: 700; color: var(--purple-2); font-size: .85em; font-variant-numeric: tabular-nums; }
+.deck-bar { position: absolute; left: 12%; right: 12%; bottom: 0; display: flex; align-items: center; justify-content: center; gap: .5em; font-size: .85em; }
+.deck-bar button { width: 1.9em; height: 1.9em; display: grid; place-items: center; border: 2px solid #111; border-radius: 50%; background: #fff; font-weight: 900; line-height: 1; }
+.deck-bar button:hover, .deck-bar button:focus-visible { background: var(--purple-2); color: #fff; outline: none; }
+.deck-count { min-width: 3.2em; text-align: center; font-weight: 900; font-variant-numeric: tabular-nums; }
+.deck-bar small { color: #777; font-weight: 700; margin-left: .3em; }
+@media (max-aspect-ratio: 1/1) { .deck-bar small { display: none; } }
+/* ตรารางวัลอยู่ใต้กองภาพ (ไม่ทับภาพและปุ่มเลื่อนภาพ) */
+.na-gallery:has(.winner-stamp) { margin-bottom: 3.6em; }
+.na-gallery .winner-stamp { top: calc(100% + .7em); bottom: auto; left: 12%; right: 12%; width: max-content; max-width: 76%; margin: 0 auto; background: #fff; transform: rotate(-2deg); font-size: .85em; }
