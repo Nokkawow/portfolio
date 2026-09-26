@@ -34,7 +34,7 @@
       const endH = mobile ? avail / (1 + standRatio) : endW / 1.72;
       const startW = mobile ? w * .56 : w * .34;
       // มุมกว้าง: จออยู่ด้านขวาและเล็กพอให้เห็นหลังมาสคอต โต๊ะ ขาโต๊ะ และ CPU ฝั่งซ้าย
-      const a = { x: mobile ? w * .31 : w * .54, y: mobile ? h * .19 : h * .13, w: startW, h: startW / 1.72 };
+      const a = { x: mobile ? w * .31 : w * .54, y: mobile ? h * .29 : h * .27, w: startW, h: startW / 1.72 };
       const b = { x: (w - endW) / 2, y: top + (avail - endH * (1 + standRatio)) / 2, w: endW, h: endH };
       const p = camera.p;
       [['x', 'left'], ['y', 'top'], ['w', 'width'], ['h', 'height']].forEach(([k, prop]) => { shell.style[prop] = (a[k] + (b[k] - a[k]) * p) + 'px'; });

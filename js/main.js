@@ -77,6 +77,8 @@
   window.initCharacter(S, api);
   const Board = window.initBoard(C, api);
   const Workspace = window.initWorkspace(C);
+  const Theater = window.initTheater();
+  window.initParallax(reduceMotion);
   const VHS = window.initVHS(Workspace.calendarPages);
   Effects.tiltCards(document.getElementById('slides'));   // 3D Card
   Effects.sparkles(document.getElementById('slides'));    // Sparkles
@@ -260,7 +262,7 @@
   tl.to({}, { duration: 2.5 });
 
   /* ---------- ScrollTrigger ตัวเดียวคุมทั้งเว็บ ---------- */
-  let lastTime = 0;
+  let lastTime = 0, storyReady = false;
   const st = ScrollTrigger.create({
     trigger: '#story',
     start: 'top top',
@@ -301,16 +303,16 @@
     const t = tl.time();
     setScene(t);
     VHS.update(t, tl.labels, calTimes);
-    if (t !== lastTime) {
+    if (storyReady && t !== lastTime) {
       // ไปข้างหน้า: เรียงตามลำดับ / ถอยหลัง: เรียงย้อนกลับ (กันสไลด์ผิดตอนกระโดดข้ามหลายฉาก)
       if (t > lastTime) cues.forEach((c) => { if (lastTime < c.time && t >= c.time) c.fwd(); });
       else [...cues].reverse().forEach((c) => { if (lastTime >= c.time && t < c.time) c.back(); });
       lastTime = t;
     }
-    ranges.forEach((r) => {
-      const inR = t >= r.a && t <= r.b;
-      if (inR !== r.in) { r.in = inR; inR ? r.on() : r.off(); }
-    });
+    if (storyReady) ranges.forEach((r) => {
+        const inR = t >= r.a && t <= r.b;
+        if (inR !== r.in) { r.in = inR; inR ? r.on() : r.off(); }
+      });
     updateNav(t);
   });
 
@@ -483,6 +485,11 @@
   gsap.ticker.add(tick);
 
   function finishLoading() {
+    window.scrollTo(0, 0);
+    lenis.scrollTo(0, { immediate: true });
+    st.scroll(0);
+    tl.time(0);
+    lastTime = 0;
     ScrollTrigger.refresh();
     Board.layout(); Workspace.layout();
     gsap.timeline({ delay: 0.25 })
@@ -490,11 +497,23 @@
       .to('.loader-scene', { y: 60, scale: 0.8, autoAlpha: 0, duration: 0.45, ease: 'power2.in' })
       .to(['.loader-pct', '.loader-bar'], { autoAlpha: 0, duration: 0.3 }, '<')
       .to('#loader', { autoAlpha: 0, duration: 0.5 })
-      .add(() => { document.body.classList.remove('is-loading'); lenis.start(); })
-      .from(lines[0].querySelectorAll('.w'), { opacity: 0, filter: 'blur(10px)', duration: 0.6, stagger: 0.12, ease: 'power2.out' }, '-=0.2')
-      .add(() => Matches.walkIn(), '<')
-      .from('.scroll-hint', { autoAlpha: 0, duration: 0.6 }, '-=0.3')
-      .to('.ui', { autoAlpha: 1, duration: 0.6 }, '<');
+      .add(() => {
+        document.body.classList.remove('is-loading');
+        Theater.start().then(() => {
+          window.scrollTo(0, 0);
+          lenis.scrollTo(0, { immediate: true });
+          st.scroll(0);
+          tl.time(0);
+          lastTime = 0;
+          storyReady = true;
+          lenis.start();
+          gsap.timeline()
+            .from(lines[0].querySelectorAll('.w'), { opacity: 0, filter: 'blur(10px)', duration: 0.6, stagger: 0.12, ease: 'power2.out' })
+            .add(() => Matches.walkIn(), '<')
+            .from('.scroll-hint', { autoAlpha: 0, duration: 0.6 }, '-=0.3')
+            .to('.ui', { autoAlpha: 1, duration: 0.6 }, '<');
+        });
+      });
   }
 
   // สำหรับทดสอบ

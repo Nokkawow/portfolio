@@ -346,7 +346,10 @@
       el('image', { href: rigDir + 'eye-' + k + '.webp', ...box }, g);
       const inner = el('g', { mask: `url(#rig-eyemask-${k})` }, g);
       const pupil = el('g', { class: 'pupil' }, inner);
-      el('image', { href: rigDir + 'iris-' + k + '.webp', ...box }, pupil);
+      // ไฟล์ม่านตาต้นฉบับมีเส้นขอบตาติดมาด้วย จึงครอปเฉพาะแกนม่านตา
+      // เพื่อให้สิ่งที่ขยับตามเมาส์มีเพียงลูกตา ส่วนขอบตาและคิ้วอยู่นิ่งกับใบหน้า
+      el('image', { href: rigDir + 'iris-' + k + '.webp', ...box,
+        style: `clip-path:ellipse(${k === 'L' ? '25% 41% at 61% 61%' : '24% 42% at 48% 58%'})` }, pupil);
       return { g, pupil, cx: pos.x + RX(e.cx), cy: pos.y + RY(e.cy) };
     });
     // คิ้วเป็นเลเยอร์ของริกจริง แยกจากลูกตา จึงเปลี่ยนสีหน้าได้โดยไม่ดึงตาหลุดจากเบ้า

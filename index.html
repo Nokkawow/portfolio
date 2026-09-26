@@ -9,11 +9,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <!-- ฟอนต์ชั่วคราว: Noto Sans Thai (UI) + Mali (ลายมือบนกระดาน) — จะเปลี่ยนเมื่อเลือกฟอนต์จริงแล้ว -->
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;700;800;900&family=Mali:wght@500;700&family=VT323&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=50">
-  <link rel="stylesheet" href="css/scene-refinement.css?v=50">
-  <link rel="stylesheet" href="css/monitor.css?v=50">
-  <link rel="stylesheet" href="css/v2.css?v=50">
-  <link rel="stylesheet" href="css/v2-news.css?v=50">
+  <link rel="stylesheet" href="css/style.css?v=51">
+  <link rel="stylesheet" href="css/scene-refinement.css?v=51">
+  <link rel="stylesheet" href="css/monitor.css?v=51">
+  <link rel="stylesheet" href="css/v2.css?v=51">
+  <link rel="stylesheet" href="css/v2-news.css?v=51">
+  <link rel="stylesheet" href="css/theater.css?v=51">
 </head>
 <body class="is-loading">
 
@@ -161,6 +162,19 @@
         <!-- มาสคอตโผล่ขอบจอ (จับ/ดัน/ยกได้) -->
         <img id="mascot" src="assets/mascot/cross.webp" alt="มาสคอต" draggable="false">
 
+        <!-- ฉากโรงหนัง: ลากเทปเข้าเครื่องก่อนเริ่มเรื่อง -->
+        <section id="theater-intro" aria-label="เครื่องเล่นเทปเปิดเรื่อง">
+          <div class="theater-room" aria-hidden="true"><i></i><b></b><span></span></div>
+          <div class="theater-screen" aria-hidden="true"><div class="screen-noise"></div><strong>NOK PRESENTS</strong><small>INSERT TAPE</small></div>
+          <div class="vcr-unit" aria-label="ช่องใส่เทป VHS">
+            <div class="vcr-slot"><i></i></div><span>VHS HQ</span><b>POWER</b><em></em>
+          </div>
+          <button class="vhs-cassette" type="button" aria-label="ลากเทปเข้าเครื่อง หรือกดเพื่อใส่เทป">
+            <span class="reel r1"></span><span class="reel r2"></span><i>NOK · MY GAME JOURNEY</i><b>VHS</b>
+          </button>
+          <p class="theater-hint">ลากเทปเข้าเครื่อง <small>หรือแตะที่เทป</small></p>
+        </section>
+
         <!-- Opening แบบ Heal -->
         <div id="opening">
           <div id="opening-lines"></div>
@@ -179,16 +193,18 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
-  <script src="js/content.js?v=50"></script>
-  <script src="js/sound.js?v=50"></script>
-  <script src="js/effects.js?v=50"></script>
-  <script src="js/scene.js?v=50"></script>
-  <script src="js/character.js?v=50"></script>
-  <script src="js/board.js?v=50"></script>
-  <script src="js/mascot.js?v=50"></script>
-  <script src="js/workspace.js?v=50"></script>
-  <script src="js/vhs.js?v=50"></script>
-  <script src="js/matches.js?v=50"></script>
-  <script src="js/main.js?v=50"></script>
+  <script src="js/content.js?v=51"></script>
+  <script src="js/sound.js?v=51"></script>
+  <script src="js/effects.js?v=51"></script>
+  <script src="js/scene.js?v=51"></script>
+  <script src="js/character.js?v=51"></script>
+  <script src="js/board.js?v=51"></script>
+  <script src="js/mascot.js?v=51"></script>
+  <script src="js/theater.js?v=51"></script>
+  <script src="js/parallax.js?v=51"></script>
+  <script src="js/workspace.js?v=51"></script>
+  <script src="js/vhs.js?v=51"></script>
+  <script src="js/matches.js?v=51"></script>
+  <script src="js/main.js?v=51"></script>
 </body>
 </html>

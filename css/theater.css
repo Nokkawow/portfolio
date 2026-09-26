@@ -1,0 +1,43 @@
+/* ============================================================
+   THEATER INTRO — โรงหนัง + เครื่องเล่น VHS ก่อนกระดาษเปิดเรื่อง
+   ============================================================ */
+#theater-intro { position:absolute; inset:0; z-index:40; overflow:hidden; background:#070708; color:#fff; opacity:0; visibility:hidden; perspective:1100px; }
+.theater-room { position:absolute; inset:0; background:radial-gradient(ellipse at 50% 34%,#312839 0 5%,#17131b 34%,#050506 76%); }
+.theater-room::before,.theater-room::after { content:''; position:absolute; z-index:2; top:0; bottom:0; width:34%; background:repeating-linear-gradient(90deg,#160d1d 0 8%,#30163c 10% 18%,#100b13 20% 28%); filter:drop-shadow(12px 0 18px #000); }
+.theater-room::before { left:-7%; transform:skewX(-5deg); }
+.theater-room::after { right:-7%; transform:scaleX(-1) skewX(-5deg); }
+.theater-room i { position:absolute; left:13%; right:13%; top:7%; height:54%; border:6px solid #151218; border-radius:6px; background:linear-gradient(#d9d7d0,#aaa9a4); box-shadow:0 0 50px #000,0 0 90px #7b1fa244; }
+.theater-room b,.theater-room span { position:absolute; left:-4%; right:-4%; bottom:-9%; height:32%; background:repeating-linear-gradient(90deg,#09080a 0 7%,#17131b 7% 14%); transform:perspective(500px) rotateX(62deg); transform-origin:bottom; }
+.theater-room span { bottom:-1%; height:15%; opacity:.85; }
+.theater-screen { position:absolute; z-index:3; left:18%; right:18%; top:10%; height:46%; display:grid; place-content:center; justify-items:center; gap:.45em; overflow:hidden; background:#08080a; border:4px solid #0d0d0f; box-shadow:0 0 35px #000; transform-origin:center; }
+.theater-screen::before { content:''; position:absolute; inset:0; background:radial-gradient(circle at 50% 50%,#401852 0,transparent 42%),repeating-linear-gradient(0deg,#ffffff0c 0 1px,transparent 1px 4px); opacity:.7; }
+.theater-screen strong { position:relative; font:900 clamp(24px,4.3vw,72px)/1 'VT323',monospace; letter-spacing:.14em; color:#eee; text-shadow:3px 0 #7b1fa2,-2px 0 #5ac8c8; }
+.theater-screen small { position:relative; font:700 clamp(12px,1.2vw,18px)/1 'VT323',monospace; letter-spacing:.35em; color:#c28be0; }
+.screen-noise { position:absolute; inset:0; opacity:.2; background:repeating-radial-gradient(circle at 40% 30%,#fff 0 1px,transparent 1px 5px); animation:theater-noise .25s steps(2) infinite; }
+.vcr-unit { position:absolute; z-index:8; left:50%; bottom:7%; translate:-50% 0; width:clamp(310px,38vw,620px); height:clamp(92px,12vw,170px); border:4px solid #080808; border-radius:8px 8px 16px 16px; background:linear-gradient(#34343a,#101014 58%,#24242a); box-shadow:0 18px 25px #000b,inset 0 2px #777; }
+.vcr-slot { position:absolute; left:13%; right:13%; top:17%; height:30%; border:3px solid #060607; border-radius:4px; background:#030304; box-shadow:inset 0 8px 12px #000; }
+.vcr-slot i { position:absolute; left:5%; right:5%; top:44%; height:2px; background:#555; }
+.vcr-unit>span { position:absolute; left:8%; bottom:12%; font:700 clamp(9px,1vw,13px)/1 monospace; color:#aaa; }
+.vcr-unit>b { position:absolute; right:9%; bottom:12%; font:700 9px/1 monospace; color:#777; }
+.vcr-unit>em { position:absolute; right:5%; bottom:11%; width:9px; height:9px; border-radius:50%; background:#631d78; box-shadow:0 0 8px #7b1fa2; }
+.vhs-cassette { position:absolute; z-index:10; left:9%; bottom:12%; width:clamp(180px,22vw,350px); aspect-ratio:1.82; border:4px solid #070708; border-radius:5px; background:linear-gradient(145deg,#29292f,#101014 58%,#34343a); box-shadow:10px 14px 20px #0008,inset 0 0 0 4px #444; color:#fff; cursor:grab; touch-action:none; transform:rotate(-5deg); }
+.vhs-cassette::before { content:''; position:absolute; left:8%; right:8%; top:20%; height:46%; border:2px solid #050506; background:#16161a; clip-path:polygon(0 0,100% 0,88% 100%,12% 100%); }
+.vhs-cassette .reel { position:absolute; z-index:2; top:27%; width:23%; aspect-ratio:1; border:5px dotted #aaa; border-radius:50%; background:radial-gradient(circle,#111 0 23%,#ddd 25% 42%,#222 44%); }
+.vhs-cassette .r1 { left:15%; }.vhs-cassette .r2 { right:15%; }
+.vhs-cassette i { position:absolute; z-index:3; left:29%; right:29%; top:37%; padding:4% 2%; background:#eee; color:#111; font:900 clamp(6px,.65vw,10px)/1 monospace; text-align:center; }
+.vhs-cassette b { position:absolute; right:7%; top:7%; font:900 clamp(8px,.9vw,13px)/1 monospace; }
+.vhs-cassette.dragging { cursor:grabbing; box-shadow:18px 24px 30px #000a; }
+.theater-hint { position:absolute; z-index:9; left:50%; bottom:1.8%; translate:-50% 0; white-space:nowrap; font:800 clamp(12px,1.15vw,17px)/1.2 'Noto Sans Thai',sans-serif; letter-spacing:.05em; }
+.theater-hint::before { content:'↗'; display:inline-block; margin-right:.55em; color:#c28be0; animation:hint-tape 1s ease-in-out infinite alternate; }
+.theater-hint small { color:#aaa; font-size:.72em; }
+#theater-intro.playing .theater-screen strong { animation:theater-glitch .17s steps(2) 4; }
+@keyframes theater-noise { to { transform:translate(3px,-2px); } }
+@keyframes hint-tape { to { transform:translate(8px,-6px); } }
+@keyframes theater-glitch { 50% { transform:translateX(7px) skewX(-5deg); filter:blur(1px); } }
+@media(max-aspect-ratio:1/1) {
+  .theater-screen { left:8%; right:8%; top:10%; height:40%; }
+  .vcr-unit { bottom:10%; width:86vw; height:25vw; }
+  .vhs-cassette { left:7%; bottom:28%; width:52vw; }
+  .theater-hint { bottom:3%; }
+}
+@media(prefers-reduced-motion:reduce) { .screen-noise,.theater-hint::before { animation:none; } }
