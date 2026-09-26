@@ -36,7 +36,7 @@
       const thumbs = p.images.map((src, i) =>
         `<button class="thumb${i === 0 ? ' active' : ''}" data-src="${src}" aria-label="รูปที่ ${i + 1}"><img src="${src}" alt=""></button>`).join('');
       const meta = [p.date, p.duration && `ใช้เวลา <em>${p.duration}</em>`].filter(Boolean).join(' · ');
-      const teamLine = p.teamSize === 1 ? `${p.team} · <b>เกมเดี่ยว</b>` : `${p.team} · ${p.teamSize} คน`;
+      const teamLine = !p.teamSize ? p.team : p.teamSize === 1 ? `${p.team} · <b>เกมเดี่ยว</b>` : `${p.team} · ${p.teamSize} คน`;
       const link = p.link
         ? `<a class="itch pop" href="${p.link}" target="_blank" rel="noopener">${p.linkLabel} ↗</a>` +
           (p.uploadedBy ? `<small class="uploaded pop">อัปโหลดโดย ${p.uploadedBy}</small>` : '')

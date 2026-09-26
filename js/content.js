@@ -30,7 +30,38 @@ window.CONTENT = {
 
   // ผลงาน — เรียงจากอดีต → ปัจจุบัน (เพิ่มชิ้นใหม่ต่อท้ายได้เลย)
   // ช่องไหนเว้นว่าง ('') จะไม่แสดงบนเว็บ
+  // ลำดับไทม์ไลน์ (เจ้าของกำหนด): Penguin Five Days → Humannoid a → Too Ka Jok → Look Up, Don't let go → 404 Reborn → Hide The Cloth
   projects: [
+    {
+      id: 'penguin',
+      title: 'Penguin Five Days',
+      short: 'Penguin Five Days',
+      news: {
+        tag: 'Game Jam',
+        headline: 'เพนกวินหนึ่งตัวกับน้ำแข็งที่กำลังละลาย: เกมแรกที่จุดไฟความหลงใหลในการทำเกม',
+        deck: 'Penguin Five Days เกมเอาชีวิตรอด 72 ชั่วโมงจาก Game Jam X โดย Hamster Hub ที่เล่าเรื่องโลกร้อนผ่านสายตาเพนกวิน'
+      },
+      date: '24–27 เม.ย. 2569',
+      duration: '72 ชั่วโมง (3 วัน)',
+      about: 'เกมที่สะท้อน<em>ภาวะโลกร้อน</em>ผ่านสายตาของเพนกวิน ที่ต้องเอาชีวิตรอดขณะที่น้ำแข็งกำลังละลายจนไม่มีที่อยู่',
+      why: 'ไฮไลต์: ผลงานเกมแรกหลังเข้ามาที่ Hamster Hub แม้ไม่ผ่านเข้ารอบ แต่เปลี่ยนจาก "ชอบ" ให้กลายเป็น<em>ความหลงใหล</em>ในการทำเกม',
+      goal: '',
+      team: 'เพนกวินกินกล้วย',
+      teamSize: 0,                  // ⚠️ ยังไม่ทราบจำนวนคน (0 = ไม่แสดง)
+      role: 'ระบบเกม · UI/UX · ดีไซน์',
+      award: '',
+      images: [
+        'assets/projects/penguin/shot1.jpg',
+        'assets/projects/penguin/shot2.jpg',
+        'assets/projects/penguin/shot3.jpg',
+        'assets/projects/penguin/shot4.jpg',
+        'assets/projects/penguin/shot5.jpg'
+      ],
+      link: 'https://phoomloser.itch.io/peng',
+      linkLabel: 'เล่นบน itch.io',
+      uploadedBy: 'เพื่อนในทีม',
+      video: ''
+    },
     {
       id: 'tookajok',
       title: 'Too Ka Jok (ห้ามพวน)',
