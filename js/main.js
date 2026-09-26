@@ -469,7 +469,7 @@
      ============================================================ */
   function loaded(img) { return new Promise((r) => (img.complete ? r() : (img.onload = img.onerror = r))); }
   // โหลดภาพหลักๆ ไว้ก่อน % จะได้สะท้อนการโหลดจริง
-  const preload = ['assets/characters/student-front.webp', 'assets/characters/student-back.webp', 'assets/characters/student-turn.webp',
+  const preload = ['assets/characters/student-neutral-v55.png', 'assets/characters/student-front.webp', 'assets/characters/student-back.webp', 'assets/characters/student-turn.webp',
     'assets/backgrounds/classroom-v52.png', 'assets/backgrounds/workspace-v52.png',
     'assets/characters/student-wave-v52.png', 'assets/characters/student-wai-v52.png']
     .map((src) => { const im = new Image(); im.src = src; return loaded(im); });

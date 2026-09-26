@@ -313,15 +313,14 @@
     el('path', { d: qDot, fill: INK }, qFront);
     el('path', { d: 'M1206,200 C1212,164 1240,140 1270,138', fill: 'none', stroke: '#fff', 'stroke-width': 5, 'stroke-linecap': 'round', opacity: 0.9 }, qFront);
 
-    // ภาพมาสคอตละเอียดใช้สปริงลำตัวเดิม ภาพเต็มชิ้นยังไม่ได้ rig ตา/ผมแยก
+    // ภาพมาสคอตท่านั่งปกติแยกเป็นลำตัว หัว/ผม และม่านตา โดยใช้ภาพต้นฉบับเดียวกัน
     Array.from(torso.children).forEach(n => n.setAttribute('display', 'none'));
     Array.from(head.children).forEach(n => { if (n !== tail) n.setAttribute('display', 'none'); });
     Array.from(tail.children).forEach(n => n.setAttribute('display', 'none'));
     [armL,armR].forEach(g => g.setAttribute('opacity','0'));
-    /* ---------- ริกตัวละครจากภาพเต็ม (แยกชิ้นใน assets/characters/rig) ----------
-       พิกัดต้นฉบับ 1024×1536 → วางที่ x -300, y -350 กว้าง 600 (สเกล rs)
-       ชิ้น: ฐาน (ลบตา+หางม้าแล้ว) / ตาขาว / ม่านตา (ขยับในมาสก์ตา) / หางม้า / ปากสำรองตอนเปลี่ยนสีหน้า
-       ทำชิ้นใหม่: ดูสคริปต์/ค่าใน assets/src/rig/meta.json */
+    /* ---------- ริกภาพมาสคอตท่านั่ง 1024×1536 ----------
+       ภาพใหม่มีลายปักบนเสื้ออยู่ในต้นฉบับ ไม่วางข้อความทับภายหลัง
+       ตัดภาพด้วย clipPath ที่ประกบกันพอดี เพื่อไม่ให้ชิ้นส่วนหายระหว่างเคลื่อน */
     const RIG = {
       L: { x: 335, y: 462, w: 125, h: 83, cx: 411.5, cy: 492.5 },
       R: { x: 515, y: 445, w: 147, h: 80, cx: 585.5, cy: 469.5 },
@@ -330,19 +329,34 @@
     };
     const rs = 600 / 1024, RX = (v) => -300 + v * rs, RY = (v) => -350 + v * rs;
     const rigDir = 'assets/characters/rig/';
-    const rig = el('g', { id: 'student-rig' }, torso);
-    el('image', { href: rigDir + 'base.webp', x: -300, y: -350, width: 600, height: 900, id: 'student-portrait' }, rig);
-    // หางม้า: ย้ายกลุ่มเดิมมาอยู่ในริก (หมุนรอบยางรัดผม)
-    rig.appendChild(tail);
-    const rt = RIG.tail;
-    el('image', { href: rigDir + 'tail.webp', x: RX(rt.x), y: RY(rt.y), width: rt.w * rs, height: rt.h * rs }, tail);
-    const tailPivot = [RX(rt.pivot[0]), RY(rt.pivot[1])];
+    const portrait = 'assets/characters/student-neutral-v55.png';
+    const imageBox = { x: -300, y: -350, width: 600, height: 900 };
+    const seam = [
+      [0, 630], [260, 630], [330, 660], [395, 700],
+      [625, 700], [690, 660], [765, 630], [1024, 630]
+    ];
+    const lineAtSeam = seam.map(([x, y]) => `${RX(x)},${RY(y)}`).join(' L');
+    const bodyClip = el('clipPath', { id: 'student-body-clip', clipPathUnits: 'userSpaceOnUse' }, defs);
+    el('path', { d: `M${lineAtSeam} L${RX(1024)},${RY(1536)} L${RX(0)},${RY(1536)} Z` }, bodyClip);
+    const headClip = el('clipPath', { id: 'student-head-clip', clipPathUnits: 'userSpaceOnUse' }, defs);
+    el('path', { d: `M${RX(0)},${RY(0)} L${RX(1024)},${RY(0)} L${lineAtSeam.split(' L').reverse().join(' L')} Z` }, headClip);
+    const bodyLayer = el('g', { id: 'student-body-layer', 'clip-path': 'url(#student-body-clip)' }, torso);
+    el('image', { href: portrait, ...imageBox, id: 'student-portrait' }, bodyLayer);
+    // ตัวอักษรจริงวางทับลายปักที่ภาพเจนอ่านไม่ชัด และจำกัดให้อยู่ในพื้นที่อกเสื้อ
+    const shirtPrint = el('g', { id: 'student-shirt-print' }, torso);
+    el('path', { d: `M${RX(403)},${RY(738)} H${RX(641)} V${RY(776)} H${RX(403)} Z`, fill: '#f9f8fc', opacity: .93 }, shirtPrint);
+    el('text', { x: RX(444), y: RY(762), 'text-anchor': 'middle', fill: '#2b1245', 'font-size': 12, 'font-weight': 800 }, shirtPrint).textContent = 'บป.';
+    el('text', { x: RX(584), y: RY(759), 'text-anchor': 'middle', fill: '#2b1245', 'font-size': 7.9, 'font-weight': 800 }, shirtPrint).textContent = 'นายฐนน เพ็ญวิเชียร';
+    const headLayer = el('g', { id: 'student-head-layer', 'clip-path': 'url(#student-head-clip)' }, head);
+    el('image', { href: portrait, ...imageBox, id: 'student-head-art' }, headLayer);
+    // กลุ่มหัวผมเป็นลูกของ head จึงหมุน/เอียงไปพร้อมศีรษะ โดยไม่ทำให้ตัวหรือเสื้อขยับตาม
+    const tailPivot = [RX(RIG.tail.pivot[0]), RY(RIG.tail.pivot[1])];
     // ตา 2 ข้าง: ตาขาว + ม่านตาที่ขยับได้ภายในมาสก์รูปตา
     const rigEyes = ['L', 'R'].map((k) => {
       const e = RIG[k], box = { x: RX(e.x), y: RY(e.y), width: e.w * rs, height: e.h * rs };
       const m = el('mask', { id: 'rig-eyemask-' + k, maskUnits: 'userSpaceOnUse', ...box }, defs);
       el('image', { href: rigDir + 'eyemask-' + k + '.png', ...box }, m);
-      const g = el('g', { id: 'rig-eye-' + k, style: 'transform-box:fill-box;transform-origin:center' }, rig);
+      const g = el('g', { id: 'rig-eye-' + k, style: 'transform-box:fill-box;transform-origin:center' }, head);
       el('image', { href: rigDir + 'eye-' + k + '.webp', ...box }, g);
       const inner = el('g', { mask: `url(#rig-eyemask-${k})` }, g);
       const pupil = el('g', { class: 'pupil' }, inner);
@@ -352,18 +366,12 @@
         style: `clip-path:ellipse(${k === 'L' ? '20% 32% at 61% 66%' : '21% 32% at 49% 65%'})` }, pupil);
       return { g, pupil, cx: pos.x + RX(e.cx), cy: pos.y + RY(e.cy) };
     });
-    // คิ้วและขนตาเดิมอยู่ใน base.webp กับ eye-L/R.webp แล้ว: ไม่วาดทับให้เป็นคิ้วสองชั้น
+    // คิ้วอยู่ในภาพหัว ขนตาอยู่กับ eye-L/R: ไม่วาดซ้ำให้เป็นสองชั้น
     // ปากตอนตกใจ/มึน: แปะสีผิวทับปากเดิม แล้ววาดปากใหม่ (ปกติซ่อน ใช้ปากในภาพ)
-    const mouthPatch = el('ellipse', { cx: RX(RIG.mouth.x), cy: RY(RIG.mouth.y), rx: 12, ry: 8, fill: RIG.mouth.skin, display: 'none' }, rig);
+    const mouthPatch = el('ellipse', { cx: RX(RIG.mouth.x), cy: RY(RIG.mouth.y), rx: 12, ry: 8, fill: RIG.mouth.skin, display: 'none' }, head);
     const rigMouth = el('path', { d: '', fill: 'none', stroke: '#3a1d1d', 'stroke-width': 2.4, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', display: 'none',
-      transform: `translate(${RX(RIG.mouth.x)},${RY(RIG.mouth.y)}) scale(.7) translate(0,-73)` }, rig);
+      transform: `translate(${RX(RIG.mouth.x)},${RY(RIG.mouth.y)}) scale(.7) translate(0,-73)` }, head);
     el('ellipse',{cx:0,cy:-90,rx:190,ry:220,fill:'transparent','pointer-events':'all'},head);
-    // ตำแหน่งสลับตามคำแก้: ชื่ออยู่ขวาของภาพ ตราอยู่ซ้ายของภาพ
-    const embroidery=el('g',{'font-family':'Noto Sans Thai,sans-serif','font-weight':900,fill:'#2a0f3a'},torso);
-    const printedName=el('text',{x:RX(600),y:RY(790),'text-anchor':'middle','font-size':8,textLength:62,lengthAdjust:'spacingAndGlyphs'},embroidery);
-    printedName.textContent=content.name;
-    const crest=el('text',{x:RX(420),y:RY(790),'text-anchor':'middle','font-size':14},embroidery);
-    crest.textContent='บป.';
 
     // เลเยอร์เอฟเฟกต์ (ปากกาที่ถูกหยิบ + ประกายตอนโดน) อยู่บนสุด
     const fx = el('g', { id: 'fx' }, svg);
