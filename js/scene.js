@@ -329,7 +329,7 @@
     };
     const rs = 600 / 1024, RX = (v) => -300 + v * rs, RY = (v) => -350 + v * rs;
     const rigDir = 'assets/characters/rig/';
-    const portrait = 'assets/characters/student-neutral-v55.png';
+    const portrait = 'assets/characters/student-neutral-no-irises-v56.png';
     const imageBox = { x: -300, y: -350, width: 600, height: 900 };
     const seam = [
       [0, 630], [260, 630], [330, 660], [395, 700],
@@ -354,16 +354,18 @@
     // ตา 2 ข้าง: ตาขาว + ม่านตาที่ขยับได้ภายในมาสก์รูปตา
     const rigEyes = ['L', 'R'].map((k) => {
       const e = RIG[k], box = { x: RX(e.x), y: RY(e.y), width: e.w * rs, height: e.h * rs };
-      const m = el('mask', { id: 'rig-eyemask-' + k, maskUnits: 'userSpaceOnUse', ...box }, defs);
-      el('image', { href: rigDir + 'eyemask-' + k + '.png', ...box }, m);
+      const eyeCx = RX(e.cx), eyeCy = RY(e.cy);
+      const clip = el('clipPath', { id: 'student-eye-clip-' + k, clipPathUnits: 'userSpaceOnUse' }, defs);
+      el('ellipse', { cx: eyeCx, cy: eyeCy + 2, rx: e.w * rs * .36, ry: e.h * rs * .27 }, clip);
       const g = el('g', { id: 'rig-eye-' + k, style: 'transform-box:fill-box;transform-origin:center' }, head);
       el('image', { href: rigDir + 'eye-' + k + '.webp', ...box }, g);
-      const inner = el('g', { mask: `url(#rig-eyemask-${k})` }, g);
+      const inner = el('g', { 'clip-path': `url(#student-eye-clip-${k})` }, g);
       const pupil = el('g', { class: 'pupil' }, inner);
-      // ไฟล์ม่านตาต้นฉบับมีเส้นขอบตาติดมาด้วย จึงครอปเฉพาะแกนม่านตา
-      // เพื่อให้สิ่งที่ขยับตามเมาส์มีเพียงลูกตา ส่วนขอบตาและคิ้วอยู่นิ่งกับใบหน้า
-      el('image', { href: rigDir + 'iris-' + k + '.webp', ...box,
-        style: `clip-path:ellipse(${k === 'L' ? '20% 32% at 61% 66%' : '21% 32% at 49% 65%'})` }, pupil);
+      // ลูกตาเป็นไฟล์แยกจริง ไม่มีขนตา คิ้ว หรือผิวหน้าติดมาด้วย
+      el('image', {
+        href: rigDir + 'student-iris-' + k + '.svg',
+        x: eyeCx - 12, y: eyeCy - 12, width: 24, height: 30
+      }, pupil);
       return { g, pupil, cx: pos.x + RX(e.cx), cy: pos.y + RY(e.cy) };
     });
     // คิ้วอยู่ในภาพหัว ขนตาอยู่กับ eye-L/R: ไม่วาดซ้ำให้เป็นสองชั้น
