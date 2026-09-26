@@ -182,6 +182,39 @@ window.CONTENT = {
       link: 'https://tanny-th22.itch.io/404reborn',
       linkLabel: 'เล่นบน itch.io',
       uploadedBy: 'เพื่อนในทีม'
+    },
+    {
+      id: 'hidecloth',
+      title: 'Hide The Cloth (มอญซ่อนผ้า)',
+      short: 'Hide The Cloth',
+      news: {
+        tag: 'แข่งขัน',
+        headline: 'มอญซ่อนผ้าเวอร์ชันออนไลน์! ทีม ProDuck ชวน 4–10 คนมานั่งล้อมวงกลางดึก แล้ววิ่งให้ทันก่อนฟ้าสาง',
+        deck: 'Hide The Cloth หยิบการละเล่นไทยที่หลายคนเคยเล่นตอนเด็ก มาทำเป็นเกม Multiplayer สุดระทึก ส่งเข้าแข่งขัน TGTS'
+      },
+      date: '5–25 ก.ย. 2569',
+      duration: '',                 // เจ้าของไม่แน่ใจ (ว่าง = ไม่แสดง)
+      about: 'การละเล่น<em>มอญซ่อนผ้า</em>ที่เราเคยเล่นตอนเด็ก กลายเป็นเกม<em>Multiplayer 4–10 คน</em> คืนนี้ยังไม่จบจนกว่าจะหกโมงเช้า — ชาวบ้านต้องเงี่ยหูฟังแล้วหันไปเช็กข้างหลังให้ทัน ส่วนมอญต้องแอบวางผ้า แล้ววิ่งไปให้ถึงที่นั่งก่อนโดนจับ',
+      why: 'ไฮไลต์: ทำส่วนเสริมระบบเกมเพลย์ และเป็น<em>หน่วยปราบบั๊ก</em>ประจำทีม — ไล่เทสต์และแก้ Error ให้เกมที่เล่นพร้อมกันหลายคนไปได้ราบรื่น',
+      goal: 'อยากให้ชาวต่างชาติได้รู้จักการละเล่นไทย และให้คนรุ่นใหม่ได้รู้จักด้วย',
+      team: 'ProDuck',
+      teamSize: 4,
+      role: 'ส่วนเสริมระบบเกมเพลย์ · Testing & Debugging',
+      award: '',
+      images: [
+        'assets/projects/hidecloth/shot1.jpg',
+        'assets/projects/hidecloth/shot2.jpg',
+        'assets/projects/hidecloth/shot3.jpg',
+        'assets/projects/hidecloth/shot4.jpg'
+      ],
+      link: '',
+      linkLabel: 'เล่นบน itch.io',
+      uploadedBy: '',
+      // วิดีโอหลายคลิปได้: [{ label, url }] หรือใส่เป็นลิงก์เดียว (string) ก็ได้
+      video: [
+        { label: 'ดูเทรลเลอร์', url: 'https://www.youtube.com/watch?v=ZXX55d0YxIk' },
+        { label: 'ดูเกมเพลย์', url: 'https://www.youtube.com/watch?v=14aTD-0QCpc' }
+      ]
     }
   ],
 

@@ -116,7 +116,7 @@
         page.className = 'br-page news-article';
         const links = [
           p.link ? `<a href="${esc(p.link)}" target="_blank" rel="noopener">ดาวน์โหลด / เล่นเกม ↗</a>` : '',
-          p.video ? `<a href="${esc(p.video)}" target="_blank" rel="noopener">ดูวิดีโอ ↗</a>` : ''
+          ...[].concat(p.video || []).map((v) => typeof v === 'string' ? { url: v, label: 'ดูวิดีโอ' } : v).map((v) => `<a href="${esc(v.url)}" target="_blank" rel="noopener">${esc(v.label || 'ดูวิดีโอ')} ↗</a>`)
         ].filter(Boolean).join('') || '<span class="coming-link">ลิงก์เกมกำลังเตรียมเผยแพร่</span>';
         page.innerHTML = `
           <div class="na-gallery">${gallery(p)}${p.award ? `<span class="winner-stamp">${esc(p.award)}${p.awardSub ? ' · ' + esc(p.awardSub) : ''}</span>` : ''}</div>
