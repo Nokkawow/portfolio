@@ -89,6 +89,20 @@
 #fin-bubble::after { content: ''; position: absolute; right: 22%; bottom: -21px; border: 9px solid transparent; border-top: 12px solid #111; }
 #fin-bubble .b2 { position: absolute; inset: .8em 1.1em; }
 #fin-thanks { position: absolute; z-index: 6; right: 4%; bottom: 6%; margin: 0; font-weight: 900; color: #111; font-size: clamp(26px, 4vw, 68px); visibility: hidden; text-align: right; }
+.work-front { opacity: 0; pointer-events: none; }
+#thanks-stage { position:absolute; inset:0; z-index:20; display:grid; place-items:center; overflow:hidden; background:radial-gradient(circle at 50% 38%,#5a2a83 0,#1b1028 45%,#08060d 100%); opacity:0; visibility:hidden; pointer-events:none; }
+.stage-spotlight { position:absolute; width:55vw; height:110vh; top:-28vh; background:linear-gradient(180deg,rgba(255,255,255,.72),rgba(255,255,255,.06)); clip-path:polygon(42% 0,58% 0,86% 100%,14% 100%); filter:blur(4px); }
+.thanks-mascot { position:absolute; bottom:-4vh; height:min(76vh,760px); filter:drop-shadow(0 16px 14px rgba(0,0,0,.55)); }
+.thanks-copy { position:absolute; bottom:7%; color:#fff; text-align:center; display:grid; gap:.25em; font-weight:900; text-shadow:0 3px 10px #000; }
+.thanks-copy b { font-size:clamp(28px,4vw,68px); }
+.thanks-copy small { font-size:clamp(14px,1.5vw,24px); letter-spacing:.12em; }
+.stage-curtain { position:absolute; top:0; bottom:0; width:24%; background:repeating-linear-gradient(90deg,#170b25 0 22px,#3f185c 22px 48px); z-index:2; transition:transform .8s ease; }
+.stage-curtain-left { left:0; transform:translateX(-100%); }
+.stage-curtain-right { right:0; transform:translateX(100%); }
+body.stage-closed .stage-curtain-left { transform:translateX(0); } body.stage-closed .stage-curtain-right { transform:translateX(0); }
+body.finale #work-desk, body.finale #work-cpu, body.finale #work-papers, body.finale #monitor-shell { opacity:0!important; pointer-events:none; }
+body.finale .work-front { opacity:1; }
+body.finale #work-chair { z-index:8; }
 
 @media (max-aspect-ratio: 1/1) {
   #fin-cards { left: 4%; right: 4%; width: auto; top: 12%; }

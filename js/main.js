@@ -244,6 +244,8 @@
   tl.to(['#work-desk', '#work-cpu', '#work-papers', '.room-tone'], { autoAlpha: 1, duration: .8 }, 'zoomout+=.4');
   tl.to('#work-chair', { autoAlpha: 1, xPercent: 0, duration: .8 }, 'zoomout+=.6');
   tl.addLabel('contact');
+  tl.to(['#work-desk', '#work-cpu', '#work-papers', '#monitor-shell', '.room-tone', '.room-caption', '.turn-hint', '.work-turned'], { autoAlpha: 0, duration: .45 }, 'contact');
+  tl.fromTo('.work-front', { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: .55, ease: 'back.out(1.4)' }, 'contact');
   tl.fromTo('#fin-bubble', { autoAlpha: 0, scale: .6, y: 20 }, { autoAlpha: 1, scale: 1, y: 0, duration: .5, ease: 'back.out(2)' }, 'contact');
   tl.fromTo('#fin-bubble .b1', { autoAlpha: 1 }, { autoAlpha: 1, duration: .01 }, 'contact');
   tl.fromTo('#fin-cards > h2, #fin-cards > p', { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: .5, stagger: .1 }, 'contact+=.2');
@@ -255,6 +257,9 @@
   cues.push({ label: 'contact', fwd: () => { document.body.classList.add('finale'); Workspace.repaintCovers(); Sound.play('pop'); }, back: () => document.body.classList.remove('finale') });
   tl.to({}, { duration: 3.5 });
   tl.addLabel('thanks');
+  tl.to(['#fin-cards', '#fin-bubble', '.work-front'], { autoAlpha: 0, duration: .45 }, 'thanks');
+  tl.fromTo('#thanks-stage', { autoAlpha: 0, scale: 1.04 }, { autoAlpha: 1, scale: 1, duration: .8, ease: 'power2.out' }, 'thanks+=.1');
+  tl.call(() => document.body.classList.add('stage-closed'), [], 'thanks+=2.1');
   tl.to('#fin-bubble .b1', { autoAlpha: 0, duration: .25 }, 'thanks');
   tl.fromTo('#fin-bubble .b2', { autoAlpha: 0 }, { autoAlpha: 1, duration: .3, immediateRender: true }, 'thanks+=.2');
   tl.fromTo('#fin-thanks', { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: .7, ease: 'power3.out' }, 'thanks+=.3');

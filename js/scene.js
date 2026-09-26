@@ -360,12 +360,14 @@
     const mouthPatch = el('ellipse', { cx: RX(RIG.mouth.x), cy: RY(RIG.mouth.y), rx: 12, ry: 8, fill: RIG.mouth.skin, display: 'none' }, rig);
     const rigMouth = el('path', { d: '', fill: 'none', stroke: '#3a1d1d', 'stroke-width': 2.4, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', display: 'none',
       transform: `translate(${RX(RIG.mouth.x)},${RY(RIG.mouth.y)}) scale(.7) translate(0,-73)` }, rig);
+    // คิ้วต้องอยู่บนสุดของเลเยอร์ใบหน้าเสมอ เพื่อไม่ถูกภาพตาหรือปากบัง
+    rig.appendChild(rigBrows);
     el('ellipse',{cx:0,cy:-90,rx:190,ry:220,fill:'transparent','pointer-events':'all'},head);
     // ตำแหน่งสลับตามคำแก้: ชื่ออยู่ขวาของภาพ ตราอยู่ซ้ายของภาพ
     const embroidery=el('g',{'font-family':'Noto Sans Thai,sans-serif','font-weight':900,fill:'#2a0f3a'},torso);
-    const printedName=el('text',{x:54,y:114,'text-anchor':'middle','font-size':12,textLength:104,lengthAdjust:'spacingAndGlyphs'},embroidery);
+    const printedName=el('text',{x:RX(610),y:RY(790),'text-anchor':'middle','font-size':10,textLength:86,lengthAdjust:'spacingAndGlyphs'},embroidery);
     printedName.textContent=content.name;
-    const crest=el('text',{x:-58,y:114,'text-anchor':'middle','font-size':15},embroidery);
+    const crest=el('text',{x:RX(420),y:RY(790),'text-anchor':'middle','font-size':14},embroidery);
     crest.textContent='บป.';
 
     // เลเยอร์เอฟเฟกต์ (ปากกาที่ถูกหยิบ + ประกายตอนโดน) อยู่บนสุด
