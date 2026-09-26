@@ -76,6 +76,7 @@
 
   window.initCharacter(S, api);
   const Board = window.initBoard(C, api);
+  const Workspace = window.initWorkspace(C);
   Effects.tiltCards(document.getElementById('slides'));   // 3D Card
   Effects.sparkles(document.getElementById('slides'));    // Sparkles
   const Mascot = window.initMascot(api);
@@ -122,6 +123,7 @@
   const lines = gsap.utils.toArray('#opening-lines .line');
   gsap.set(lines[0], { autoAlpha: 1 });
   gsap.set('#board-layer', { xPercent: -100, autoAlpha: 0 });
+  gsap.set(['#time-layer', '#workspace-layer'], { autoAlpha: 0 });
 
   const cues = [];   // จุดที่ต้องสั่งงานตอนเลื่อนผ่าน (ไป/กลับ)
   const ranges = []; // ช่วงเวลา (เข้า/ออก)
@@ -172,27 +174,54 @@
   cues.push({ label: 'question', fwd: () => { Board.clearInk(); Board.show(0, true); }, back: () => Board.show(-1) });
   tl.to({}, { duration: 3 });
 
-  // 6) แปรงลบ → สไลด์ถัดไป (ผลงานทีละชิ้น → ขอบคุณ)
-  const targets = C.projects.map((_, i) => ({ label: 'project-' + i, slide: Board.projectSlide(i), hold: 4 }));
-  targets.push({ label: 'contact', slide: Board.contactSlide, hold: 4 });
-  targets.push({ label: 'thanks', slide: Board.thanksSlide, hold: 2.5 });
-  let prevSlide = 0;
-  targets.forEach((t, i) => {
-    const wp = { p: 0 };
-    const eraseLabel = 'erase-' + i;
-    tl.addLabel(eraseLabel);
-    tl.fromTo(wp, { p: 0 }, { p: 1, duration: 2.5, ease: 'none', immediateRender: false, onUpdate: () => Board.setWipe(wp.p) }, eraseLabel);
-    ranges.push({ from: eraseLabel, offFrom: -0.3, to: eraseLabel, offTo: 3.3, on: () => Mascot.setPeek(true), off: () => Mascot.setPeek(false) });
-    tl.addLabel(t.label);
-    tl.set(wp, { p: 0, onUpdate: () => Board.setWipe(0) }, t.label);
-    const from = prevSlide;
-    cues.push({
-      label: t.label,
-      fwd: () => { Board.setWipe(0); Board.clearInk(); Board.show(t.slide, true); },
-      back: () => { Board.show(from, false); Board.setWipe(wp.p); } // ใช้ค่าจริงของแปรง ณ ตำแหน่งที่ถอยไปถึง
-    });
-    prevSlide = t.slide;
-    tl.to({}, { duration: t.hold });
+  // 6) ลบคำถามให้หมด → กริ่งเลิกเรียน → กระดานมืด
+  const wipe = { p: 0 };
+  tl.addLabel('erase-board');
+  tl.fromTo(wipe, { p: 0 }, { p: 1, duration: 3, ease: 'none', immediateRender: false, onUpdate: () => Board.setWipe(wipe.p) }, 'erase-board');
+  tl.fromTo('#chalk-dust', { autoAlpha: 0 }, { autoAlpha: .55, duration: 1.4, yoyo: true, repeat: 1 }, 'erase-board+=.4');
+  ranges.push({ from: 'erase-board', offFrom: -0.2, to: 'erase-board', offTo: 3.1, on: () => Mascot.setPeek(true), off: () => Mascot.setPeek(false) });
+  tl.addLabel('bell');
+  cues.push({ label: 'bell', fwd: () => Sound.play('bell', 1), back: () => {} });
+  tl.to('#board-layer', { backgroundColor: '#000', duration: 1.1, ease: 'power2.in' }, 'bell');
+  tl.to('#board', { autoAlpha: 0, scale: 1.03, duration: .75 }, 'bell+=.25');
+
+  // 7) ปฏิทินหลุดจาก 26 ก.ย. 2566 ถึง 27 ก.ย. 2569
+  tl.addLabel('time');
+  tl.set('#time-layer', { autoAlpha: 1 }, 'time');
+  Workspace.calendarPages.slice(0, -1).forEach((page, i) => {
+    tl.to(page, { yPercent: 125, rotation: i % 2 ? 14 : -12, autoAlpha: 0, duration: .75, ease: 'power2.in' }, `time+=${i * .62}`);
+  });
+  tl.fromTo('.time-copy', { autoAlpha: 0, x: -30 }, { autoAlpha: 1, x: 0, duration: .8 }, 'time+=1.5');
+  tl.to({}, { duration: .7 });
+
+  // 8) ห้องทำงาน: เห็นด้านหลังก่อน แล้วหมุน 90° พร้อมซูมเข้าจอ
+  tl.addLabel('workspace');
+  tl.fromTo('#workspace-layer', { autoAlpha: 0, xPercent: -8 }, { autoAlpha: 1, xPercent: 0, duration: 1.2, immediateRender: false }, 'workspace');
+  tl.to('#time-layer', { autoAlpha: 0, duration: .7 }, 'workspace');
+  tl.fromTo('.room-caption', { autoAlpha: 0, y: 25 }, { autoAlpha: 1, y: 0, duration: .9 }, 'workspace+=.35');
+  tl.to({}, { duration: 1.2 });
+  tl.addLabel('turn');
+  tl.to('#work-chair', { rotationY: -90, xPercent: -18, duration: 1.5, ease: 'power3.inOut' }, 'turn');
+  tl.to('.work-face', { autoAlpha: 1, duration: .35 }, 'turn+=.65');
+  tl.to('.work-hair', { rotation: -8, x: -8, duration: .35, yoyo: true, repeat: 3, ease: 'sine.inOut' }, 'turn');
+  tl.to(['.room-caption', '.turn-hint'], { autoAlpha: 0, duration: .5 }, 'turn+=.7');
+  cues.push({ label: 'turn', fwd: () => Sound.play('whoosh', .5), back: () => Sound.play('whoosh', .5) });
+  tl.addLabel('monitor');
+  tl.to('#workspace-layer', {
+    scale: () => window.innerWidth < 700 ? 1.18 : 2.35,
+    xPercent: () => window.innerWidth < 700 ? 0 : -25,
+    yPercent: () => window.innerWidth < 700 ? -5 : 4,
+    duration: 2.2, ease: 'power3.inOut'
+  }, 'monitor');
+  tl.to(['#work-chair', '#work-desk', '.room-tone'], { autoAlpha: 0, duration: .8 }, 'monitor+=1.2');
+  tl.to({}, { duration: .5 });
+
+  // 9) เลื่อนแนวตั้งคุมหน้าในจอให้เดินแนวนอน
+  Workspace.panels.forEach((panel, i) => {
+    const label = i < C.projects.length ? 'project-' + i : (i === C.projects.length ? 'contact' : 'thanks');
+    tl.addLabel(label);
+    if (i > 0) tl.to('#portfolio-track', { xPercent: -(100 / Workspace.panels.length) * i, duration: 2, ease: 'power2.inOut' }, label);
+    tl.to({}, { duration: i < C.projects.length ? 3.2 : 2.5 });
   });
 
   /* ---------- ScrollTrigger ตัวเดียวคุมทั้งเว็บ ---------- */
@@ -205,7 +234,10 @@
     scrub: 1,
     animation: tl,
     invalidateOnRefresh: true,
-    onRefresh: () => Board.layout()
+    onRefresh: () => { Board.layout(); Workspace.layout(); }
+  });
+  Board.onManualComplete(() => {
+    if (tl.time() >= tl.labels['erase-board'] - .2 && tl.time() < tl.labels.bell) scrollToLabel('bell', .9);
   });
 
   // ตรวจจุด cue/range ทุกเฟรมจากเวลาจริงของไทม์ไลน์ (ถูกต้องทั้งไปและกลับ)
@@ -358,7 +390,7 @@
 
   function finishLoading() {
     ScrollTrigger.refresh();
-    Board.layout();
+    Board.layout(); Workspace.layout();
     gsap.timeline({ delay: 0.25 })
       .to('.loader-logo', { scale: 0.85, autoAlpha: 0, duration: 0.5, ease: 'power2.in' })
       .to('.loader-pct', { autoAlpha: 0, duration: 0.3 }, '<')
@@ -370,5 +402,5 @@
   }
 
   // สำหรับทดสอบ
-  window.__debug = { tl, st, lenis, Board, Mascot, scrollToLabel };
+  window.__debug = { tl, st, lenis, Board, Mascot, Workspace, scrollToLabel };
 })();

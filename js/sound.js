@@ -61,7 +61,11 @@
     squeak() { tone(1500 + Math.random() * 500, 0.05, { type: 'sawtooth', gain: 0.025 }); noise(0.05, { f: 4000, q: 6, gain: 0.08 }); },
     grab() { tone(330, 0.1, { to: 520, gain: 0.15, type: 'triangle' }); },
     boing() { tone(220, 0.35, { to: 660, gain: 0.2, type: 'sine' }); },
-    click() { noise(0.03, { f: 2000, q: 3, gain: 0.15 }); }
+    click() { noise(0.03, { f: 2000, q: 3, gain: 0.15 }); },
+    bell() {
+      [880, 1174, 1397].forEach((f, i) => tone(f, 1.15, { type: 'sine', gain: 0.16 / (i + 1), at: i * 0.04 }));
+      tone(440, 1.35, { type: 'triangle', gain: 0.12, at: 0.02 });
+    }
   };
 
   function startAmbient() {

@@ -91,12 +91,12 @@
        ============================================================ */
     const char = el('g', { id: 'char', transform: T }, svg);
 
-    /* --- ตัว (ฮู้ดวาฬเพชฌฆาต + เสื้อกั๊ก + เชิ้ต + เนคไท) --- */
+    /* --- ตัว (ชุดนักเรียนบางกะปิ + ปีกขาวเอกลักษณ์มาสคอต) --- */
     const torso = el('g', { id: 'char-torso' }, char);
     // ฮู้ดด้านหลังคอ
     fillLine(torso, 'M-128,152 C-108,112 -46,100 0,103 C46,100 108,112 128,152 Z', '#1b1b1b', 3);
     // ตัวเสื้อคลุม
-    fillLine(torso, 'M-210,320 C-206,222 -176,156 -112,134 C-74,122 -46,121 -30,125 L30,125 C46,121 74,122 112,134 C176,156 206,222 210,320 Z', '#111', 3.5);
+    fillLine(torso, 'M-210,320 C-206,222 -176,156 -112,134 C-74,122 -46,121 -30,125 L30,125 C46,121 74,122 112,134 C176,156 206,222 210,320 Z', '#fff', 3.5);
     // ลายขาววาฬ (ขอบหน้าเสื้อคลุม)
     fillLine(torso, 'M-104,142 C-128,176 -134,236 -122,320 L-86,320 C-94,250 -92,190 -78,146 Z', '#fff', 3);
     fillLine(torso, 'M104,142 C128,176 134,236 122,320 L86,320 C94,250 92,190 78,146 Z', '#fff', 3);
@@ -104,28 +104,30 @@
     // คอ
     fillLine(torso, 'M-26,96 L-24,132 C-10,140 10,140 24,132 L26,96 Z', '#fff', 3);
     el('path', { d: 'M-26,100 C-10,114 10,114 26,100 L25,118 C10,126 -10,126 -25,118 Z', fill: 'url(#tone-fine)', opacity: 0.55 }, torso);
-    // เชิ้ต (ช่อง V)
-    fillLine(torso, 'M-30,126 L0,196 L30,126 C12,134 -12,134 -30,126 Z', '#fff', 2.6);
-    // เนคไท (ม่วง)
-    fillLine(torso, 'M-9,134 L9,134 L7,149 L-7,149 Z', '#6a1b9a', 2.4);
-    fillLine(torso, 'M-7,149 L7,149 L12,200 L0,214 L-12,200 Z', '#7b1fa2', 2.4);
+    // สาบเสื้อนักเรียนแขนสั้น
+    line(torso, 'M0,132 L0,320', 2.5);
     // ปกเสื้อ
     fillLine(torso, 'M-30,125 L-10,150 L-3,133 Z', '#fff', 2.4);
     fillLine(torso, 'M30,125 L10,150 L3,133 Z', '#fff', 2.4);
-    // เสื้อกั๊ก
-    fillLine(torso, 'M-78,320 L-76,160 C-62,146 -44,134 -30,128 L0,198 L30,128 C44,134 62,146 76,160 L78,320 Z', '#2b2b2b', 3);
-    [226, 258, 290].forEach(y => el('circle', { cx: 0, cy: y, r: 3.6, fill: '#777', stroke: INK, 'stroke-width': 1.5 }, torso));
+    fillLine(torso, 'M-186,154 C-220,166 -238,204 -230,238 L-168,246 L-142,170 Z', '#fff', 3);
+    fillLine(torso, 'M186,154 C220,166 238,204 230,238 L168,246 L142,170 Z', '#fff', 3);
+    [-1, 1].forEach(s => fillLine(torso, `M${s * 34},220 L${s * 108},220 L${s * 104},276 L${s * 36},276 Z`, '#fff', 2));
+    [176, 218, 260, 302].forEach(y => el('circle', { cx: 0, cy: y, r: 3.2, fill: '#111' }, torso));
 
     // ป้ายชื่อ (จุดที่กล้องซูมเข้า)
-    const badge = el('g', { id: 'char-badge', transform: 'rotate(-3 -84 214)' }, torso);
-    fillLine(badge, 'M-140,201 L-28,201 L-28,227 L-140,227 Z', '#fff', 2.6);
-    el('rect', { x: -140, y: 201, width: 7, height: 26, fill: '#7b1fa2' }, badge);
+    const badge = el('g', { id: 'char-badge', transform: 'rotate(-2 -84 205)' }, torso);
+    fillLine(badge, 'M-148,190 L-22,190 L-22,224 L-148,224 Z', '#fff', 2.6);
+    el('rect', { x: -148, y: 190, width: 7, height: 34, fill: '#7b1fa2' }, badge);
     const nameText = el('text', {
-      id: 'char-name', x: -80, y: 219.5, 'text-anchor': 'middle',
-      'font-family': 'Noto Sans Thai, sans-serif', 'font-weight': 800, 'font-size': 12.5, fill: INK,
-      textLength: 96, lengthAdjust: 'spacingAndGlyphs'
+      id: 'char-name', x: -82, y: 211.5, 'text-anchor': 'middle',
+      'font-family': 'Noto Sans Thai, sans-serif', 'font-weight': 800, 'font-size': 11.5, fill: INK,
+      textLength: 108, lengthAdjust: 'spacingAndGlyphs'
     }, badge);
     nameText.textContent = content.name;
+    const school = el('g', { transform: 'translate(72 185)' }, torso);
+    el('path', { d: 'M0,0 L24,8 L20,36 L0,46 L-20,36 L-24,8 Z', fill: '#fff', stroke: INK, 'stroke-width': 3 }, school);
+    const schoolText = el('text', { x: 0, y: 28, 'text-anchor': 'middle', 'font-family': 'Noto Sans Thai,sans-serif', 'font-size': 15, 'font-weight': 900, fill: '#7b1fa2' }, school);
+    schoolText.textContent = 'บป.';
 
     /* --- หัว (ทั้งกลุ่มเอียงตามเมาส์ได้) --- */
     const head = el('g', { id: 'char-head' }, char);

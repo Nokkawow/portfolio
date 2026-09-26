@@ -315,6 +315,21 @@
 
     /* ---------- วาด / ถูลบ ด้วยมือผู้ใช้ ---------- */
     let mode = null, last = null, lastT = 0, grabOff = { x: 0, y: 0 };
+    let manualDone = false, manualComplete = null;
+    const erasedCells = new Set();
+    function markErased(cx, cy, radius) {
+      const cols = 12, rows = 7;
+      const x0 = Math.max(0, Math.floor((cx - radius) / W * cols));
+      const x1 = Math.min(cols - 1, Math.floor((cx + radius) / W * cols));
+      const y0 = Math.max(0, Math.floor((cy - radius) / H * rows));
+      const y1 = Math.min(rows - 1, Math.floor((cy + radius) / H * rows));
+      for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) erasedCells.add(`${x}:${y}`);
+      if (!manualDone && erasedCells.size / (cols * rows) >= .62) {
+        manualDone = true;
+        Sound.play('bell', 1);
+        if (manualComplete) manualComplete();
+      }
+    }
     function toSurface(e) {
       const r = surface.getBoundingClientRect();
       return { x: e.clientX - r.left, y: e.clientY - r.top };
@@ -353,7 +368,12 @@
         // จุดกลางแปรง (ด้านสักหลาด) ในพิกัดกระดาน
         const o = surfaceOffset();
         const cx = er.x + eraser.offsetWidth / 2 - o.x, cy = er.y + eraser.offsetHeight * 0.75 - o.y;
-        if (last.cx !== undefined) wipeStroke(ink, [[last.cx, last.cy], [cx, cy]], eraser.offsetHeight * 0.9);
+        if (last.cx !== undefined) {
+          const radius = eraser.offsetHeight * 0.48;
+          wipeStroke(ink, [[last.cx, last.cy], [cx, cy]], radius * 2);
+          wipeStroke(wipe, [[last.cx, last.cy], [cx, cy]], radius * 2);
+          markErased(cx, cy, radius);
+        }
         p.cx = cx; p.cy = cy;
         const v = Math.hypot(p.x - last.x, p.y - last.y) / Math.max(1, now - lastT);
         Sound.rub(Math.min(0.35, v * 0.2));
@@ -379,7 +399,7 @@
     layer.addEventListener('pointerup', end);
     layer.addEventListener('pointercancel', end);
 
-    function clearInk() { ink.clearRect(0, 0, W, H); }
+    function clearInk() { ink.clearRect(0, 0, W, H); erasedCells.clear(); manualDone = false; }
 
     function layout() { resize(); computeRest(); autoEraser(er.auto); }
     window.addEventListener('resize', () => { computeRest(); autoEraser(er.auto); });
@@ -390,6 +410,7 @@
       contactSlide: slides.length - 2,
       thanksSlide: slides.length - 1,
       show, setWipe, clearInk, layout,
+      onManualComplete(fn) { manualComplete = fn; },
       get current() { return current; }
     };
   };

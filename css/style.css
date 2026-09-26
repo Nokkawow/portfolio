@@ -244,6 +244,69 @@ body.playing .stage { touch-action: none; }
   filter: drop-shadow(4px 5px 0 rgba(0,0,0,.18));
 }
 #eraser svg { display: block; width: 100%; height: auto; }
+#chalk-dust { position: absolute; inset: 0; z-index: 3; pointer-events: none; opacity: 0; background-image: radial-gradient(circle, rgba(17,17,17,.26) 0 1px, transparent 1.6px); background-size: 19px 17px; mix-blend-mode: multiply; }
+
+/* ============================================================
+   เวลาผ่านไป + ห้องทำงาน + พอร์ตในจอ
+   ============================================================ */
+#time-layer, #workspace-layer { position: absolute; inset: 0; opacity: 0; visibility: hidden; }
+#time-layer { z-index: 8; overflow: hidden; display: grid; place-items: center; background: #0a0a0a; color: #fff; }
+.time-copy { position: absolute; z-index: 10; left: 7vw; bottom: 10vh; display: grid; gap: 4px; }
+.time-copy small, .room-caption small { color: #c28be0; font-weight: 900; letter-spacing: .18em; }
+.time-copy strong { font-size: clamp(32px, 6vw, 86px); line-height: 1; }
+#calendar-stack { position: relative; width: min(55vw, 620px); aspect-ratio: 4/3; perspective: 1000px; }
+.calendar-page { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; background: #fff; color: #111; border: 5px solid #111; box-shadow: 18px 20px 0 rgba(123,31,162,.65); transform-origin: 50% 0; }
+.calendar-page::before { content: ''; position: absolute; left: 8%; right: 8%; top: 10%; height: 14px; background: repeating-linear-gradient(90deg,#111 0 12px,transparent 12px 32px); }
+.calendar-page b { font-size: clamp(90px, 17vw, 230px); line-height: .85; }
+.calendar-page span { font-size: clamp(21px, 4vw, 46px); font-weight: 900; }
+.calendar-page small { color: var(--purple-2); font-size: clamp(16px, 2vw, 26px); font-weight: 900; }
+
+#workspace-layer { z-index: 9; overflow: hidden; background: #f7f7f4; color: #111; transform-origin: 74% 48%; }
+.room-tone { position: absolute; inset: 0; opacity: .36; background: radial-gradient(circle at 15% 20%,transparent 0 2px,#d8d8d8 2px 3px,transparent 3px) 0 0/18px 18px, linear-gradient(112deg,transparent 52%,rgba(123,31,162,.1) 52% 53%,transparent 53%); }
+.room-caption { position: absolute; z-index: 2; left: 6vw; top: 16vh; display: grid; gap: 12px; max-width: 36vw; }
+.room-caption strong { font-size: clamp(25px, 3.3vw, 58px); line-height: 1.22; }
+#work-desk { position: absolute; left: 35%; right: -4%; bottom: 5%; height: 23%; border: 6px solid #111; background: #fff; transform: skewX(-3deg); }
+#work-desk::before, #work-desk::after { content: ''; position: absolute; bottom: -65vh; width: 6px; height: 65vh; background: #111; }
+#work-desk::before { left: 8%; } #work-desk::after { right: 8%; }
+#work-desk i { position: absolute; left: 6%; bottom: 100%; width: 16%; height: 22%; border: 5px solid #111; background: repeating-linear-gradient(#fff 0 13%,#ddd 13% 16%); }
+#work-chair { position: absolute; z-index: 3; left: 45%; bottom: 9%; width: clamp(190px, 23vw, 360px); height: 58%; transform-origin: 50% 88%; }
+.chair-back { position: absolute; left: 12%; top: 20%; width: 76%; height: 55%; border: 6px solid #111; border-radius: 45% 45% 25% 25%; background: #151515; box-shadow: inset 0 0 0 14px #fff; }
+.chair-seat { position: absolute; left: 5%; right: 5%; bottom: 5%; height: 20%; border: 6px solid #111; background: #fff; border-radius: 50%; }
+#work-character { position: absolute; z-index: 2; left: 22%; top: 7%; width: 56%; height: 62%; transform-style: preserve-3d; }
+.work-hair, .work-face, .work-shirt { position: absolute; display: block; left: 50%; transform: translateX(-50%); border: 5px solid #111; }
+.work-hair { top: 0; width: 100%; aspect-ratio: 1; border-radius: 48% 52% 42% 45%; background: radial-gradient(circle at 70% 30%,#7b1fa2 0 7%,transparent 8%), repeating-linear-gradient(115deg,#17101c 0 12px,#341540 13px 19px); }
+.work-face { top: 15%; width: 68%; aspect-ratio: 1; border-radius: 46%; background: #fff; opacity: 0; }
+.work-face::before { content: '⌁  ⌁'; position: absolute; inset: 42% 0 auto; text-align: center; font-weight: 900; }
+.work-shirt { top: 48%; width: 90%; height: 52%; border-radius: 44% 44% 18% 18%; background: #fff; }
+.work-shirt::after { content: ''; position: absolute; left: 50%; top: 0; width: 4px; height: 100%; background: #111; }
+#monitor-shell { position: absolute; z-index: 4; right: 4%; top: 12%; width: min(52vw, 900px); aspect-ratio: 16/11; transform-origin: 50% 45%; }
+.monitor-bezel { position: absolute; inset: 0 0 12%; padding: 3.8% 3.2% 5%; border: 7px solid #111; border-radius: 3%; background: #171717; box-shadow: 12px 15px 0 rgba(0,0,0,.18); }
+.monitor-camera { position: absolute; width: 8px; height: 8px; border-radius: 50%; background: #777; left: 50%; top: 1.6%; }
+.monitor-brand { position: absolute; bottom: 1.4%; left: 0; right: 0; text-align: center; color: #aaa; font-size: 10px; letter-spacing: .25em; }
+.monitor-stand { position: absolute; left: 42%; right: 42%; top: 88%; bottom: 0; background: #111; }
+.monitor-stand::after { content: ''; position: absolute; left: -75%; right: -75%; bottom: 0; height: 18%; background: #111; border-radius: 999px; }
+#monitor-screen { position: relative; width: 100%; height: 100%; overflow: hidden; background: #fff; }
+#portfolio-track { height: 100%; display: flex; width: max-content; will-change: transform; }
+.portfolio-panel { position: relative; flex: none; width: calc(min(52vw, 900px) * .936); height: 100%; padding: clamp(18px, 3.5vw, 58px); overflow: hidden; background: #fff; display: grid; }
+.project-panel { grid-template-columns: 48% 1fr; gap: 5%; align-items: center; }
+.project-index { position: absolute; left: 3%; top: 3%; color: var(--purple-2); font-size: clamp(9px, .85vw, 13px); font-weight: 900; letter-spacing: .18em; }
+.project-gallery { position: relative; height: 64%; perspective: 800px; }
+.stack-photo { position: absolute; inset: 0; border: 4px solid #111; background: #ddd; box-shadow: 8px 9px 0 rgba(0,0,0,.13); overflow: hidden; transition: transform .35s ease, z-index 0s; }
+.stack-photo:nth-child(2) { transform: rotate(5deg) translate(7%,5%); }.stack-photo:nth-child(3) { transform: rotate(-6deg) translate(-6%,8%); }.stack-photo:nth-child(4) { transform: rotate(9deg) translate(10%,10%); }.stack-photo:nth-child(5) { transform: rotate(-10deg) translate(-10%,12%); }
+.stack-photo.active { z-index: 8; transform: rotate(0) translate(0,-5%) scale(1.08); }
+.stack-photo.full { position: fixed; inset: 7vh 7vw; width: auto; height: auto; z-index: 100; transform: none; }
+.stack-photo img { width: 100%; height: 100%; object-fit: cover; }
+.project-copy h2, .monitor-contact h2, .monitor-thanks h2 { font-size: clamp(24px, 3.1vw, 54px); line-height: 1; margin: .25em 0; }
+.project-date { font-size: clamp(9px, .9vw, 14px); color: #666; font-weight: 800; }
+.project-about { font-size: clamp(12px, 1.15vw, 19px); font-weight: 800; line-height: 1.35; margin-bottom: .8em; }
+.project-copy dl { display: grid; gap: .55em; font-size: clamp(9px, .85vw, 14px); }
+.project-copy dl div { border-top: 2px solid #111; padding-top: .45em; }.project-copy dt { font-weight: 900; }.project-copy dd { color: #555; }
+.project-actions { display: flex; gap: 8px; margin-top: 1em; flex-wrap: wrap; }.project-actions a,.coming-link { padding: .65em 1em; border: 2px solid #111; font-size: clamp(9px,.8vw,13px); font-weight: 900; text-decoration: none; }.project-actions a:hover { background: var(--purple-2); color: #fff; }
+.winner-stamp { display: inline-block; color: var(--purple-2); border: 3px solid var(--purple-2); padding: .3em .55em; transform: rotate(-3deg); font-size: clamp(8px,.75vw,12px); font-weight: 900; }
+.monitor-contact { grid-template-columns: .8fr 1.2fr; gap: 7%; align-items: center; }.monitor-contact > div:first-child { position: relative; }.monitor-contact-list { display: grid; gap: 10px; }.monitor-contact-list a { display: grid; padding: 1em; border: 3px solid #111; color: #111; text-decoration: none; transition: .2s; }.monitor-contact-list a:hover,.monitor-contact-list a.copied { transform: translateY(-4px); border-color: var(--purple-2); }.monitor-contact-list small { color: var(--purple-2); font-weight: 900; }.monitor-contact-list strong { word-break: break-word; }
+.monitor-thanks { place-items: center; text-align: center; }.monitor-thanks > div { position: relative; }.mini-mascot { width: 80px; aspect-ratio: 1; margin: 30px auto 0; border: 5px solid #111; border-radius: 50%; display: grid; place-items: center; color: var(--purple-2); font-size: 45px; font-weight: 900; animation: bob 1.8s ease-in-out infinite alternate; }
+.turn-hint { position: absolute; z-index: 7; right: 12%; bottom: 5%; padding: .55em 1em; border-radius: 99px; background: #111; color: #fff; font-size: 12px; font-weight: 900; }
+@keyframes bob { to { transform: translateY(-10px) rotate(4deg); } }
 
 /* สไลด์บนกระดาน */
 #slides { position: absolute; inset: 0; }
@@ -393,6 +456,20 @@ body.playing .stage { touch-action: none; }
    RESPONSIVE — จอแนวตั้ง / มือถือ
    ============================================================ */
 @media (max-aspect-ratio: 1/1) {
+  #calendar-stack { width: 78vw; }
+  .time-copy { left: 8vw; bottom: 8vh; }
+  .room-caption { left: 7vw; top: 12vh; max-width: 82vw; }
+  #work-desk { left: 8%; right: -40%; bottom: 3%; }
+  #work-chair { left: 8%; width: 44vw; bottom: 8%; }
+  #monitor-shell { right: 11%; top: 28%; width: 78vw; }
+  .portfolio-panel { width: calc(78vw * .936); padding: 18px; }
+  .project-panel { grid-template-columns: 1fr; grid-template-rows: 43% 1fr; gap: 4%; }
+  .project-gallery { height: 90%; width: 72%; margin: auto; }
+  .project-copy h2, .monitor-contact h2, .monitor-thanks h2 { font-size: clamp(20px, 6vw, 38px); }
+  .project-copy dl { display: none; }
+  .monitor-contact { grid-template-columns: 1fr; align-content: center; gap: 6%; }
+  .monitor-contact-list { gap: 6px; }
+  .turn-hint { right: 4%; bottom: 3%; }
   .s3-text { top: auto; bottom: calc(var(--gutter) + 130px); transform: none; right: var(--gutter); left: var(--gutter); }
   .s3-text p {
     font-size: clamp(22px, 6.4vw, 40px); text-align: left; display: inline-block; padding: 10px 16px;
