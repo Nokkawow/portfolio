@@ -178,6 +178,7 @@ window.CONTENT = {
       team: 'ไซเบอร์บิด (Cyber Bit)',
       teamSize: 4,
       role: 'ระบบเกมทั้งหมด · แก้บั๊ก',
+      host: { name: 'สจล.', logo: 'assets/logos/kmitl.webp' },   // Mini Game Jam 2026 KMITL
       images: [
         'assets/projects/404reborn/shot1.jpg',
         'assets/projects/404reborn/shot2.jpg',
