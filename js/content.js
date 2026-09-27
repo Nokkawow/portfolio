@@ -27,8 +27,8 @@ window.CONTENT = {
     text: 'จากคนที่เล่นเกมอยู่หน้าจอ<br>ผมจะสร้าง<em>โลกของตัวเอง</em><br>ให้คนอื่นเข้ามาเล่นได้ไหม?',
     imageNote: 'รูปเกมที่เคยเล่น',
     // คลังเกม Steam ของเจ้าของ (ตัดเฉพาะแผงปกเกม · เล่นไป-ย้อนกลับ จึงวนต่อกันเนียน)
-    video: 'assets/video/steam-library.mp4',
-    poster: 'assets/video/steam-library-poster.jpg',
+    video: 'assets/video/steam-library.mp4?v=2',
+    poster: 'assets/video/steam-library-poster.jpg?v=2',
     videoLabel: 'คลังเกมที่ผมเคยเล่น'
   },
 
