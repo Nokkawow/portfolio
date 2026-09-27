@@ -115,6 +115,7 @@
     const TROPHY = '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M14 6h20v10a10 10 0 0 1-20 0z" fill="#ffd54a" stroke="#111" stroke-width="3" stroke-linejoin="round"/><path d="M14 10H7c0 7 3 10 8 11M34 10h7c0 7-3 10-8 11" fill="none" stroke="#111" stroke-width="3" stroke-linecap="round"/><path d="M21 26h6v7h-6z" fill="#ffd54a" stroke="#111" stroke-width="3"/><path d="M14 33h20v8H14z" fill="#7b1fa2" stroke="#111" stroke-width="3" stroke-linejoin="round"/><path d="M19 11v6" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>';
     const awardBanner = (p) => `<div class="award-banner"><span class="ab-icon">${TROPHY}</span><div><b>${esc(p.award)}</b>${p.awardSub ? `<small>${esc(p.awardSub)}</small>` : ''}</div><i aria-hidden="true">✦</i></div>`;
     const NEW_BADGE = '<span class="nw-new">NEW</span>';
+    const hostBadge = (p) => p.host ? `<span class="host-badge" data-host="${esc(p.host.name)}" title="จัดโดย ${esc(p.host.name)}"><img src="${esc(p.host.logo)}" alt="จัดโดย ${esc(p.host.name)}"></span>` : '';
     // คลิป YouTube ดูได้ในหน้าข่าว: โชว์ภาพปกก่อน กดเล่นแล้วค่อยโหลดตัวเล่นจริง (หน้าเว็บจึงไม่หนัก)
     const ytId = (u) => { const m = String(u).match(/(?:youtu\.be\/|[?&]v=|embed\/|shorts\/)([\w-]{11})/); return m ? m[1] : null; };
     function clipPlayer(p) {
@@ -139,7 +140,7 @@
       </article>
       <div class="nw-list">${newestFirst.slice(1).map((p) => `
         <article class="nw-card" data-open="${p.idx}" tabindex="0">
-          <img src="${esc(p.images[0])}" alt="">
+          <figure class="nw-card-img"><img src="${esc(p.images[0])}" alt="">${hostBadge(p)}</figure>
           <div><span class="nw-tag">${esc(newsOf(p).tag)}</span><h3>${esc(newsOf(p).headline)}</h3><p>${esc(newsOf(p).deck)}</p></div>
         </article>`).join('')}</div>
       <footer class="nw-foot">คลิกข่าวเพื่อเปิดแท็บใหม่ · เลื่อนหน้าเว็บต่อเพื่อไปหน้าติดต่อ</footer>`;
@@ -172,6 +173,7 @@
           ...[].concat(p.video || []).map((v) => typeof v === 'string' ? { url: v, label: 'ดูวิดีโอ' } : v).map((v) => `<a href="${esc(v.url)}" target="_blank" rel="noopener">${esc(v.label || 'ดูวิดีโอ')} ↗</a>`)
         ].filter(Boolean).join('') || '<span class="coming-link">ลิงก์เกมกำลังเตรียมเผยแพร่</span>';
         page.innerHTML = `
+          ${hostBadge(p)}
           <div class="na-media">${p.award ? awardBanner(p) : ''}<div class="na-gallery">${gallery(p)}</div>${clipPlayer(p)}</div>
           <div class="na-copy">
             <span class="nw-tag">${esc(n.tag)}</span>${p.idx === lead.idx ? NEW_BADGE : ''}

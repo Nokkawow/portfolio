@@ -55,6 +55,7 @@ window.CONTENT = {
       teamSize: 4,
       role: 'ระบบเกม · UI/UX · ดีไซน์',
       award: '',
+      host: { name: 'Hamster Hub', logo: 'assets/logos/hamster-hub.webp' },   // ผู้จัดงาน (โลโก้กลมมุมขวาบนของข่าว)
       images: [                     // รูปแรก = รูปหลัก
         'assets/projects/penguin/shot1.jpg',
         'assets/projects/penguin/shot2.jpg',
@@ -145,6 +146,7 @@ window.CONTENT = {
       team: 'ฤดูร้อนไม่มีเธอ เหมือนก่อน เหมือนเก่า ขาดเธอเฮ้อเฮ้อเฮอเฮ้อเฮอ',
       teamSize: 4,
       role: 'Dev ระบบเกมทั้งหมด · Testing & Debugging',
+      host: { name: 'Hamster Hub', logo: 'assets/logos/hamster-hub.webp' },   // ผู้จัดงาน (โลโก้กลมมุมขวาบนของข่าว)
       images: [
         'assets/projects/lookup/shot1.jpg',
         'assets/projects/lookup/shot2.jpg',     // ป้ายรางวัลอันดับ 3

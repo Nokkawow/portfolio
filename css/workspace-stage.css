@@ -118,3 +118,23 @@ body.finale #contact-mascot { animation: cm-breathe 3.2s ease-in-out infinite; t
 .clip-screen:hover img { transform: scale(1.04); filter: brightness(.85); }
 .clip-play { position: absolute; left: 50%; top: 50%; width: 3.4em; height: 3.4em; margin: -1.7em 0 0 -1.7em; display: grid; place-items: center; padding-left: .2em; border: 3px solid #111; border-radius: 50%; background: #7b1fa2; color: #fff; font-size: 1.1em; box-shadow: 3px 4px 0 #111; transition: transform .2s ease; }
 .clip-screen:hover .clip-play { transform: scale(1.12); }
+
+/* ---------- โลโก้ผู้จัดงาน (Hamster Hub) แบบกลม ติดมุมขวาบนของข่าว ---------- */
+.news-article { position: relative; }
+.host-badge {
+  position: absolute; z-index: 5; display: block; width: clamp(46px, 5.5em, 84px); aspect-ratio: 1;
+  border: 3px solid #111; border-radius: 50%; overflow: hidden; background: #ffd54a;
+  box-shadow: 3px 4px 0 #7b1fa2; transform: rotate(8deg);
+}
+.host-badge img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.news-article > .host-badge { top: .2em; right: .5em; overflow: visible; }
+.news-article > .host-badge img { border-radius: 50%; }
+.news-article > .host-badge::after {
+  content: 'จัดโดย ' attr(data-host); position: absolute; left: 50%; top: calc(100% + .35em); transform: translateX(-50%);
+  white-space: nowrap; padding: .1em .5em; background: #111; color: #fff; border-radius: 999px; font-size: .62em; font-weight: 800;
+}
+.news-article:has(> .host-badge) .na-copy > .nw-tag + h2, .news-article:has(> .host-badge) .na-copy > h2 { padding-right: 4.2em; }
+.br-view { overflow-x: hidden; }
+.news-article > .host-badge:hover { transform: rotate(-4deg) scale(1.08); transition: transform .25s ease; }
+.nw-card-img { position: relative; margin: 0; }
+.nw-card-img .host-badge { top: -.6em; right: -.6em; width: clamp(30px, 3.2em, 52px); border-width: 2px; box-shadow: 2px 3px 0 #7b1fa2; }
