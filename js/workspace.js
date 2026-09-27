@@ -139,9 +139,9 @@
         <div><span class="nw-tag">${esc(newsOf(lead).tag)}</span>${NEW_BADGE}<h2>${esc(newsOf(lead).headline)}</h2><p>${esc(newsOf(lead).deck)}</p><em>อ่านต่อ →</em></div>
       </article>
       <div class="nw-list">${newestFirst.slice(1).map((p) => `
-        <article class="nw-card" data-open="${p.idx}" tabindex="0">
-          <figure class="nw-card-img"><img src="${esc(p.images[0])}" alt="">${hostBadge(p)}</figure>
-          <div><span class="nw-tag">${esc(newsOf(p).tag)}</span><h3>${esc(newsOf(p).headline)}</h3><p>${esc(newsOf(p).deck)}</p></div>
+        <article class="nw-card${p.award ? ' nw-award' : ''}" data-open="${p.idx}" tabindex="0">
+          <figure class="nw-card-img"><img src="${esc(p.images[0])}" alt="">${hostBadge(p)}${p.award ? `<span class="nw-shine" aria-hidden="true"></span><span class="nw-ribbon">${TROPHY}${esc(p.awardShort || p.awardSub || 'รางวัล')}</span>` : ''}</figure>
+          <div>${p.award ? '<i class="nw-spark s1" aria-hidden="true">✦</i><i class="nw-spark s2" aria-hidden="true">✦</i><i class="nw-spark s3" aria-hidden="true">✧</i>' : ''}<span class="nw-tag">${esc(newsOf(p).tag)}</span><h3>${esc(newsOf(p).headline)}</h3><p>${esc(newsOf(p).deck)}</p></div>
         </article>`).join('')}</div>
       <footer class="nw-foot">คลิกข่าวเพื่อเปิดแท็บใหม่ · เลื่อนหน้าเว็บต่อเพื่อไปหน้าติดต่อ</footer>`;
     view.appendChild(home);

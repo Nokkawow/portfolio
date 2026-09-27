@@ -111,6 +111,7 @@
 
 | วันที่ | ใคร | ทำอะไร |
 |---|---|---|
+| 2026-09-27 | Claude | v66: ข่าวที่ได้รางวัลในหน้าแรก (.nw-award): กรอบออร่าทอง-ม่วงหมุน (@property --aura) + เรืองแสงเต้นเป็นจังหวะ + ป้ายถ้วยบนรูป (awardShort) + แสงวิ่งผ่านรูป + ประกายรอบหัวข่าว + ไฮไลต์เหลืองใต้พาดหัว |
 | 2026-09-27 | Claude | v65: จอโรงหนังตอนเปิดเว็บเปลี่ยน NOK PRESENTS → NIN PRESENTS |
 | 2026-09-27 | Claude | v64: ตราพระเกี้ยว สจล. (จาก Wikipedia: King Mongkut's Institute of Technology Ladkrabang logo.svg) เป็นโลโก้ผู้จัดของข่าว 404 : REBORN (Mini Game Jam 2026 KMITL) |
 | 2026-09-27 | Claude | v63: โลโก้ผู้จัด Hamster Hub (Game Jam X · Rainy Game Jam) แบบกลม มุมขวาบนของข่าว + ป้าย "จัดโดย" และมุมรูปในหน้าแรก (content: host) |

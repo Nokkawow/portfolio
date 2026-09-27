@@ -138,3 +138,41 @@ body.finale #contact-mascot { animation: cm-breathe 3.2s ease-in-out infinite; t
 .news-article > .host-badge:hover { transform: rotate(-4deg) scale(1.08); transition: transform .25s ease; }
 .nw-card-img { position: relative; margin: 0; }
 .nw-card-img .host-badge { top: -.6em; right: -.6em; width: clamp(30px, 3.2em, 52px); border-width: 2px; box-shadow: 2px 3px 0 #7b1fa2; }
+
+/* ---------- ข่าวที่ได้รางวัล: ออร่าทอง-ม่วงหมุนรอบกรอบ + ป้ายถ้วย + แสงวิบวับวิ่งผ่านรูป (เด่นกว่าข่าวอื่นทั้งหมด) ---------- */
+@property --aura { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+.nw-card.nw-award {
+  position: relative; border: 4px solid transparent; padding: 1em;
+  background: linear-gradient(#fffdf5, #fff) padding-box,
+              conic-gradient(from var(--aura), #ffd54a, #ff9f1c, #9c3fc4, #ff3b6b, #ffd54a) border-box;
+  box-shadow: 0 0 0 2px #111, 0 0 18px 2px rgba(255, 196, 0, .55), 0 0 42px 6px rgba(156, 63, 196, .35);
+  animation: aura-spin 3.2s linear infinite, aura-pulse 2.2s ease-in-out infinite;
+}
+.nw-card.nw-award:hover, .nw-card.nw-award:focus-visible {
+  transform: translate(-3px, -4px) scale(1.01);
+  box-shadow: 0 0 0 2px #111, 6px 7px 0 #111, 0 0 28px 6px rgba(255, 196, 0, .75), 0 0 60px 12px rgba(156, 63, 196, .45);
+}
+@keyframes aura-spin { to { --aura: 360deg; } }
+@keyframes aura-pulse { 50% { box-shadow: 0 0 0 2px #111, 0 0 30px 6px rgba(255, 196, 0, .8), 0 0 64px 14px rgba(156, 63, 196, .45); } }
+.nw-card.nw-award img { filter: none; }
+.nw-card.nw-award h3 { text-decoration: underline .38em #ffe27a; text-underline-offset: -.18em; text-decoration-skip-ink: none; }
+.nw-card.nw-award > div { position: relative; }
+.nw-card.nw-award .nw-tag { background: linear-gradient(90deg, #6a1b9a, #9c3fc4); box-shadow: 2px 2px 0 #111; }
+/* แสงวิ่งผ่านรูป */
+.nw-card-img { overflow: visible; }
+.nw-shine { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.nw-shine::before { content: ''; position: absolute; top: -20%; bottom: -20%; width: 35%; left: -60%; background: linear-gradient(100deg, transparent, rgba(255,255,255,.75), transparent); transform: skewX(-18deg); animation: aura-shine 2.8s ease-in-out infinite; }
+@keyframes aura-shine { 0%, 40% { left: -60%; } 80%, 100% { left: 130%; } }
+/* ป้ายถ้วยบนรูป */
+.nw-ribbon {
+  position: absolute; left: -.6em; bottom: .7em; z-index: 4; display: inline-flex; align-items: center; gap: .35em;
+  padding: .3em .8em .3em .45em; background: linear-gradient(90deg, #ffd54a, #ffb300); color: #111;
+  border: 2.5px solid #111; border-radius: 6px; box-shadow: 3px 3px 0 #111; font-weight: 900; font-size: .9em; transform: rotate(-4deg);
+}
+.nw-ribbon svg { width: 1.5em; height: 1.5em; }
+/* ประกายรอบหัวข่าว */
+.nw-spark { position: absolute; font-style: normal; color: #ffb300; text-shadow: 0 0 6px #fff3b0; pointer-events: none; animation: aura-twinkle 1.8s ease-in-out infinite; }
+.nw-spark.s1 { top: -.6em; right: 6%; font-size: 1.5em; }
+.nw-spark.s2 { bottom: -.4em; right: 30%; font-size: 1.1em; animation-delay: .6s; color: #9c3fc4; }
+.nw-spark.s3 { top: 30%; right: -.3em; font-size: 1.2em; animation-delay: 1.1s; }
+@keyframes aura-twinkle { 0%, 100% { opacity: .2; transform: scale(.6) rotate(0); } 50% { opacity: 1; transform: scale(1.2) rotate(25deg); } }
