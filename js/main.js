@@ -237,13 +237,13 @@
   // 9) ในจอ = เบราว์เซอร์ Nokkawow News — กดอ่านข่าวได้อิสระ (ไม่กดก็เลื่อนผ่านได้)
   tl.fromTo('#browser', { autoAlpha: 0, scale: .96 }, { autoAlpha: 1, scale: 1, duration: .6, ease: 'back.out(1.5)' }, 'monitor+=1.2');
   tl.addLabel('news', 'monitor+=1.9');
-  // มาสคอตค่อยๆ โผล่หัวจากหลังจอมาแอบดูว่าเราอ่านข่าวอะไร
-  tl.fromTo('#news-peek', { autoAlpha: 0, xPercent: -35, rotation: -8 }, { autoAlpha: 1, xPercent: 0, rotation: 0, duration: .8, ease: 'back.out(1.6)', immediateRender: false }, 'news+=.4');
+  // มาสคอตโผล่ขึ้นมาจากขอบล่างข้างจอคอม แอบดูว่าเราอ่านข่าวอะไร
+  tl.fromTo('#news-peek', { autoAlpha: 0, yPercent: 60, rotation: 6 }, { autoAlpha: 1, yPercent: 0, rotation: 0, duration: .8, ease: 'back.out(1.6)', immediateRender: false }, 'news+=.4');
   tl.to({}, { duration: 5 }, 'news');   // ค้างให้เลือกอ่านข่าว
 
   // 10) ซูมออกจากจอ → เจอมาสคอตนั่งหน้าคอม ทักทาย + บัตรขูดติดต่อ
   tl.addLabel('zoomout');
-  tl.to('#news-peek', { autoAlpha: 0, xPercent: -35, duration: .4 }, 'zoomout');
+  tl.to('#news-peek', { autoAlpha: 0, yPercent: 60, duration: .4 }, 'zoomout');
   tl.to(Workspace.camera, { p: 0, duration: 1.6, ease: 'power3.inOut', onUpdate: Workspace.renderCamera }, 'zoomout');
   tl.to(['#work-desk', '#work-cpu', '#work-papers', '.room-tone'], { autoAlpha: 1, duration: .8 }, 'zoomout+=.4');
   tl.to('#work-chair', { autoAlpha: 1, yPercent: 0, scale: 1, duration: .8 }, 'zoomout+=.6');

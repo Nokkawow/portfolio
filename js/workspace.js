@@ -55,8 +55,8 @@
         shell.style[prop] = frame[k] + 'px';
       });
       // มาสคอตแอบดู: ซ่อนตัวครึ่งหนึ่งหลังขอบขวาของจอคอม (ขยับตามกล้อง)
-      const peekH = frame.h * .45, peekW = peekH * 592 / 492;
-      px(peekEl, { left: frame.x + frame.w - peekW * .42, top: frame.y + frame.h * .1, width: peekW, height: peekH });
+      const peekH = Math.min(h * .52, frame.h * .8), peekW = peekH * 592 / 492;
+      px(peekEl, { left: frame.x + frame.w - peekW * .3, top: h - peekH * .86, width: peekW, height: peekH });
       if (stageBox && stageBox.w === w && stageBox.h === h) return;   // ส่วนอื่นขยับเฉพาะตอนขนาดจอเปลี่ยน
       stageBox = { w, h };
       // โต๊ะ: กว้างเกือบเต็มฉาก หน้าโต๊ะหนาพอดีตา
@@ -115,6 +115,15 @@
     const TROPHY = '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M14 6h20v10a10 10 0 0 1-20 0z" fill="#ffd54a" stroke="#111" stroke-width="3" stroke-linejoin="round"/><path d="M14 10H7c0 7 3 10 8 11M34 10h7c0 7-3 10-8 11" fill="none" stroke="#111" stroke-width="3" stroke-linecap="round"/><path d="M21 26h6v7h-6z" fill="#ffd54a" stroke="#111" stroke-width="3"/><path d="M14 33h20v8H14z" fill="#7b1fa2" stroke="#111" stroke-width="3" stroke-linejoin="round"/><path d="M19 11v6" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>';
     const awardBanner = (p) => `<div class="award-banner"><span class="ab-icon">${TROPHY}</span><div><b>${esc(p.award)}</b>${p.awardSub ? `<small>${esc(p.awardSub)}</small>` : ''}</div><i aria-hidden="true">✦</i></div>`;
     const NEW_BADGE = '<span class="nw-new">NEW</span>';
+    // คลิป YouTube ดูได้ในหน้าข่าว: โชว์ภาพปกก่อน กดเล่นแล้วค่อยโหลดตัวเล่นจริง (หน้าเว็บจึงไม่หนัก)
+    const ytId = (u) => { const m = String(u).match(/(?:youtu\.be\/|[?&]v=|embed\/|shorts\/)([\w-]{11})/); return m ? m[1] : null; };
+    function clipPlayer(p) {
+      const vids = [].concat(p.video || []).map((v) => typeof v === 'string' ? { url: v, label: 'ดูวิดีโอ' } : v)
+        .map((v) => ({ ...v, id: ytId(v.url) })).filter((v) => v.id);
+      if (!vids.length) return '';
+      const tabs = vids.length > 1 ? `<div class="clip-tabs" role="tablist">${vids.map((v, i) => `<button type="button" role="tab" data-clip="${v.id}" aria-selected="${!i}">${esc(v.label.replace(/^ดู/, ''))}</button>`).join('')}</div>` : '';
+      return `<div class="clip-box">${tabs}<button type="button" class="clip-screen" data-yt="${vids[0].id}" aria-label="เล่นคลิป ${esc(vids[0].label)}"><img src="https://i.ytimg.com/vi/${vids[0].id}/hqdefault.jpg" alt="" loading="lazy"><span class="clip-play" aria-hidden="true">▶</span></button></div>`;
+    }
 
     // หน้าแรก: พาดหัวข่าว
     const home = document.createElement('section');
@@ -163,7 +172,7 @@
           ...[].concat(p.video || []).map((v) => typeof v === 'string' ? { url: v, label: 'ดูวิดีโอ' } : v).map((v) => `<a href="${esc(v.url)}" target="_blank" rel="noopener">${esc(v.label || 'ดูวิดีโอ')} ↗</a>`)
         ].filter(Boolean).join('') || '<span class="coming-link">ลิงก์เกมกำลังเตรียมเผยแพร่</span>';
         page.innerHTML = `
-          <div class="na-media">${p.award ? awardBanner(p) : ''}<div class="na-gallery">${gallery(p)}</div></div>
+          <div class="na-media">${p.award ? awardBanner(p) : ''}<div class="na-gallery">${gallery(p)}</div>${clipPlayer(p)}</div>
           <div class="na-copy">
             <span class="nw-tag">${esc(n.tag)}</span>${p.idx === lead.idx ? NEW_BADGE : ''}
             <h2>${esc(n.headline)}</h2>
@@ -329,6 +338,28 @@
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openBox(c); }
       else if (e.key === 'ArrowRight') { e.preventDefault(); cycle(gal, { x: 1, y: 0 }); refocus(gal); }
       else if (e.key === 'ArrowLeft') { e.preventDefault(); cycle(gal, { x: -1, y: 0 }, true); refocus(gal); }
+    });
+    view.addEventListener('click', (e) => {
+      const tab = e.target.closest('[data-clip]');
+      const screen = e.target.closest('.clip-screen');
+      if (tab) {
+        const box = tab.closest('.clip-box');
+        box.querySelectorAll('[data-clip]').forEach((b) => b.setAttribute('aria-selected', String(b === tab)));
+        const old = box.querySelector('.clip-screen, iframe');
+        const s = document.createElement('button');
+        s.type = 'button'; s.className = 'clip-screen'; s.dataset.yt = tab.dataset.clip; s.setAttribute('aria-label', 'เล่นคลิป');
+        s.innerHTML = `<img src="https://i.ytimg.com/vi/${tab.dataset.clip}/hqdefault.jpg" alt=""><span class="clip-play" aria-hidden="true">▶</span>`;
+        old.replaceWith(s);
+        return;
+      }
+      if (screen) {
+        const f = document.createElement('iframe');
+        f.src = `https://www.youtube-nocookie.com/embed/${screen.dataset.yt}?autoplay=1&rel=0&playsinline=1`;
+        f.title = 'คลิปเกม'; f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen'; f.allowFullscreen = true;
+        f.className = 'clip-frame';
+        screen.replaceWith(f);
+        Sound.play('click', .2);
+      }
     });
     view.addEventListener('click', (e) => {
       const b = e.target.closest('[data-deck]');
