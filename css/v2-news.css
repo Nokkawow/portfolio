@@ -146,7 +146,7 @@ body.finale #workspace-layer { background:radial-gradient(circle at 83% 75%,#f1e
   padding: 3.2% 3.2% 0; background: #fff; border: 2px solid #111; border-radius: 3px;
   box-shadow: 5px 6px 0 rgba(123,31,162,.28), 0 10px 22px rgba(0,0,0,.12);
   cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none;
-  will-change: transform; transform-style: preserve-3d;
+  transform-style: flat;   /* flat: ให้ z-index เป็นตัวตัดสินว่าใบไหนอยู่บน (preserve-3d บางเครื่องวาดตามลำดับ DOM) */
 }
 .polaroid.top { box-shadow: 8px 10px 0 rgba(123,31,162,.38), 0 16px 30px rgba(0,0,0,.18); }
 .polaroid.dragging { cursor: grabbing; box-shadow: 14px 18px 0 rgba(123,31,162,.3), 0 26px 40px rgba(0,0,0,.25); }

@@ -29,7 +29,9 @@
 
     addSlide('slide-question', `
       <p class="b-text b-big write">${C.question.text}</p>
-      <figure class="photo placeholder pop"><span>${C.question.imageNote}</span></figure>
+      ${C.question.video
+        ? `<figure class="photo game-video pop"><video src="${C.question.video}" poster="${C.question.poster || ''}" muted loop autoplay playsinline preload="auto" aria-label="${C.question.videoLabel || ''}"></video><figcaption>${C.question.videoLabel || ''}</figcaption></figure>`
+        : `<figure class="photo placeholder pop"><span>${C.question.imageNote}</span></figure>`}
     `);
 
     C.projects.forEach((p) => {

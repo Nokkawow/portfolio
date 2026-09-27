@@ -31,6 +31,7 @@
     const chairEl = document.getElementById('work-chair');
     const papersEl = document.getElementById('work-papers');
     const rageEl = document.getElementById('mascot-rage');
+    const peekEl = document.getElementById('news-peek');
     const px = (el, box) => { for (const k in box) el.style[k] = box[k] + 'px'; };
     let stageBox = null;
     function layout() {
@@ -53,6 +54,9 @@
         frame[k] = a[k] + (b[k] - a[k]) * p;
         shell.style[prop] = frame[k] + 'px';
       });
+      // มาสคอตแอบดู: ซ่อนตัวครึ่งหนึ่งหลังขอบขวาของจอคอม (ขยับตามกล้อง)
+      const peekH = frame.h * .45, peekW = peekH * 592 / 492;
+      px(peekEl, { left: frame.x + frame.w - peekW * .42, top: frame.y + frame.h * .1, width: peekW, height: peekH });
       if (stageBox && stageBox.w === w && stageBox.h === h) return;   // ส่วนอื่นขยับเฉพาะตอนขนาดจอเปลี่ยน
       stageBox = { w, h };
       // โต๊ะ: กว้างเกือบเต็มฉาก หน้าโต๊ะหนาพอดีตา
@@ -107,6 +111,10 @@
         <div class="deck-bar"><button type="button" data-deck="prev" aria-label="ภาพก่อนหน้า">‹</button><span class="deck-count">1 / ${n}</span><button type="button" data-deck="next" aria-label="ภาพถัดไป">›</button><small>ลากปัดภาพออกได้เลย</small></div>` : ''}`;
     }
     const newsOf = (p) => p.news || { tag: 'ผลงาน', headline: p.title, deck: '' };
+    // ป้ายรางวัลใหญ่เหนือกองรูป (ให้เห็นเด่นตั้งแต่แวบแรก)
+    const TROPHY = '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M14 6h20v10a10 10 0 0 1-20 0z" fill="#ffd54a" stroke="#111" stroke-width="3" stroke-linejoin="round"/><path d="M14 10H7c0 7 3 10 8 11M34 10h7c0 7-3 10-8 11" fill="none" stroke="#111" stroke-width="3" stroke-linecap="round"/><path d="M21 26h6v7h-6z" fill="#ffd54a" stroke="#111" stroke-width="3"/><path d="M14 33h20v8H14z" fill="#7b1fa2" stroke="#111" stroke-width="3" stroke-linejoin="round"/><path d="M19 11v6" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>';
+    const awardBanner = (p) => `<div class="award-banner"><span class="ab-icon">${TROPHY}</span><div><b>${esc(p.award)}</b>${p.awardSub ? `<small>${esc(p.awardSub)}</small>` : ''}</div><i aria-hidden="true">✦</i></div>`;
+    const NEW_BADGE = '<span class="nw-new">NEW</span>';
 
     // หน้าแรก: พาดหัวข่าว
     const home = document.createElement('section');
@@ -117,8 +125,8 @@
       <header class="nw-mast"><h1>${esc(site.name)}</h1><p>${esc(site.tagline)}</p></header>
       <div class="nw-ticker"><b>ข่าวด่วน</b><div><span>${newestFirst.map((p) => esc(newsOf(p).headline)).join(' &nbsp;✦&nbsp; ')}</span></div></div>
       <article class="nw-lead" data-open="${lead.idx}" tabindex="0">
-        <img src="${esc(lead.images[0])}" alt="">
-        <div><span class="nw-tag">${esc(newsOf(lead).tag)}</span><h2>${esc(newsOf(lead).headline)}</h2><p>${esc(newsOf(lead).deck)}</p><em>อ่านต่อ →</em></div>
+        <figure class="nw-lead-img"><img src="${esc(lead.images[0])}" alt="">${NEW_BADGE}</figure>
+        <div><span class="nw-tag">${esc(newsOf(lead).tag)}</span>${NEW_BADGE}<h2>${esc(newsOf(lead).headline)}</h2><p>${esc(newsOf(lead).deck)}</p><em>อ่านต่อ →</em></div>
       </article>
       <div class="nw-list">${newestFirst.slice(1).map((p) => `
         <article class="nw-card" data-open="${p.idx}" tabindex="0">
@@ -155,9 +163,9 @@
           ...[].concat(p.video || []).map((v) => typeof v === 'string' ? { url: v, label: 'ดูวิดีโอ' } : v).map((v) => `<a href="${esc(v.url)}" target="_blank" rel="noopener">${esc(v.label || 'ดูวิดีโอ')} ↗</a>`)
         ].filter(Boolean).join('') || '<span class="coming-link">ลิงก์เกมกำลังเตรียมเผยแพร่</span>';
         page.innerHTML = `
-          <div class="na-gallery">${gallery(p)}${p.award ? `<span class="winner-stamp">${esc(p.award)}${p.awardSub ? ' · ' + esc(p.awardSub) : ''}</span>` : ''}</div>
+          <div class="na-media">${p.award ? awardBanner(p) : ''}<div class="na-gallery">${gallery(p)}</div></div>
           <div class="na-copy">
-            <span class="nw-tag">${esc(n.tag)}</span>
+            <span class="nw-tag">${esc(n.tag)}</span>${p.idx === lead.idx ? NEW_BADGE : ''}
             <h2>${esc(n.headline)}</h2>
             <p class="na-by">${[p.date, p.duration && 'ใช้เวลา ' + p.duration, 'โดยกองบรรณาธิการ ' + site.name].filter(Boolean).map(esc).join(' · ')}</p>
             <p class="na-deck">${esc(n.deck)}</p>
@@ -429,26 +437,79 @@
     document.querySelector('#fin-bubble .b1').textContent = fin.hello;
     document.querySelector('#fin-bubble .b2').textContent = fin.bye;
     document.getElementById('fin-thanks').innerHTML = content.thanks.title;
+    /* ---------- มาสคอตหน้าติดต่อ: ลากได้ · ชี้แล้วเอียงตาม · จิ้มแล้วกระโดดพูดประโยคสุ่ม · ขูดการ์ดเปิดแล้วเชียร์ ---------- */
     const contactMascot = document.getElementById('contact-mascot');
+    const mImg = contactMascot.querySelector('img');
+    const bubbleText = document.querySelector('#fin-bubble .b1');
+    const LINES = ['ขูดการ์ดดูสิ มีช่องทางติดต่อซ่อนอยู่นะ!', 'จิ้มผมทำไมเนี่ย ฮ่าๆ', 'ทักมาคุยเรื่องเกมกันได้เลยครับ!', 'อยากทำเกมด้วยกันไหม?', 'อย่าลืมไปลองเล่นเกมผมนะ!', 'ฮึบ! กระโดดสูงไหมครับ?', 'ขอบคุณที่ดูมาถึงตรงนี้นะครับ'];
+    let lineIdx = -1, sayTimer = null, busy = false;
+    function say(text, hold = 2600) {
+      bubbleText.textContent = text;
+      gsap.fromTo('#fin-bubble', { scale: .85 }, { scale: 1, duration: .45, ease: 'back.out(3)', overwrite: 'auto' });
+      clearTimeout(sayTimer);
+      sayTimer = setTimeout(() => { bubbleText.textContent = fin.hello; }, hold);
+    }
+    function popFx(icons, n = 6) {
+      const r = contactMascot.getBoundingClientRect(), sr = stage.getBoundingClientRect();
+      for (let k = 0; k < n; k++) {
+        const s = document.createElement('i');
+        s.className = 'cm-fx'; s.textContent = icons[k % icons.length];
+        s.style.left = (r.left - sr.left + r.width * (.3 + Math.random() * .4)) + 'px';
+        s.style.top = (r.top - sr.top + r.height * .2) + 'px';
+        contactMascot.parentNode.appendChild(s);
+        gsap.to(s, { x: gsap.utils.random(-90, 90), y: gsap.utils.random(-130, -60), rotation: gsap.utils.random(-40, 40), autoAlpha: 0, duration: 1.1, ease: 'power2.out', onComplete: () => s.remove() });
+      }
+    }
+    function hop(height = 60) {
+      if (busy) return;
+      busy = true;
+      gsap.timeline({ onComplete: () => { busy = false; } })
+        .to(mImg, { scaleY: .9, scaleX: 1.06, transformOrigin: '50% 100%', duration: .12, ease: 'power2.out' })
+        .to(mImg, { y: -height, scaleY: 1.06, scaleX: .96, duration: .28, ease: 'power2.out' })
+        .to(mImg, { y: 0, scaleY: 1, scaleX: 1, duration: .32, ease: 'bounce.out' });
+    }
+    function mascotCheer() { hop(80); say('เย้! เปิดได้แล้ว ทักมาได้เลยนะ!'); popFx(['✦', '★', '♪'], 8); Sound.play('pop', .3); }
     let mascotDrag = null;
     contactMascot.addEventListener('pointerdown', (e) => {
-      mascotDrag = { x: e.clientX, y: e.clientY };
-      contactMascot.setPointerCapture(e.pointerId);
-      Sound.play('pop', .12);
+      mascotDrag = { x: e.clientX, y: e.clientY, moved: 0 };
+      try { contactMascot.setPointerCapture(e.pointerId); } catch (_) {}
+      gsap.killTweensOf(mImg, 'x,y,rotation');
     });
     contactMascot.addEventListener('pointermove', (e) => {
-      if (!mascotDrag) return;
-      const x = Math.max(-65, Math.min(65, (e.clientX - mascotDrag.x) * .42));
-      const y = Math.max(-45, Math.min(45, (e.clientY - mascotDrag.y) * .35));
-      gsap.set(contactMascot.querySelector('img'), { x, y, rotation: x * .08 });
+      if (mascotDrag) {
+        const dx = e.clientX - mascotDrag.x, dy = e.clientY - mascotDrag.y;
+        mascotDrag.moved = Math.max(mascotDrag.moved, Math.hypot(dx, dy));
+        const x = Math.max(-65, Math.min(65, dx * .42)), y = Math.max(-45, Math.min(45, dy * .35));
+        gsap.set(mImg, { x, y, rotation: x * .08 });
+        return;
+      }
+      if (e.pointerType !== 'mouse' || busy) return;
+      // ชี้เมาส์: เอนตัวตามนิดๆ เหมือนหันมามอง
+      const r = contactMascot.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width - .5;
+      gsap.to(mImg, { rotation: px * 6, x: px * 10, duration: .4, overwrite: 'auto' });
     });
+    contactMascot.addEventListener('pointerleave', () => { if (!mascotDrag && !busy) gsap.to(mImg, { rotation: 0, x: 0, duration: .6, ease: 'elastic.out(1,.5)' }); });
     const releaseMascot = () => {
       if (!mascotDrag) return;
+      const tap = mascotDrag.moved < 6;
       mascotDrag = null;
-      gsap.to(contactMascot.querySelector('img'), { x: 0, y: 0, rotation: 0, duration: reduce ? .01 : .65, ease: 'elastic.out(1,.45)' });
+      gsap.to(mImg, { x: 0, y: 0, rotation: 0, duration: .65, ease: 'elastic.out(1,.45)' });
+      if (tap) {
+        lineIdx = (lineIdx + 1) % LINES.length;
+        say(LINES[lineIdx]);
+        hop();
+        popFx(['♪', '✦', '?'], 5);
+        Sound.play('pop', .2);
+      } else {
+        say('เวียนหัวแล้วคร้าบ~', 1800);
+      }
     };
     contactMascot.addEventListener('pointerup', releaseMascot);
     contactMascot.addEventListener('pointercancel', releaseMascot);
+    contactMascot.setAttribute('role', 'button');
+    contactMascot.tabIndex = 0;
+    contactMascot.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); lineIdx = (lineIdx + 1) % LINES.length; say(LINES[lineIdx]); hop(); } });
 
     // ชั้นเงินสำหรับขูด
     const covers = [...finCards.querySelectorAll('.sc-cover')].map((cv) => ({ cv, ctx: cv.getContext('2d'), done: false, last: null, moves: 0 }));
@@ -483,6 +544,7 @@
       gsap.to(c.cv, { autoAlpha: 0, duration: .45, onComplete: () => { c.cv.style.pointerEvents = 'none'; } });
       const card = c.cv.closest('.sc-card');
       card.classList.add('revealed');
+      mascotCheer();
       gsap.fromTo(card, { scale: .94 }, { scale: 1, duration: .5, ease: 'back.out(3)' });
       Sound.play('pop');
       for (let k = 0; k < 8; k++) {
@@ -643,6 +705,18 @@
       });
     });
     markPapers();
+
+    /* ---------- มาสคอตแอบดูตอนอ่านข่าว: จิ้มแล้วพูดประโยคใหม่ ---------- */
+    const PEEK_LINES = ['อ่านข่าวผมอยู่เหรอ?', 'ข่าวไหนเจ๋งสุด บอกหน่อย!', 'ลองปัดรูปดูสิ ปัดได้นะ', 'เกมนี้ผมภูมิใจมากเลย', 'แอบดูนิดนึงนะ ฮิๆ'];
+    let peekIdx = 0;
+    const peekBubble = peekEl.querySelector('.np-bubble');
+    peekEl.addEventListener('click', () => {
+      peekIdx = (peekIdx + 1) % PEEK_LINES.length;
+      peekBubble.textContent = PEEK_LINES[peekIdx];
+      gsap.fromTo(peekEl.querySelector('img'), { y: 0 }, { y: -18, duration: .16, yoyo: true, repeat: 1, ease: 'power2.out' });
+      gsap.fromTo(peekBubble, { scale: .7 }, { scale: 1, duration: .4, ease: 'back.out(3)' });
+      Sound.play('pop', .2);
+    });
 
     /* ---------- CPU: คนดูกดปิดคอม → จอดับ → มาสคอตหัวร้อน เอื้อมไปกดเปิดเอง → จอติดขึ้นมาทำงานต่อ ---------- */
     const workspace = document.getElementById('workspace-layer');
