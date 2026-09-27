@@ -111,6 +111,7 @@
 
 | วันที่ | ใคร | ทำอะไร |
 |---|---|---|
+| 2026-09-27 | Claude | v65: จอโรงหนังตอนเปิดเว็บเปลี่ยน NOK PRESENTS → NIN PRESENTS |
 | 2026-09-27 | Claude | v64: ตราพระเกี้ยว สจล. (จาก Wikipedia: King Mongkut's Institute of Technology Ladkrabang logo.svg) เป็นโลโก้ผู้จัดของข่าว 404 : REBORN (Mini Game Jam 2026 KMITL) |
 | 2026-09-27 | Claude | v63: โลโก้ผู้จัด Hamster Hub (Game Jam X · Rainy Game Jam) แบบกลม มุมขวาบนของข่าว + ป้าย "จัดโดย" และมุมรูปในหน้าแรก (content: host) |
 | 2026-09-27 | Claude | v62: ตัดวิดีโอคลังเกมช่วง 6 วินาทีแรก (ปกยังโหลดไม่ครบ) ออก เหลือลูป 14 วินาที |
