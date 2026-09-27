@@ -36,6 +36,14 @@
 /* หน้าติดต่อ: ใช้ข้อความทักทายชุดเดียว (ข้อความลาอยู่บนเวทีขอบคุณแล้ว) กันตัวอักษรซ้อนกัน */
 #fin-bubble .b2 { display: none; }
 
-@media (prefers-reduced-motion: reduce) {
-  #workspace-layer.computer-boot #monitor-screen::after { animation: none; }
+/* หน้าติดต่อ (จอแนวนอน): การ์ด 4 ใบเรียงแถวเดียวด้านล่าง เปิดพื้นที่กลางจอให้ทางเดินภาพผลงาน */
+@media (min-aspect-ratio: 1/1) {
+  body.finale #fin-cards { left: 4%; right: 34%; width: auto; top: auto; bottom: 7%; }
+  body.finale #fin-cards > h2, body.finale #fin-cards > p { text-shadow: 0 0 8px #fff, 0 0 3px #fff; }
+  body.finale .sc-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(10px, 1.2vw, 20px); }
+  body.finale .sc-card { min-height: clamp(96px, 11vw, 170px); }
+  body.finale .sc-inner { flex-direction: column; align-items: flex-start; justify-content: center; gap: .5em; font-size: clamp(11px, 1.05vw, 18px); }
+  body.finale .sc-logo { width: 2.4em; height: 2.4em; }
+  body.finale .sc-card:nth-child(odd) { transform: rotate(-1.5deg); }
+  body.finale .sc-card:nth-child(even) { transform: rotate(1.5deg) translateY(-6%); }
 }

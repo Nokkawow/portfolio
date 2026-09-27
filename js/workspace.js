@@ -235,7 +235,7 @@
       markTop(cards, order);
       order.forEach((ci, k) => {
         const v = { ...stackPose(k), x: 0, y: 0, rotationX: 0, rotationY: 0 };
-        if (instant || reduce) gsap.set(cards[ci], v);
+        if (instant) gsap.set(cards[ci], v);
         else gsap.to(cards[ci], { ...v, duration: 0.55, ease: 'back.out(1.5)', overwrite: 'auto' });
       });
       setCount(gal);
@@ -253,7 +253,6 @@
       const c = cards[order[0]], w = gal.clientWidth;
       order.push(order.shift());
       Sound.play('whoosh', 0.04);
-      if (reduce) { layoutStack(gal, true); return; }
       markTop(cards, order);
       c.style.zIndex = 60;                       // ขณะบินออกยังลอยอยู่บนสุด
       setCount(gal);
@@ -286,7 +285,7 @@
         return;
       }
       // เมาส์ชี้ใบบนสุด: การ์ดเอียงตามตำแหน่งเมาส์
-      if (e.pointerType !== 'mouse' || reduce) return;
+      if (e.pointerType !== 'mouse') return;
       const c = e.target.closest('.polaroid.top');
       if (!c) return;
       const r = c.getBoundingClientRect();
@@ -372,7 +371,7 @@
     (function initStream() {
       const P = { perspective: 30, cardWidth: 18, cardHeight: 25, cardRadius: 0.4, birthHeight: 2.6, exitHeight: 46,
         railBirth: -11, railExit: 44, fan: 3.3, turnBirth: 6, turnExit: 28, stops: 24 };
-      const CARDS = 9, SPEED = 22, AXIS = 52;
+      const CARDS = 9, SPEED = 22, AXIS = 44;
       // จุดลับตาอยู่ในช่องว่างระหว่างการ์ดติดต่อกับมาสคอต (จอแนวตั้งกลับมาอยู่กลาง)
       const CENTER = matchMedia('(max-aspect-ratio: 1/1)').matches ? 50 : 59;
       const imgs = content.projects.flatMap((p) => (p.images || []).map((src) => ({ src, alt: p.title })));
@@ -540,17 +539,16 @@
       refillTimer = null;
       papers.forEach((p) => { p.classList.remove('gone', 'flying', 'dragging'); gsap.killTweensOf(p); gsap.set(p, { clearProps: 'transform,opacity,visibility' }); });
       paperWrap.classList.remove('stack-dragging');
-      markTop();
-      if (reduce) return;
+      markPapers();
       // กองใหม่ร่วงลงมาเรียงจากล่างขึ้นบน
       gsap.from(papers, { y: -stage.clientHeight * .45, rotation: () => gsap.utils.random(-25, 25), autoAlpha: 0, duration: .45, stagger: .045, ease: 'back.out(1.3)' });
       Sound.play('paper', .2);
     }
     function scheduleRefill() {
-      if (!onDesk().length && !refillTimer) refillTimer = setTimeout(refill, reduce ? 300 : 1500);
+      if (!onDesk().length && !refillTimer) refillTimer = setTimeout(refill, 1500);
     }
     // ป้ายและ aria ตามหน้าที่ของแต่ละแผ่นตอนนี้
-    function markTop() {
+    function markPapers() {
       const desk = onDesk(), t = desk.at(-1), base = desk[0];
       papers.forEach((p) => {
         p.classList.toggle('is-top', p === t);
@@ -566,7 +564,6 @@
       paper.tabIndex = -1;
       const dir = Math.sign(vx) || (Math.random() < .5 ? -1 : 1);
       const W = stage.clientWidth, H = stage.clientHeight;
-      if (reduce) { gsap.to(paper, { autoAlpha: 0, duration: .2, delay, onComplete: () => { paper.classList.add('gone'); scheduleRefill(); } }); return; }
       const sway = gsap.utils.random(40, 90);
       gsap.timeline({ delay, onComplete: () => { paper.classList.add('gone'); scheduleRefill(); } })
         .to(paper, { x: `+=${gsap.utils.clamp(-W * .5, W * .5, vx * .32)}`, y: `+=${gsap.utils.clamp(-H * .4, H * .2, vy * .22) - 40}`,
@@ -585,9 +582,9 @@
       // ฐานหลุดก่อน แล้วแผ่นบนๆ ค่อยเอนตามและร่วงตามกัน (แผ่นสูงยิ่งเหวี่ยงไกล)
       stack.forEach((p, i) => {
         const k = i / Math.max(1, stack.length - 1);
-        blowAway(p, dir * (380 + k * 900 + gsap.utils.random(-120, 120)), -120 - k * 260, reduce ? 0 : .04 + i * .05);
+        blowAway(p, dir * (380 + k * 900 + gsap.utils.random(-120, 120)), -120 - k * 260, .04 + i * .05);
       });
-      markTop();
+      markPapers();
     }
     papers.forEach((paper) => {
       let drag = null;
@@ -633,7 +630,7 @@
         if (moved < 6) { Sound.play('paper', .2); gsap.to(paper, { x: 0, y: 0, rotation: 0, duration: .3 }); return; }
         Sound.play('paper', .3);
         blowAway(paper, d.vx || (d.px - d.x0) * 6, d.vy || (d.py - d.y0) * 6);
-        markTop();
+        markPapers();
       };
       paper.addEventListener('pointerup', release);
       paper.addEventListener('pointercancel', release);
@@ -642,10 +639,10 @@
         if (e.detail !== 0) return;
         const desk = onDesk();
         if (paper === desk[0] && desk.length > 1) toppleStack(1);
-        else if (paper === desk.at(-1)) { blowAway(paper, 900, -200); markTop(); }
+        else if (paper === desk.at(-1)) { blowAway(paper, 900, -200); markPapers(); }
       });
     });
-    markTop();
+    markPapers();
 
     /* ---------- CPU: คนดูกดปิดคอม → จอดับ → มาสคอตหัวร้อน เอื้อมไปกดเปิดเอง → จอติดขึ้นมาทำงานต่อ ---------- */
     const workspace = document.getElementById('workspace-layer');
@@ -666,7 +663,6 @@
       if (!powerOn || gag) return;              // กำลังเล่นมุกอยู่ รอให้จบก่อน
       setPower(false);
       workspace.classList.add('mascot-angry');
-      if (reduce) { gag = setTimeout(() => { gag = null; setPower(true); workspace.classList.remove('mascot-angry'); }, 400); return; }
       // สั่นเพราะโกรธ → เอนตัวเอื้อมไปทาง CPU → กดเปิด → กลับมานั่งทำงานต่อ
       const reach = cpu.getBoundingClientRect().left - chair.getBoundingClientRect().right;
       gag = gsap.timeline({ onComplete: () => { gag = null; workspace.classList.remove('mascot-angry'); } })
